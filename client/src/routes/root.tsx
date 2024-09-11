@@ -7,12 +7,9 @@ function Root() {
   }, []);
 
   return (
-    <div className="container-fluid d-flex flex-column vh-100">
-      <div className="row flex-shrink-0  border-bottom p-3">
-        <h1 className="h5 mb-0">Fixed Header</h1>
-      </div>
-      <div className="row flex-grow-1 overflow-hidden">
-        <div className="col-3 border-end overflow-auto h-100 px-0">
+    <div className="container-fluid d-flex flex-column">
+      <div className="row overflow-hidden vh-100">
+        <div className="col-3 border-end h-100 px-0">
           <div className="p-3">
             <ul className="list-unstyled">
               <li>
@@ -27,13 +24,17 @@ function Root() {
             </ul>
           </div>
         </div>
-        <div className="col-6 overflow-x-hidden overflow-y-auto h-100 px-0">
+        <div className="col h-100 px-0 overflow-y-auto">
+          <h4 className="d-flex border-bottom sticky-top bg-dark py-2 justify-content-center">
+            <a className="header px-5"> Trending </a>
+            <a className="header px-5"> Following </a>
+          </h4>
           <div>
             <Outlet />
           </div>
         </div>
-        <div className="col-3 border-start overflow-auto h-100 px-0">
-          <div className="p-3">:)</div>
+        <div className="col-3 border-start h-100 px-0">
+          <div className="">:)</div>
         </div>
       </div>
     </div>

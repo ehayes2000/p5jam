@@ -1,6 +1,8 @@
 export interface User {
   userId: number;
   displayName: string;
+  commentCount: number;
+  postCount: number;
 }
 
 export interface Post {

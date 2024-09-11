@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getPosts } from "../client";
+import formatNumber from "../junkDrawer/formatNumber";
 import { type Post } from "../types";
 
 function Explore() {
@@ -10,31 +11,16 @@ function Explore() {
       .then((posts) => setPosts(posts))
       .then(() => console.log("SET", posts));
   }, []);
-
-  function formatNumber(num: number) {
-    let absNum = Math.abs(num);
-
-    if (absNum >= 1e6) {
-      // Format for millions
-      return (num / 1e6).toFixed(1).replace(/\.0$/, "") + "m";
-    } else if (absNum >= 1e3) {
-      // Format for thousands
-      return (num / 1e3).toFixed(1).replace(/\.0$/, "") + "k";
-    } else {
-      // Format for numbers under 1000
-      return num.toString();
-    }
-  }
   return (
-    <div>
+    <div className="d-flex flex-column flex-grow-1">
       {posts.length === 0 ? (
         <div> loading ... </div>
       ) : (
         posts.map((p) => (
-          <div key={`${p.postId}`} className="post row border-bottom px-5 py-3">
+          <div key={`${p.postId}`} className="post border-bottom px-5 py-3">
             <h4 className="post-author px-1"> {p.author.displayName} </h4>
             <p className="post-description px-1"> {p.description} </p>
-            <p className="post-script p-1"> {p.script} </p>
+            <p className="post-script p-1 rounded"> {p.script} </p>
             <span className="p-0 d-flex justify-content-between">
               <span className="comment-icon px-1">
                 <i className="bi bi-chat"></i>

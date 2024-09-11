@@ -4,14 +4,20 @@ let users: User[] = [
   {
     userId: 0,
     displayName: "Bird Guy",
+    commentCount: 2,
+    postCount: 2,
   },
   {
     userId: 1,
     displayName: "Rat Guy",
+    commentCount: 1,
+    postCount: 1,
   },
   {
     userId: 2,
     displayName: "Feet Guy",
+    commentCount: 100,
+    postCount: 200,
   },
 ];
 let maxUser = 2;
@@ -100,6 +106,8 @@ export async function createUser(name: string): Promise<User | null> {
   const newUser: User = {
     displayName: name,
     userId: maxUser,
+    postCount: 0,
+    commentCount: 0,
   };
   users.push(newUser);
   return newUser;
