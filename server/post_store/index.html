@@ -1,21 +1,13 @@
-import { PrismaClient, Prisma } from '@prisma/client'
-import { v4 as uuid } from 'uuid'
-
-const prisma = new PrismaClient()
-
-const userData: Prisma.UserCreateInput[] = [
-  {
-    id: uuid(),
-    name: 'Alice',
-    email: 'alice@prisma.io',
-    password: '$2a$10$TLtC603wy85MM./ot/pvEec0w2au6sjPaOmLpLQFbxPdpJH9fDwwS', // myPassword42
-    posts: {
-      create: [
-        {
-          description: 'https://pris.ly/discord',
-          published: true,
-          id: uuid(),
-          script: `const h = 510
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/addons/p5.sound.min.js"></script>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <script>
+      const h = 510
       const w = 510
       const cellSize = 10
       const cy = h / cellSize
@@ -176,30 +168,7 @@ const userData: Prisma.UserCreateInput[] = [
           }
         }
         step = false
-      }`,
-        },
-      ],
-    },
-  },
-]
-
-async function main() {
-  console.log(`Start seeding ...`)
-  for (const u of userData) {
-    const user = await prisma.user.create({
-      data: u,
-    })
-    console.log(`Created user with id: ${user.id}`)
-  }
-  console.log(`Seeding finished.`)
-}
-
-main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
-  .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
+      }
+    </script>
+  </body>
+</html>

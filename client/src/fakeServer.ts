@@ -1,20 +1,21 @@
 import { type User, type Post } from "./types";
+import { v4 as uuid } from "uuid";
 
 let users: User[] = [
   {
-    userId: 0,
+    id: uuid(),
     displayName: "Bird Guy",
     commentCount: 2,
     postCount: 2,
   },
   {
-    userId: 1,
+    id: uuid(),
     displayName: "Rat Guy",
     commentCount: 1,
     postCount: 1,
   },
   {
-    userId: 2,
+    id: uuid(),
     displayName: "Feet Guy",
     commentCount: 100,
     postCount: 200,
@@ -27,51 +28,51 @@ let posts: Post[] = [
     likeCount: 4,
     viewCount: 100,
     description: "I love birds !",
-    script: "let birds = true;",
+    script: "http://localhost:8000/index.html",
     published: new Date(),
     author: users[0],
     commentCount: 1,
-    postId: 1,
+    id: uuid(),
   },
   {
     likeCount: 40,
     viewCount: 100000,
     description: "I hate birds",
-    script: "let birds = die;",
+    script: "http://localhost:8000/index.html",
     published: new Date(),
     author: users[1],
     commentCount: 40,
-    postId: 2,
+    id: uuid(),
   },
   {
     likeCount: -4,
     viewCount: 10,
     description: "too many posts about birds guys",
-    script: "let toes = true;",
+    script: "http://localhost:8000/index.html",
     published: new Date(),
     author: users[2],
     commentCount: 3,
-    postId: 3,
+    id: uuid(),
   },
   {
     likeCount: -400,
     viewCount: 10,
     description: "Why am I being downvoted?",
-    script: "I didn't do this part",
+    script: "http://localhost:8000/index.html",
     published: new Date(),
     author: users[2],
     commentCount: 100,
-    postId: 4,
+    id: uuid(),
   },
   {
     likeCount: 1200,
     viewCount: 12000,
     description: "ur wierd",
-    script: "//boids algorithm",
+    script: "http://localhost:8000/index.html",
     published: new Date(),
     author: users[0],
     commentCount: 100,
-    postId: 4,
+    id: uuid(),
   },
 ];
 export async function getPosts(): Promise<Post[]> {
@@ -105,7 +106,7 @@ export async function createUser(name: string): Promise<User | null> {
   maxUser++;
   const newUser: User = {
     displayName: name,
-    userId: maxUser,
+    id: uuid(),
     postCount: 0,
     commentCount: 0,
   };

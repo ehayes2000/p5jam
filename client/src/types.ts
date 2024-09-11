@@ -1,5 +1,5 @@
 export interface User {
-  userId: number;
+  id: string;
   displayName: string;
   commentCount: number;
   postCount: number;
@@ -9,9 +9,11 @@ export interface Post {
   likeCount: number;
   viewCount: number;
   description: string;
-  script: string;
+  script: string; // is an html string
   published: Date;
   author: User;
-  postId: number;
+  id: string;
   commentCount: number;
 }
+
+// TODO create draft
