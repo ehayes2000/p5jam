@@ -42,6 +42,7 @@ const Query = objectType({
         return context.prisma.post.findMany()
       },
     })
+
     t.nullable.field('me', {
       type: 'User',
       resolve: (parent, args, context: Context) => {
@@ -62,38 +63,6 @@ const Query = objectType({
       resolve: (_parent, args, context: Context) => {
         return context.prisma.post.findUnique({
           where: { id: args.id || undefined },
-        })
-      },
-    })
-
-    t.nonNull.list.nonNull.field('feed', {
-      type: 'Post',
-      args: {
-        searchString: stringArg(),
-        skip: intArg(),
-        take: intArg(),
-        orderBy: arg({
-          type: 'PostOrderByUpdatedAtInput',
-        }),
-      },
-      resolve: (_parent, args, context: Context) => {
-        const or = args.searchString
-          ? {
-              OR: [
-                { title: { contains: args.searchString } },
-                { content: { contains: args.searchString } },
-              ],
-            }
-          : {}
-
-        return context.prisma.post.findMany({
-          where: {
-            published: true,
-            ...or,
-          },
-          take: args.take || undefined,
-          skip: args.skip || undefined,
-          orderBy: args.orderBy || undefined,
         })
       },
     })
@@ -190,8 +159,8 @@ const Mutation = objectType({
         const userId = getUserId(context)
         return context.prisma.post.create({
           data: {
-            title: args.data.title,
-            description: args.data.content,
+            description: args.data.content || undefined,
+            content: args.data.content || undefined,
             authorId: userId,
           },
         })
@@ -254,21 +223,48 @@ const Mutation = objectType({
   },
 })
 
+// const User = objectType({
+//   name: 'User',
+//   definition(t) {
+//     t.nonNull.int('id')
+//     t.nonNull.string('email')
+//     t.nonNull.string('name')
+//     t.nonNull.list.nonNull.field('posts', {
+//       type: 'Post',
+//       resolve: async (parent, _, context: Context) => {
+//         const posts = await context.prisma.user
+//           .findUnique({
+//             where: { id: parent.id },
+//           })
+//           .posts()
+//         return posts ?? []
+//       },
+//     })
+//   },
+// })
+
 const User = objectType({
   name: 'User',
   definition(t) {
     t.nonNull.int('id')
-    t.string('name')
     t.nonNull.string('email')
+    t.nonNull.string('name')
     t.nonNull.list.nonNull.field('posts', {
       type: 'Post',
-      resolve: (parent, _, context: Context) => {
-        // TODO why is this an error?
-        return context.prisma.user
+      resolve: async (parent, _, context: Context) => {
+        const posts = await context.prisma.user
           .findUnique({
-            where: { id: parent.id || undefined },
+            where: { id: parent.id },
           })
           .posts()
+
+        // Map the Prisma result to match the Nexus schema exactly
+        return (posts ?? []).map((post) => ({
+          ...post,
+          authorId: post.authorId ?? parent.id, // Ensure authorId is never null
+          createdAt: post.createdAt.toISOString(), // Convert Date to string
+          updatedAt: post.updatedAt.toISOString(), // Convert Date to string
+        }))
       },
     })
   },
@@ -280,8 +276,8 @@ const Post = objectType({
     t.nonNull.int('id')
     t.nonNull.field('createdAt', { type: 'DateTime' })
     t.nonNull.field('updatedAt', { type: 'DateTime' })
-    t.nonNull.string('title')
-    t.string('description')
+    t.nonNull.string('description')
+    t.nonNull.string('content')
     t.nonNull.string('script')
     t.nonNull.boolean('published')
     t.nonNull.int('likeCount')
@@ -291,11 +287,12 @@ const Post = objectType({
       resolve: (parent, _, context: Context) => {
         return context.prisma.post
           .findUnique({
-            where: { id: parent.id || undefined },
+            where: { id: parent.id },
           })
           .author()
       },
     })
+    t.nonNull.int('authorId')
   },
 })
 
@@ -322,7 +319,6 @@ const UserUniqueInput = inputObjectType({
 const PostCreateInput = inputObjectType({
   name: 'PostCreateInput',
   definition(t) {
-    t.nonNull.string('title')
     t.string('content')
   },
 })

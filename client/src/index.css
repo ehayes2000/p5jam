@@ -1,2 +1,24 @@
+html, 
+body { 
+  height: 100%;
+  /* background-color: red; */
+}
 
+#root{ 
+  height: 100%;
+  width: 100%;
+}
 
+.post-author { 
+  font-size: medium;
+  font-weight: bold;
+}
+
+.post-description { 
+
+}
+
+.post-script { 
+  border-radius: .25rem;
+  background-color: rgb(29, 29, 29);
+}

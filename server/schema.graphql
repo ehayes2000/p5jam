@@ -23,20 +23,20 @@ type Mutation {
 
 type Post {
   author: User
+  authorId: Int!
+  content: String!
   createdAt: DateTime!
-  description: String
+  description: String!
   id: Int!
   likeCount: Int!
   published: Boolean!
   script: String!
-  title: String!
   updatedAt: DateTime!
   viewCount: Int!
 }
 
 input PostCreateInput {
   content: String
-  title: String!
 }
 
 input PostOrderByUpdatedAtInput {
@@ -46,7 +46,6 @@ input PostOrderByUpdatedAtInput {
 type Query {
   allUsers: [User!]!
   draftsByUser(userUniqueInput: UserUniqueInput!): [Post]
-  feed(orderBy: PostOrderByUpdatedAtInput, searchString: String, skip: Int, take: Int): [Post!]!
   me: User
   postById(id: Int): Post
   posts: [Post]
@@ -61,7 +60,7 @@ enum SortOrder {
 type User {
   email: String!
   id: Int!
-  name: String
+  name: String!
   posts: [Post!]!
 }
 

@@ -8,10 +8,10 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
+  id       Int    @id @default(autoincrement())
+  email    String @unique
   password String
-  name     String?
+  name     String
   posts    Post[]
 }
 
@@ -19,12 +19,12 @@ model Post {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  title       String
-  description String?
+  description String   @default("")
+  content     String   @default("")
   script      String   @default("")
   published   Boolean  @default(false)
   likeCount   Int      @default(0)
   viewCount   Int      @default(0)
   author      User?    @relation(fields: [authorId], references: [id])
-  authorId    Int?
+  authorId    Int
 }

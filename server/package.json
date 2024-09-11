@@ -1,14 +1,14 @@
 {
-  "name": "graphql-auth",
+  "name": "graphql",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node-dev --no-notify --respawn --transpile-only src/server",
-    "start": "node dist/server",
+    "dev": "bun --watch src/server.ts",
+    "start": "bun src/server.ts",
     "clean": "rm -rf dist",
-    "build": "npm -s run clean && npm -s run generate && tsc",
-    "generate": "npm -s run generate:prisma && npm -s run generate:nexus",
-    "generate:prisma": "prisma generate",
-    "generate:nexus": "ts-node --transpile-only src/schema"
+    "build": "bun run clean && bun run generate && bun build --target=bun ./src/server.ts --outdir ./dist",
+    "generate": "bun run generate:prisma && bun run generate:nexus",
+    "generate:prisma": "bunx prisma generate",
+    "generate:nexus": "bun run src/schema.ts"
   },
   "prettier": {
     "semi": false,
