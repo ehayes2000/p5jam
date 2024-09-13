@@ -11,17 +11,15 @@ function Root() {
       <div className="row overflow-hidden vh-100">
         <div className="col-3 border-end h-100 px-0">
           <div className="p-3">
-            <ul className="list-unstyled">
-              <li>
-                <Link to="users/">Users</Link>
-              </li>
-              <li>
-                <Link to="explore/">Explore</Link>
-              </li>
-              <li>
-                <Link to="makePost/">New Post</Link>
-              </li>
-            </ul>
+            <div>
+              <Link to="users/">Users</Link>
+            </div>
+            <div>
+              <Link to="explore/">Explore</Link>
+            </div>
+            <div>
+              <Link to="makePost/">New Post</Link>
+            </div>
           </div>
         </div>
         <div className="col h-100 px-0 overflow-y-auto">

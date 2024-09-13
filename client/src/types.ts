@@ -9,7 +9,8 @@ export interface Post {
   likeCount: number;
   viewCount: number;
   description: string;
-  script: string; // is an html string
+  content: string;
+  // script: string; // is an html string // removed -- is a url
   published: Date;
   author: User;
   id: string;

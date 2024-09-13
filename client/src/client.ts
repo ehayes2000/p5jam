@@ -7,8 +7,11 @@ import {
 
 import { type Post } from "./types";
 
-export async function getPosts() {
-  return mockGetPosts();
+// TODO error handling?
+export async function getPosts(): Promise<Post[]> {
+  const response = await fetch(`${import.meta.env.VITE_API_BASE}/posts`);
+  const posts = await response.json();
+  return posts;
 }
 
 export async function createPost(

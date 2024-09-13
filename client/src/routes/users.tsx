@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { getUsers } from "../client";
 import { type User } from "../types";
-import formatNumber from "../junkDrawer/formatNumber";
 
 function Users() {
   const [users, setUsers] = useState<User[]>([]);
@@ -16,11 +15,11 @@ function Users() {
           <div className="d-flex gap-4">
             <span className="comment-icon ">
               <i className="bi bi-heart"> </i>
-              <span> {formatNumber(u.commentCount)} </span>
+              <span> {u.commentCount} </span>
             </span>
             <span className="comment-icon ">
               <i className="bi bi-bar-chart"></i>
-              <span> {formatNumber(u.postCount)} </span>
+              <span> {u.postCount} </span>
             </span>
           </div>
         </div>
