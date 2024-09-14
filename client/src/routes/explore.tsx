@@ -10,7 +10,7 @@ function Explore() {
     getPosts().then((posts) => setPosts(posts));
   }, []);
   return (
-    <div className="d-flex flex-column flex-grow-1">
+    <div className="grid gap-4 justify-center p-6">
       {posts.length === 0 ? (
         <div> loading ... </div>
       ) : (

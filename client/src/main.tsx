@@ -9,9 +9,9 @@ import Root from "./routes/root";
 import ErrorPage from "./routes/errorPage";
 import Explore from "./routes/explore";
 import Users from "./routes/users";
-import EditPost from "./routes/editPost";
-import "bootstrap/dist/css/bootstrap.min.css";
+import NewPost from "./routes/newPost";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import "highlight.js/styles/default.min.css";
 import "./index.css";
 
 const router = createBrowserRouter([
@@ -34,7 +34,7 @@ const router = createBrowserRouter([
       },
       {
         path: "makePost/",
-        element: <EditPost />,
+        element: <NewPost />,
       },
     ],
   },

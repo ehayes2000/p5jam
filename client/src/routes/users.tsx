@@ -8,10 +8,10 @@ function Users() {
     getUsers().then((users) => setUsers(users));
   }, []);
   return (
-    <div className="d-flex flex-column p-3 gap-2">
+    <div className="grid gap-4">
       {users.map((u) => (
-        <div className="p-3 border rounded d-flex justify-content-between">
-          <span className="fw-bold">{u.displayName}</span>
+        <div className="border p-4 rounded-md">
+          <span className="fw-bold">{u.name}</span>
           <div className="d-flex gap-4">
             <span className="comment-icon ">
               <i className="bi bi-heart"> </i>

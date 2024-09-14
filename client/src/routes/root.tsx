@@ -7,33 +7,14 @@ function Root() {
   }, []);
 
   return (
-    <div className="container-fluid d-flex flex-column">
-      <div className="row overflow-hidden vh-100">
-        <div className="col-3 border-end h-100 px-0">
-          <div className="p-3">
-            <div>
-              <Link to="users/">Users</Link>
-            </div>
-            <div>
-              <Link to="explore/">Explore</Link>
-            </div>
-            <div>
-              <Link to="makePost/">New Post</Link>
-            </div>
-          </div>
-        </div>
-        <div className="col h-100 px-0 overflow-y-auto">
-          <h4 className="d-flex border-bottom sticky-top bg-dark py-2 justify-content-center">
-            <a className="header px-5"> Trending </a>
-            <a className="header px-5"> Following </a>
-          </h4>
-          <div>
-            <Outlet />
-          </div>
-        </div>
-        <div className="col-3 border-start h-100 px-0">
-          <div className="">:)</div>
-        </div>
+    <div className="w-full h-full sm:grid sm:grid-flow-col sm:grid-cols-5 sm:divide-x">
+      <div className="fixed bottom-0 w-full p-6 flex gap-8 font-bold sm:relative sm:flex-col sm:justify-start sm:gap-4">
+        <Link to="explore/">Explore</Link>
+        <Link to="users/">Users</Link>
+        <Link to="makePost/">New Post</Link>
+      </div>
+      <div className="w-full h-full sm:col-span-4 overflow-y-auto p-6">
+        <Outlet />
       </div>
     </div>
   );

@@ -1,8 +1,12 @@
 export interface User {
   id: string;
-  displayName: string;
+  name: string;
   commentCount: number;
   postCount: number;
+}
+export interface PostDraft {
+  description: string;
+  script: string;
 }
 
 export interface Post {
