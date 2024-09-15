@@ -1,6 +1,10 @@
 import { Html } from '@elysiajs/html'
 
-export default function P5Template({ script }: { script: string }) {
+export default function ScriptTemplate({
+  script,
+}: {
+  script: string
+}): JSX.Element {
   return (
     <html lang="en">
       <style>
