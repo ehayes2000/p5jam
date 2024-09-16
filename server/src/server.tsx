@@ -1,25 +1,23 @@
 import { Elysia, t } from 'elysia'
 import { cors } from '@elysiajs/cors'
 import { html, Html } from '@elysiajs/html'
-import { PrismaClient, Prisma } from '@prisma/client'
 import { v4 as uuid } from 'uuid'
-import P5Template from './P5Template'
-
-const prisma = new PrismaClient()
+import ScriptTemplate from './scriptTemplate'
+import { login } from './routes/login'
+import { restrictedRoutes } from './routes/restricted'
+import client from './prisma'
 
 new Elysia()
   .use(html())
   .get('/post/script/:id', async ({ params, error }) => {
-    const { id } = params
-
-    const post = await prisma.post.findUnique({
-      where: { id },
+    const post = await client.post.findUnique({
+      where: { id: params.id },
     })
     if (!post) return error(404)
-    return <P5Template script={post.script} />
+    return <ScriptTemplate script={'44'} />
   })
   .get('/posts', async ({ error }) => {
-    const posts = await prisma.post.findMany({
+    const posts = await client.post.findMany({
       select: {
         id: true,
         createdAt: true,
@@ -40,10 +38,8 @@ new Elysia()
   .post(
     '/makePost',
     async ({ body }) => {
-      console.log('hehe xdj post plx', body)
-
       try {
-        const newPost = await prisma.post.create({
+        const newPost = await client.post.create({
           data: {
             ...body,
             id: uuid(),
@@ -55,7 +51,7 @@ new Elysia()
           },
         })
         return { success: true, post: newPost }
-      } catch (error) {
+      } catch (error: any) {
         return { success: false, error: error.message }
       }
     },
@@ -66,16 +62,16 @@ new Elysia()
       }),
     },
   )
-  .get('/', () => (
+  .get('/test', () => (
     <html lang="en">
-      <head>
-        <title>Hello World</title>
-      </head>
       <body>
         <h1>Hello World</h1>
       </body>
     </html>
   ))
+  .use(login)
+  .use(restrictedRoutes)
   .use(cors())
   .listen(3000)
+
 console.log('🚀 running on http://localhost:3000')
