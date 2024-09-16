@@ -1,4 +1,8 @@
 {
   "tabWidth": 2,
-  "singleQuote": false
+  "singleQuote": true,
+  "semi": false,
+  "rules": {
+    "newline-per-chained-call": true 
+  }
 }

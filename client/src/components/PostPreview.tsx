@@ -1,7 +1,6 @@
-import { type PostDraft } from "../types";
+import { type PostDraft } from '../types'
 
 export default function PostPreview({ draft }: { draft: PostDraft }) {
-  console.log("remount");
   const template = `
     <!DOCTYPE html>
     <html lang="en">
@@ -20,10 +19,8 @@ export default function PostPreview({ draft }: { draft: PostDraft }) {
         <script>${draft.script}</script>
       </body>
     </html>
-  `;
-  const blob = new Blob([template], { type: "text/html" });
-  const blobUrl = URL.createObjectURL(blob);
-  return (
-    <iframe src={blobUrl} width="360" height="360" scrolling="no"></iframe>
-  );
+  `
+  const blob = new Blob([template], { type: 'text/html' })
+  const blobUrl = URL.createObjectURL(blob)
+  return <iframe src={blobUrl} width="360" height="360" scrolling="no"></iframe>
 }

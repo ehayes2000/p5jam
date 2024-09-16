@@ -2,10 +2,10 @@
   "name": "graphql",
   "license": "MIT",
   "scripts": {
-    "dev": "bun --watch src/server.tsx",
-    "start": "bun src/server.tsx",
+    "dev": "NODE_ENV=development bun --watch src/server.tsx",
+    "start:prod": "NODE_ENV=production bun src/server.tsx",
     "clean": "rm -rf dist",
-    "build": "bun run clean && bun run generate && bun build --target=bun ./src/server.ts --outdir ./dist",
+    "build": "bun run clean && bunx prisma generate && bun build --target=bun ./src/server.tsx --outdir ./dist",
     "generate": "bunx prisma generate"
   },
   "prettier": {
@@ -16,6 +16,7 @@
   "dependencies": {
     "@elysiajs/cors": "^1.1.1",
     "@elysiajs/html": "^1.1.1",
+    "@elysiajs/static": "^1.1.1",
     "@lucia-auth/adapter-prisma": "^4.0.1",
     "@prisma/client": "5.19.1",
     "@types/uuid": "^10.0.0",

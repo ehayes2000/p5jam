@@ -31,6 +31,7 @@ if (!process.env.GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET)
   throw new Error(
     'undefined environment variables GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET',
   )
+
 export const github = new GitHub(
   process.env.GITHUB_CLIENT_ID!,
   process.env.GITHUB_CLIENT_SECRET!,

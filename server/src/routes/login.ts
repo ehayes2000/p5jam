@@ -13,7 +13,6 @@ export const login = new Elysia({ prefix: '/login' })
   .get('/github', async ({ cookie, redirect }) => {
     const state = generateState()
     const url = await github.createAuthorizationURL(state)
-
     cookie.github_oauth_state.set({
       value: state,
       path: '/',
@@ -29,6 +28,7 @@ export const login = new Elysia({ prefix: '/login' })
     async ({
       cookie: { github_oauth_state, auth_session },
       query,
+      body,
       error,
       redirect,
     }) => {
@@ -62,7 +62,7 @@ export const login = new Elysia({ prefix: '/login' })
           auth_session.set({
             ...sessionCookie.attributes,
           })
-          return redirect('/')
+          return redirect('http://localhost:5173')
         } else {
           const id = uuid()
           const newUser: User = {
@@ -76,7 +76,7 @@ export const login = new Elysia({ prefix: '/login' })
           auth_session.set({
             ...sessionCookie.attributes,
           })
-          return redirect('/')
+          return redirect('http://localhost:5173')
         }
       } catch (e) {
         if (

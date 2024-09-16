@@ -1,20 +1,20 @@
-import { Elysia, t } from 'elysia'
-import { cors } from '@elysiajs/cors'
+import { Elysia } from 'elysia'
 import { html, Html } from '@elysiajs/html'
-import { v4 as uuid } from 'uuid'
+import { staticPlugin } from '@elysiajs/static'
 import ScriptTemplate from './scriptTemplate'
 import { login } from './routes/login'
 import { restrictedRoutes } from './routes/restricted'
 import client from './prisma'
 
-new Elysia()
-  .use(html())
+const api = new Elysia({ prefix: '/api' })
+  .use(login)
+  .use(restrictedRoutes)
   .get('/post/script/:id', async ({ params, error }) => {
     const post = await client.post.findUnique({
       where: { id: params.id },
     })
     if (!post) return error(404)
-    return <ScriptTemplate script={'44'} />
+    return <ScriptTemplate script={post.id} />
   })
   .get('/posts', async ({ error }) => {
     const posts = await client.post.findMany({
@@ -35,43 +35,20 @@ new Elysia()
     if (!posts) return error(404)
     return posts
   })
-  .post(
-    '/makePost',
-    async ({ body }) => {
-      try {
-        const newPost = await client.post.create({
-          data: {
-            ...body,
-            id: uuid(),
-            content: '',
-            published: true,
-            likeCount: 0,
-            viewCount: 0,
-            author: { connect: { id: 'test' } }, // TODO
-          },
-        })
-        return { success: true, post: newPost }
-      } catch (error: any) {
-        return { success: false, error: error.message }
-      }
-    },
-    {
-      body: t.Object({
-        script: t.String(),
-        description: t.String(),
-      }),
-    },
-  )
-  .get('/test', () => (
-    <html lang="en">
-      <body>
-        <h1>Hello World</h1>
-      </body>
-    </html>
-  ))
-  .use(login)
-  .use(restrictedRoutes)
-  .use(cors())
-  .listen(3000)
 
-console.log('🚀 running on http://localhost:3000')
+const server = new Elysia().use(api)
+
+if (process.env.NODE_ENV !== 'development') {
+  server.use(
+    staticPlugin({
+      assets: '../client/dist',
+      prefix: '',
+    }),
+  )
+} else {
+  server.get('/', ({ redirect }) => redirect(process.env.DEV_SERVER!))
+}
+
+server.listen(3000, (debug) =>
+  console.log(`console.log('🚀 running on ${debug.url.origin}`),
+)
