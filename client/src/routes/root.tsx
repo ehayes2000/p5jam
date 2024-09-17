@@ -12,6 +12,7 @@ function Root() {
         <Link to="explore">Explore</Link>
         <Link to="users">Users</Link>
         <Link to="makePost">New Post</Link>
+        <Link to="profile">Profile</Link>
         <Link to="login">Login</Link>
       </div>
       <div className="w-full h-full sm:col-span-4 overflow-y-auto p-6">

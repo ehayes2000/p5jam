@@ -5,6 +5,7 @@ export default function ScriptTemplate({
 }: {
   script: string
 }): JSX.Element {
+  console.log('template')
   return (
     <html lang="en">
       <style>

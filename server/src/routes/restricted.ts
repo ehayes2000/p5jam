@@ -126,6 +126,44 @@ export const restrictedRoutes = new Elysia({ prefix: '/profile' })
           },
         },
       )
+      app.get(
+        '/posts',
+        async ({ userId }) => {
+          const posts = await client.post.findMany({
+            select: {
+              id: true,
+              script: false,
+              createdAt: true,
+              updatedAt: true,
+              description: true,
+              content: true,
+              published: true,
+              likeCount: true,
+              viewCount: true,
+              authorId: true,
+            },
+            where: { authorId: userId },
+          })
+          return posts
+        },
+        {
+          response: {
+            200: t.Array(
+              t.Object({
+                id: t.String(),
+                createdAt: t.Date(),
+                updatedAt: t.Date(),
+                description: t.String(),
+                content: t.String(),
+                published: t.Boolean(),
+                likeCount: t.Number(),
+                viewCount: t.Number(),
+                authorId: t.String(),
+              }),
+            ),
+          },
+        },
+      )
       app.get('/greet', async ({ userId }) => {
         const user = await client.user.findUnique({
           where: {

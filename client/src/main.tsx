@@ -7,6 +7,7 @@ import Explore from './routes/explore'
 import Users from './routes/users'
 import NewPost from './routes/newPost'
 import Login from './routes/login'
+import Profile from './routes/profile'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'highlight.js/styles/default.min.css'
 import './index.css'
@@ -36,6 +37,10 @@ export const router = createBrowserRouter([
       {
         path: 'login',
         element: <Login />,
+      },
+      {
+        path: 'profile',
+        element: <Profile />,
       },
     ],
   },
