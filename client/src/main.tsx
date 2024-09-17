@@ -8,6 +8,7 @@ import Users from './routes/users'
 import NewPost from './routes/newPost'
 import Login from './routes/login'
 import Profile from './routes/profile'
+import EditPost from './routes/editPost'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'highlight.js/styles/default.min.css'
 import './index.css'
@@ -41,6 +42,10 @@ export const router = createBrowserRouter([
       {
         path: 'profile',
         element: <Profile />,
+      },
+      {
+        path: 'editPost',
+        element: <EditPost />,
       },
     ],
   },

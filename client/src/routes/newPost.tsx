@@ -1,12 +1,13 @@
-import EditPost from "../components/EditPost";
-import { type PostDraft } from "../types";
+import PostEditor from '../components/PostEditor'
+import { type PostDraft } from '../types'
+import { makePost } from '../client'
 
 const newDraft = (): PostDraft => {
   return {
     script: DEFAULT_SCRIPT,
-    description: "",
-  };
-};
+    description: '',
+  }
+}
 
 const DEFAULT_SCRIPT = `
 const WIDTH=360
@@ -18,11 +19,18 @@ function setup() {
 function draw() {
   // TODO
 }
-`;
+`
 export default function NewPost() {
   return (
     <div className="">
-      <EditPost post={newDraft()} />
+      <PostEditor
+        callback={async (description, script) => {
+          const newPost = await makePost({ description, script })
+          return newPost === 'ok'
+        }}
+        callbackText="Post"
+        post={newDraft()}
+      />
     </div>
-  );
+  )
 }

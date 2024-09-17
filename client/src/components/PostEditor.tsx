@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { type PostDraft } from '../types'
-import { makePost } from '../client'
 import PostPreview from './PostPreview'
 import CodeMirror, { EditorView, EditorState } from '@uiw/react-codemirror'
 import { vim } from '@replit/codemirror-vim'
@@ -11,7 +10,21 @@ type Keybind = 'Vim' | 'Normal'
 
 const MAX_DESCRIPTION = 255
 
-export default function EditPost({ post }: { post: PostDraft }) {
+export default function PostEditor({
+  post,
+  callbackText,
+  callback,
+}: {
+  callback: ({
+    description,
+    script,
+  }: {
+    description: string
+    script: string
+  }) => Promise<boolean>
+  callbackText: string
+  post: PostDraft
+}) {
   const [script, setScript] = useState<string>(post.script)
   const [description, setDescription] = useState<string>(post.description)
   const [keybind, setKeyBind] = useState<Keybind>(() => {
@@ -47,7 +60,7 @@ export default function EditPost({ post }: { post: PostDraft }) {
       <form
         onSubmit={(e) => {
           e.preventDefault()
-          makePost({ description, script })
+          callback({ description, script })
         }}
       >
         <div className="flex flex-col gap-1">
@@ -109,7 +122,7 @@ export default function EditPost({ post }: { post: PostDraft }) {
               type="submit"
               className="px-2  bg-gray-200 hover:bg-gray-300"
             >
-              Post
+              {callbackText}
             </button>
           </div>
         </div>

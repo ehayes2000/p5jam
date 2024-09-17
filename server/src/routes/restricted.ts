@@ -112,58 +112,38 @@ export const restrictedRoutes = new Elysia({ prefix: '/profile' })
                 authorId: userId,
               },
             })
-            return { success: true }
+            return
           } catch (e) {
             set.status = 400
-            return { success: false }
+            return
           }
         },
         {
           body: t.Object({ postId: t.String() }),
           response: {
-            200: t.Object({ success: t.Boolean() }),
-            400: t.Object({ success: t.Boolean() }),
+            200: t.Void(),
+            400: t.Void(),
           },
         },
       )
-      app.get(
-        '/posts',
-        async ({ userId }) => {
-          const posts = await client.post.findMany({
-            select: {
-              id: true,
-              script: false,
-              createdAt: true,
-              updatedAt: true,
-              description: true,
-              content: true,
-              published: true,
-              likeCount: true,
-              viewCount: true,
-              authorId: true,
-            },
-            where: { authorId: userId },
-          })
-          return posts
-        },
-        {
-          response: {
-            200: t.Array(
-              t.Object({
-                id: t.String(),
-                createdAt: t.Date(),
-                updatedAt: t.Date(),
-                description: t.String(),
-                content: t.String(),
-                published: t.Boolean(),
-                likeCount: t.Number(),
-                viewCount: t.Number(),
-                authorId: t.String(),
-              }),
-            ),
+      app.get('/posts', async ({ userId }) => {
+        const posts = await client.post.findMany({
+          select: {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+            description: true,
+            content: true,
+            script: true,
+            published: true,
+            likeCount: true,
+            viewCount: true,
+            author: true,
           },
-        },
-      )
+          where: { authorId: userId },
+        })
+        return posts
+      })
       app.get('/greet', async ({ userId }) => {
         const user = await client.user.findUnique({
           where: {

@@ -1,4 +1,4 @@
-import { type Post } from "../types";
+import { type Post } from '../types'
 
 export function Sketch({ id }: { id: string }) {
   return (
@@ -10,7 +10,7 @@ export function Sketch({ id }: { id: string }) {
       className="rounded-sm"
       src={`${import.meta.env.VITE_API_BASE}/post/script/${id}`}
     ></iframe>
-  );
+  )
 }
 
 export default function Post({ post: p }: { post: Post }) {
@@ -33,5 +33,5 @@ export default function Post({ post: p }: { post: Post }) {
         </span>
       </div>
     </div>
-  );
+  )
 }

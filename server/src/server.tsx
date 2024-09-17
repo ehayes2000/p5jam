@@ -25,58 +25,18 @@ const api = new Elysia({ prefix: '/api' })
         updatedAt: true,
         description: true,
         content: true,
-        script: false,
+        script: true,
         published: true,
         likeCount: true,
         viewCount: true,
         author: true,
-        authorId: true,
+      },
+      where: {
+        published: true,
       },
     })
-    if (!posts) return error(404)
     return posts
   })
-  .get(
-    '/user/:id/posts',
-    async ({ params }) => {
-      const posts = await client.post.findMany({
-        select: {
-          id: true,
-          script: false,
-          createdAt: true,
-          updatedAt: true,
-          description: true,
-          content: true,
-          published: true,
-          likeCount: true,
-          viewCount: true,
-          authorId: true,
-        },
-        where: {
-          id: params.id,
-          published: true,
-        },
-      })
-      return posts
-    },
-    {
-      response: {
-        200: t.Array(
-          t.Object({
-            id: t.String(),
-            createdAt: t.Date(),
-            updatedAt: t.Date(),
-            description: t.String(),
-            content: t.String(),
-            published: t.Boolean(),
-            likeCount: t.Number(),
-            viewCount: t.Number(),
-            authorId: t.String(),
-          }),
-        ),
-      },
-    },
-  )
 
 const server = new Elysia().use(api)
 
