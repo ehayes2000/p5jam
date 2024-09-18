@@ -1,0 +1,42 @@
+{
+  "name": "server",
+  "license": "MIT",
+  "scripts": {
+    "dev": "NODE_ENV=development bun --watch src/server.tsx",
+    "start:prod": "NODE_ENV=production bun src/server.tsx",
+    "clean": "rm -rf dist",
+    "build": "bun run clean && bunx prisma generate && tsc",
+    "build:declaration": "tsc --emitDeclarationOnly ./src/server.tsx",
+    "generate": "bunx prisma generate"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "all"
+  },
+  "main": "dist/server.js",
+  "types": "dist/server.d.ts",
+  "dependencies": {
+    "@elysiajs/cors": "^1.1.1",
+    "@elysiajs/html": "^1.1.1",
+    "@elysiajs/static": "^1.1.1",
+    "@lucia-auth/adapter-prisma": "^4.0.1",
+    "@prisma/client": "5.19.1",
+    "@types/uuid": "^10.0.0",
+    "@uiw/react-codemirror": "^4.23.2",
+    "arctic": "^1.9.2",
+    "bcryptjs": "2.4.3",
+    "elysia": "^1.1.12",
+    "jsonwebtoken": "9.0.2",
+    "lucia": "^3.2.0",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.9",
+    "@types/jsonwebtoken": "9.0.6",
+    "prisma": "5.19.1"
+  },
+  "prisma": {
+    "seed": "bun prisma/seed.ts"
+  }
+}
