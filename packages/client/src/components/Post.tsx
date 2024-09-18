@@ -1,4 +1,4 @@
-import { type Post } from '../types'
+import { client } from '../client'
 
 export function Sketch({ id }: { id: string }) {
   return (
@@ -8,10 +8,14 @@ export function Sketch({ id }: { id: string }) {
       height="360"
       scrolling="no" // TODO
       className="rounded-sm"
-      src={`${import.meta.env.VITE_API_BASE}/post/script/${id}`}
+      src={`${import.meta.env.VITE_API_BASE}/api/posts/script/${id}`}
     ></iframe>
   )
 }
+
+type Post = NonNullable<
+  Awaited<ReturnType<typeof client.api.posts.get>>['data']
+>[number] // :)
 
 export default function Post({ post: p }: { post: Post }) {
   return (

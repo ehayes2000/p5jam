@@ -16,7 +16,7 @@ function Users() {
   return (
     <div className="grid gap-4">
       {users.map((u) => (
-        <div className="border p-4 rounded-md">
+        <div key={u.id} className="border p-4 rounded-md">
           <span className="fw-bold">{u.name}</span>
           <div className="d-flex gap-4">
             <span className="comment-icon ">

@@ -1,5 +1,4 @@
 import { Elysia, t } from 'elysia'
-import cors from '@elysiajs/cors'
 import { Html, html } from '@elysiajs/html'
 import { staticPlugin } from '@elysiajs/static'
 import ScriptTemplate from './scriptTemplate'

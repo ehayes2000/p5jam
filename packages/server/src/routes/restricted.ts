@@ -33,6 +33,10 @@ export const restrictedRoutes = new Elysia()
     '/posts', // TODO "posts"
     async ({ body, userId, error }) => {
       try {
+        const postCount = await client.user.findUniqueOrThrow({
+          where: { id: userId },
+          select: { postCount: true },
+        })
         const [newPost, _] = await client.$transaction([
           client.post.create({
             data: {
@@ -45,7 +49,10 @@ export const restrictedRoutes = new Elysia()
               author: { connect: { id: userId } },
             },
           }),
-          client.$executeRaw`update "User" set postCount = postCount + 1 where id = ${userId}`,
+          client.user.update({
+            where: { id: userId },
+            data: { postCount: postCount.postCount + 1 },
+          }),
         ])
         return { post: newPost }
       } catch (error: any) {
@@ -88,28 +95,46 @@ export const restrictedRoutes = new Elysia()
       }),
     },
   )
-  .delete(
-    '/posts/:id',
-    async ({ userId, error, params: { id } }) => {
-      try {
-        await client.$transaction([
-          client.post.delete({
-            where: {
-              id,
-              authorId: userId,
-            },
-          }),
-          client.$executeRaw`update "User" postCount = postCount - 1 where id = ${userId}`,
-        ])
-        return
-      } catch (e) {
-        return error(404)
-      }
-    },
-    {
-      body: t.Object({ postId: t.String() }),
-    },
-  )
+  .delete('/posts/:id', async ({ userId, error, params: { id } }) => {
+    try {
+      const postCount = await client.user.findUniqueOrThrow({
+        where: { id: userId },
+        select: { postCount: true },
+      })
+      await client.$transaction([
+        client.post.delete({
+          where: {
+            id,
+            authorId: userId,
+          },
+        }),
+        client.user.update({
+          where: { id: userId },
+          data: {
+            postCount: postCount.postCount - 1,
+          },
+        }),
+      ])
+      const posts = await client.post.findMany({
+        select: {
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+          description: true,
+          content: true,
+          script: true,
+          published: true,
+          likeCount: true,
+          viewCount: true,
+          author: true,
+        },
+        where: { authorId: userId },
+      })
+      return posts
+    } catch (e) {
+      return error(404)
+    }
+  })
   .get('/users/:id/posts', async ({ userId, params: { id } }) => {
     const posts = await client.post.findMany({
       select: {
@@ -145,4 +170,7 @@ export const restrictedRoutes = new Elysia()
     } else {
       throw new Error('how did we get here. Auth failed!!!')
     }
+  })
+  .get('/myid', async ({ userId }) => {
+    return { id: userId }
   })

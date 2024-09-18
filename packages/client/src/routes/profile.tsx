@@ -1,50 +1,76 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import Post from '../components/Post'
+import { client, getMyid } from '../client'
 
 function Profile() {
   const navigate = useNavigate()
-  // const [myPosts, setMyPosts] = useState<TPost[]>([])
+  const [myPosts, setMyPosts] =
+    useState<Awaited<ReturnType<typeof client.api.posts.get>>['data']>()
 
-  return <div> hi </div>
-  // useEffect(() => {
-  //   getProfilePosts().then((posts) => setMyPosts(posts))
-  // }, [])
+  useEffect(() => {
+    ;(async () => {
+      const myId = await getMyid()
+      if (!myId) {
+        setMyPosts(null)
+        return
+      }
+      const posts = await client.api.users({ id: myId }).posts.get()
+      if (posts.data) {
+        setMyPosts(posts.data)
+      }
+    })()
+  }, [])
 
-  // const deletePost = async (id: string) => {
-  //   const deleted = await clientDeletePost(id)
-  //   if (deleted) setMyPosts(await getProfilePosts())
-  // }
-  // const editPost = (post: TPost) => {
-  //   return navigate(`/editPost`, {
-  //     state: {
-  //       post,
-  //     },
-  //   })
-  // }
-  // return (
-  //   <div className="grid gap-4 justify-center p-6">
-  //     {myPosts.map((p) => (
-  //       <div key={p.id}>
-  //         <div className="p-1 flex lex gap-1">
-  //           <button
-  //             onClick={() => editPost(p)}
-  //             className="bg-gray-200 px-2 rounded-sm hover:bg-gray-300"
-  //           >
-  //             Edit
-  //           </button>
-  //           <button
-  //             onClick={() => deletePost(p.id)}
-  //             className="bg-gray-200 px-2 rounded-sm hover:bg-gray-300"
-  //           >
-  //             Delete
-  //           </button>
-  //         </div>
-  //         <Post key={p.id} post={p} />
-  //       </div>
-  //     ))}
-  //   </div>
-  // )
+  const deletePost = async (id: string) => {
+    const updated = await client.api.posts({ id }).delete()
+    if (updated.data) {
+      setMyPosts(updated.data)
+    }
+  }
+
+  const editPost = (post: {
+    id: string
+    description: string
+    script: string
+  }) => {
+    return navigate(`/editPost`, {
+      state: {
+        post,
+      },
+    })
+  }
+
+  return (
+    <div className="grid gap-4 justify-center p-6">
+      {myPosts ? (
+        <>
+          {myPosts.map((p) => (
+            <div key={p.id}>
+              <div className="p-1 flex lex gap-1">
+                <button
+                  onClick={() => editPost(p)}
+                  className="bg-gray-200 px-2 rounded-sm hover:bg-gray-300"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => deletePost(p.id)}
+                  className="bg-gray-200 px-2 rounded-sm hover:bg-gray-300"
+                >
+                  Delete
+                </button>
+              </div>
+              <Post key={p.id} post={p} />
+            </div>
+          ))}
+        </>
+      ) : (
+        <Link to="/login" />
+      )}
+    </div>
+  )
 }
 
 export default Profile

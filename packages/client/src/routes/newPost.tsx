@@ -1,11 +1,5 @@
 import PostEditor from '../components/PostEditor'
-
-// const newDraft = (): PostDraft => {
-//   return {
-//     script: DEFAULT_SCRIPT,
-//     description: '',
-//   }
-// }
+import { client } from '../client'
 
 const DEFAULT_SCRIPT = `
 const WIDTH=360
@@ -21,15 +15,17 @@ function draw() {
 export default function NewPost() {
   return (
     <div className="">
-      hi
-      {/* <PostEditor
-        callback={async (description, script) => {
-          const newPost = await makePost({ description, script })
-          return newPost === 'ok'
+      <PostEditor
+        callback={async ({ description, script }) => {
+          const newPost = await client.api.posts.post({ script, description })
+          return newPost.error === null
         }}
         callbackText="Post"
-        post={newDraft()}
-      /> */}
+        post={{
+          script: DEFAULT_SCRIPT,
+          description: '',
+        }}
+      />
     </div>
   )
 }

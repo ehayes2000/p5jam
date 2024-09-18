@@ -7,3 +7,15 @@ export const client = treaty<App>('', {
     return fetch(`${import.meta.env.VITE_API_BASE}/${path}`, options)
   },
 })
+
+export const getMyid = async (): Promise<string | null> => {
+  const cachedId = localStorage.getItem('uid')
+  if (cachedId) return cachedId
+  const id = await client.api.myid.get()
+  if (id.data) {
+    localStorage.setItem('uid', id.data.id)
+    return id.data.id
+  } else {
+    return null
+  }
+}

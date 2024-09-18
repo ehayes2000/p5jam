@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { Outlet, Link } from 'react-router-dom'
 
 function Root() {
