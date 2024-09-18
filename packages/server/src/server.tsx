@@ -36,7 +36,7 @@ const api = new Elysia({ prefix: '/api' })
         published: true,
       },
     })
-    return posts ?? ([] as Post[])
+    return (posts ?? ([] as Post[])).reverse()
   })
   .get('/users', async () => {
     return await client.user.findMany()

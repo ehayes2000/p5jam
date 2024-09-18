@@ -149,6 +149,9 @@ export const restrictedRoutes = new Elysia()
         viewCount: true,
         author: true,
       },
+      orderBy: {
+        updatedAt: 'desc',
+      },
       where: {
         authorId: userId,
         ...(userId === id ? {} : { published: true }),

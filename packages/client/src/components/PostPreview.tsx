@@ -1,6 +1,10 @@
-import { type PostDraft } from '../types'
+import { useEffect } from 'react'
 
-export default function PostPreview({ draft }: { draft: PostDraft }) {
+export default function PostPreview({
+  draft,
+}: {
+  draft: { description: string; script: string }
+}) {
   const template = `
     <!DOCTYPE html>
     <html lang="en">
@@ -20,7 +24,13 @@ export default function PostPreview({ draft }: { draft: PostDraft }) {
       </body>
     </html>
   `
+
   const blob = new Blob([template], { type: 'text/html' })
   const blobUrl = URL.createObjectURL(blob)
+  useEffect(() => {
+    return () => {
+      URL.revokeObjectURL(blobUrl)
+    }
+  }, [blobUrl])
   return <iframe src={blobUrl} width="360" height="360" scrolling="no"></iframe>
 }

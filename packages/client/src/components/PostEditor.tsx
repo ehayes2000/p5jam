@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { type PostDraft } from '../types'
+import { useNavigate } from 'react-router-dom'
 import PostPreview from './PostPreview'
 import CodeMirror, { EditorView, EditorState } from '@uiw/react-codemirror'
 import { vim } from '@replit/codemirror-vim'
@@ -23,8 +23,10 @@ export default function PostEditor({
     script: string
   }) => Promise<boolean>
   callbackText: string
-  post: PostDraft
+  post: { description: string; script: string }
 }) {
+  const nav = useNavigate()
+  console.log(nav)
   const [script, setScript] = useState<string>(post.script)
   const [description, setDescription] = useState<string>(post.description)
   const [keybind, setKeyBind] = useState<Keybind>(() => {
@@ -58,9 +60,11 @@ export default function PostEditor({
   return (
     <div className="w-full grid gap-1">
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault()
-          callback({ description, script })
+          const success = await callback({ description, script })
+          console.log(success, 'DONE')
+          if (success) nav('/profile')
         }}
       >
         <div className="flex flex-col gap-1">
