@@ -123,16 +123,13 @@ export const makeProtectedRoutes = (
     })
     .get('/users/:id/posts', async ({ userId, params: { id } }) => {
       const posts = await client.post.findMany({
-        select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          description: true,
-          content: true,
-          script: true,
-          published: true,
-          likeCount: true,
-          viewCount: true,
+        include: {
+          comments: {
+            include: { author: true },
+            orderBy: {
+              createdAt: 'desc',
+            },
+          },
           author: true,
         },
         orderBy: {
@@ -180,13 +177,16 @@ export const makeProtectedRoutes = (
               commentCount: true,
             },
           })
-          await client.comment.create({
+          const newComment = await client.comment.create({
             data: {
               id: uuid(),
               text,
               authorId: userId,
               createdAt: new Date(),
               postId,
+            },
+            include: {
+              author: true,
             },
           })
           await client.user.update({
@@ -197,6 +197,7 @@ export const makeProtectedRoutes = (
             data: { commentCount: counts.commentCount + 1 },
             where: { id: postId },
           })
+          return newComment
         } catch (e) {
           return error(404)
         }
@@ -206,12 +207,12 @@ export const makeProtectedRoutes = (
       },
     )
     .delete(
-      '/comments/:commentId',
-      async ({ userId, error, body: { commentId } }) => {
+      '/comments',
+      async ({ userId, error, body: { id } }) => {
         try {
           const counts = await client.comment.findFirstOrThrow({
             where: {
-              id: commentId,
+              id,
             },
             select: {
               author: {
@@ -229,7 +230,7 @@ export const makeProtectedRoutes = (
           })
           await client.comment.delete({
             where: {
-              id: commentId,
+              id,
               authorId: userId,
             },
           })
@@ -255,7 +256,7 @@ export const makeProtectedRoutes = (
       },
       {
         body: t.Object({
-          commentId: t.String(),
+          id: t.String(),
         }),
       },
     )

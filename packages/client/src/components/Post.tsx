@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { client, TPost } from '../client'
 import Comments from './Comments'
 
@@ -16,14 +16,32 @@ export function Sketch({ id }: { id: string }) {
 }
 
 export default function Post({ post: p }: { post: TPost }) {
-  const [openComments, setOpenComments] = useState<boolean>(true)
+  const [openComments, setOpenComments] = useState<boolean>(false)
+  const [comments, setComments] = useState<typeof p.comments>(p.comments)
+
   const postComment = async ({ text }: { text: string }) => {
-    const ok = await client.api.comments.post({ text, postId: p.id })
-    return ok.error === null
+    const newComment = await client.api.comments.post({ text, postId: p.id })
+    if (newComment.data) setComments([newComment.data, ...comments])
   }
-  console.log(p)
+
+  const deleteComment = async ({ id }: { id: string }) => {
+    await client.api.comments.delete({ id })
+    setComments(comments.filter((c) => c.id !== id))
+  }
+
+  const pref = useRef(null)
+
+  // TODO
+  useEffect(() => {
+    if (pref.current) {
+      const width = pref.current.offsetWidth
+      pref.current.style.width = `${width}px`
+    }
+  }, [])
+
   return (
     <div
+      ref={pref}
       key={p.id}
       className="border rounded-md p-2 grid content-center justify-center gap-1"
     >
@@ -36,12 +54,22 @@ export default function Post({ post: p }: { post: TPost }) {
           <span> {p.likeCount} </span>
         </span>
         <span className="px-1">
-          <i className={`bi  ${openComments ? 'bi-chat-fill' : 'bi-chat'}`}></i>
-          <span> {p.commentCount} </span>
+          <button onClick={() => setOpenComments(!openComments)}>
+            <i
+              className={`bi  ${openComments ? 'bi-chat-fill' : 'bi-chat'}`}
+            ></i>
+          </button>
+          <span> {comments.length} </span>
         </span>
       </div>
       {openComments ? (
-        <Comments comments={p.comments} postComment={postComment} />
+        <div className="">
+          <Comments
+            comments={comments}
+            postComment={postComment}
+            deleteComment={deleteComment}
+          />
+        </div>
       ) : (
         <></>
       )}

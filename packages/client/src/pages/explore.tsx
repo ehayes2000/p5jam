@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react'
-import { client } from '../client'
+import { client, TPost } from '../client'
 import Post from '../components/Post'
 
 function Explore() {
-  const [posts, setPosts] = useState<
-    NonNullable<Awaited<ReturnType<typeof client.api.posts.get>>['data']>
-  >([])
+  const [posts, setPosts] = useState<TPost[]>([])
   useEffect(() => {
     ;(async () => {
       const { data } = await client.api.posts.get()
+      console.log(data)
       if (data) setPosts(data)
     })()
   }, [])

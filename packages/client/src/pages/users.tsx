@@ -20,7 +20,7 @@ function Users() {
           <span className="fw-bold">{u.name}</span>
           <div className="d-flex gap-4">
             <span className="comment-icon ">
-              <i className="bi bi-heart"> </i>
+              <i className="bi bi-chat"> </i>
               <span> {u.commentCount} </span>
             </span>
             <span className="comment-icon ">

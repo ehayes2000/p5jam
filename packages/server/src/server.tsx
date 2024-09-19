@@ -23,6 +23,9 @@ export const api = new Elysia({ prefix: '/api' })
       include: {
         comments: {
           include: { author: true },
+          orderBy: {
+            createdAt: 'desc',
+          },
         },
         author: true,
       },
@@ -41,6 +44,9 @@ export const api = new Elysia({ prefix: '/api' })
       return client.comment.findMany({
         include: { author: true },
         where: { postId: id },
+        orderBy: {
+          createdAt: 'desc',
+        },
       })
     },
     { body: t.Object({ id: t.String() }) },

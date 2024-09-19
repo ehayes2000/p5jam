@@ -5,9 +5,11 @@ import { client, TPost, getMyId } from '../client'
 export default function Comments({
   comments,
   postComment,
+  deleteComment,
 }: {
   comments: TPost['comments']
-  postComment: (t: { text: string }) => Promise<boolean>
+  postComment: (t: { text: string }) => Promise<void>
+  deleteComment: (id: { id: string }) => Promise<void>
 }) {
   const [myComment, setMyComment] = useState<string>('')
   const [myId, setMyId] = useState<string | null>(null)
@@ -16,8 +18,9 @@ export default function Comments({
       setMyId(await getMyId())
     })()
   }, [])
+
   return (
-    <div>
+    <div className="flex flex-col gap-1">
       {myId ? (
         <div className="">
           <textarea
@@ -28,7 +31,10 @@ export default function Comments({
           />
           <button
             className="relative border left hover:bg-gray-200 px-1"
-            onClick={() => postComment({ text: myComment })}
+            onClick={() => {
+              setMyComment('')
+              postComment({ text: myComment })
+            }}
           >
             Post
           </button>
@@ -36,16 +42,34 @@ export default function Comments({
       ) : (
         <a href="/login"> login </a>
       )}
-      {comments.map((c) => (
-        <div className="flex justify-between">
-          <div>{c.author.name}</div>
-          <div>{c.createdAt.toString()}</div>
-          <div> {c.text} </div>
-          <div>
-            <i className="bi bi-hand-thumbs-up" /> {c.likeCount}
+      {comments.map((c) => {
+        let dateString = ''
+        try {
+          dateString = new Date(c.createdAt).toDateString()
+        } catch {}
+        return (
+          <div key={c.id} className="flex-col justify-between border p-1">
+            <div className="flex justify-start gap-2">
+              <div>{c.author.name}</div>
+              <div className="text-gray-500 font-light">{dateString}</div>
+            </div>
+            <div className="text-wrap"> {c.text} </div>
+
+            <div className="flex justify-between">
+              <span>
+                <i className="bi bi-heart" /> {c.likeCount}
+              </span>
+              {c.authorId === myId ? (
+                <button onClick={() => deleteComment({ id: c.id })}>
+                  <i className="bi bi-trash3" />
+                </button>
+              ) : (
+                <></>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
