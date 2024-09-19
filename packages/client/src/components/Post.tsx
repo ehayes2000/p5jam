@@ -1,4 +1,6 @@
-import { client } from '../client'
+import { useState } from 'react'
+import { client, TPost } from '../client'
+import Comments from './Comments'
 
 export function Sketch({ id }: { id: string }) {
   return (
@@ -13,29 +15,36 @@ export function Sketch({ id }: { id: string }) {
   )
 }
 
-type Post = NonNullable<
-  Awaited<ReturnType<typeof client.api.posts.get>>['data']
->[number] // :)
-
-export default function Post({ post: p }: { post: Post }) {
+export default function Post({ post: p }: { post: TPost }) {
+  const [openComments, setOpenComments] = useState<boolean>(true)
+  const postComment = async ({ text }: { text: string }) => {
+    const ok = await client.api.comments.post({ text, postId: p.id })
+    return ok.error === null
+  }
+  console.log(p)
   return (
     <div
       key={p.id}
-      className="border rounded-md py-4 px-12 flex-col content-center justify-center"
+      className="border rounded-md p-2 grid content-center justify-center gap-1"
     >
-      <h2 className="py-2"> {p.author.name} </h2>
+      <h2 className=""> {p.author.name} </h2>
       <Sketch id={p.id} />
-      <div className="py-2"> {p.description} </div>
+      <div className=""> {p.description} </div>
       <div className="flex gap-4 justify-start">
         <span>
           <i className="bi bi-heart"> </i>
           <span> {p.likeCount} </span>
         </span>
-        <span className="comment-icon px-1">
-          <i className="bi bi-bar-chart"></i>
-          <span> {p.viewCount} </span>
+        <span className="px-1">
+          <i className={`bi  ${openComments ? 'bi-chat-fill' : 'bi-chat'}`}></i>
+          <span> {p.commentCount} </span>
         </span>
       </div>
+      {openComments ? (
+        <Comments comments={p.comments} postComment={postComment} />
+      ) : (
+        <></>
+      )}
     </div>
   )
 }

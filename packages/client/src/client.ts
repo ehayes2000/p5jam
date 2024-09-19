@@ -8,7 +8,7 @@ export const client = treaty<App>('', {
   },
 })
 
-export const getMyid = async (): Promise<string | null> => {
+export const getMyId = async (): Promise<string | null> => {
   const cachedId = localStorage.getItem('uid')
   if (cachedId) return cachedId
   const id = await client.api.myid.get()
@@ -19,3 +19,7 @@ export const getMyid = async (): Promise<string | null> => {
     return null
   }
 }
+
+export type TPost = NonNullable<
+  Awaited<ReturnType<typeof client.api.posts.get>>['data']
+>[number]

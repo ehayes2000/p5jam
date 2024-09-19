@@ -1,14 +1,14 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
-import Root from './routes/root'
-import ErrorPage from './routes/errorPage'
-import Explore from './routes/explore'
-import Users from './routes/users'
-import NewPost from './routes/newPost'
-import Login from './routes/login'
-import Profile from './routes/profile'
-import EditPost from './routes/editPost'
+import Root from './pages/root'
+import ErrorPage from './pages/errorPage'
+import Explore from './pages/explore'
+import Users from './pages/users'
+import NewPost from './pages/newPost'
+import LoginPage from './pages/login'
+import Profile from './pages/profile'
+import EditPost from './pages/editPost'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'highlight.js/styles/default.min.css'
 import './index.css'
@@ -37,7 +37,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'login',
-        element: <Login />,
+        element: <LoginPage />,
       },
       {
         path: 'profile',

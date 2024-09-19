@@ -1,4 +1,4 @@
-function Login() {
+function LoginPage() {
   return (
     <div className="group text-gray-700 hover:text-black">
       <a
@@ -12,4 +12,4 @@ function Login() {
   )
 }
 
-export default Login
+export default LoginPage

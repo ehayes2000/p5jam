@@ -21,18 +21,32 @@ model User {
   postCount    Int       @default(0)
   posts        Post[]
   sessions     Session[]
+  comments     Comment[]
 }
 
 model Post {
-  id          String   @id
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  description String   @default("")
-  content     String   @default("")
-  script      String   @default("")
-  published   Boolean  @default(false)
-  likeCount   Int      @default(0)
-  viewCount   Int      @default(0)
-  author      User     @relation(fields: [authorId], references: [id])
-  authorId    String
+  id           String    @id
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  description  String    @default("")
+  content      String    @default("")
+  script       String    @default("")
+  published    Boolean   @default(false)
+  likeCount    Int       @default(0)
+  viewCount    Int       @default(0)
+  commentCount Int       @default(0)
+  author       User      @relation(fields: [authorId], references: [id])
+  authorId     String
+  comments     Comment[]
+}
+
+model Comment {
+  id        String   @id
+  createdAt DateTime @default(now())
+  text      String
+  likeCount Int      @default(0)
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
 }

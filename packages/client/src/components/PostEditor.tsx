@@ -26,7 +26,6 @@ export default function PostEditor({
   post: { description: string; script: string }
 }) {
   const nav = useNavigate()
-  console.log(nav)
   const [script, setScript] = useState<string>(post.script)
   const [description, setDescription] = useState<string>(post.description)
   const [keybind, setKeyBind] = useState<Keybind>(() => {
@@ -63,7 +62,6 @@ export default function PostEditor({
         onSubmit={async (e) => {
           e.preventDefault()
           const success = await callback({ description, script })
-          console.log(success, 'DONE')
           if (success) nav('/profile')
         }}
       >

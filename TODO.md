@@ -18,7 +18,14 @@
    - serve screenshot
    - on click load iframe
 
+** get posts by user id ** -> fix profile
+
 5. Comments
+
+- [x] create, delete
+- [ ] ui for create / delete
+- [ ] ui to display
+
 6. Likes
 7. Views
 

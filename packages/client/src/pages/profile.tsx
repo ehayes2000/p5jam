@@ -2,18 +2,17 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import Post from '../components/Post'
-import { client, getMyid } from '../client'
+import { client, getMyId, TPost } from '../client'
 
 function Profile() {
   const navigate = useNavigate()
-  const [myPosts, setMyPosts] =
-    useState<Awaited<ReturnType<typeof client.api.posts.get>>['data']>()
+  const [myPosts, setMyPosts] = useState<TPost[]>()
 
   useEffect(() => {
     ;(async () => {
-      const myId = await getMyid()
+      const myId = await getMyId()
       if (!myId) {
-        setMyPosts(null)
+        setMyPosts([])
         return
       }
       const posts = await client.api.users({ id: myId }).posts.get()

@@ -3,14 +3,14 @@ import { Html, html } from '@elysiajs/html'
 import { staticPlugin } from '@elysiajs/static'
 import ScriptTemplate from './scriptTemplate'
 import { login } from './routes/login'
-import { restrictedRoutes } from './routes/restricted'
+import protectedRoutes from './routes/protected'
 import client from './prisma'
 import { Post } from '@prisma/client'
 
-const api = new Elysia({ prefix: '/api' })
+export const api = new Elysia({ prefix: '/api' })
   .use(html())
   .use(login)
-  .use(restrictedRoutes)
+  .use(protectedRoutes)
   .get('/posts/script/:id', async ({ params, error }) => {
     const post = await client.post.findUnique({
       where: { id: params.id },
@@ -20,16 +20,10 @@ const api = new Elysia({ prefix: '/api' })
   })
   .get('/posts', async () => {
     const posts = await client.post.findMany({
-      select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        description: true,
-        content: true,
-        script: true,
-        published: true,
-        likeCount: true,
-        viewCount: true,
+      include: {
+        comments: {
+          include: { author: true },
+        },
         author: true,
       },
       where: {
@@ -41,6 +35,16 @@ const api = new Elysia({ prefix: '/api' })
   .get('/users', async () => {
     return await client.user.findMany()
   })
+  .get(
+    '/comments',
+    async ({ body: { id } }) => {
+      return client.comment.findMany({
+        include: { author: true },
+        where: { postId: id },
+      })
+    },
+    { body: t.Object({ id: t.String() }) },
+  )
 
 const app = new Elysia().use(api)
 
@@ -58,3 +62,4 @@ if (process.env.NODE_ENV !== 'development') {
 app.listen(3000, (debug) => console.log(`🚀 running on ${debug.url.origin}`))
 
 export type App = typeof app
+export * from '@prisma/client'
