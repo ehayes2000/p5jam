@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { client, TPost } from '../client'
+import { client, TPost, getMyId } from '../client'
 import Comments from './Comments'
 
 export function Sketch({ id }: { id: string }) {
@@ -15,15 +15,9 @@ export function Sketch({ id }: { id: string }) {
   )
 }
 
-export default function Post({
-  post: p,
-  liked,
-}: {
-  post: TPost
-  liked: boolean
-}) {
-  console.log('is liked,', liked, p.id)
-  const [isLiked, setIsLiked] = useState<boolean>(liked)
+export default function Post({ post: p }: { post: TPost }) {
+  const [myId, setMyId] = useState<string | null>(null)
+  const [isLiked, setIsLiked] = useState<boolean>()
   const [openComments, setOpenComments] = useState<boolean>(false)
   const [comments, setComments] = useState<typeof p.comments>(p.comments)
 
@@ -45,6 +39,9 @@ export default function Post({
       const width = pref.current.offsetWidth
       pref.current.style.width = `${width}px`
     }
+    getMyId().then((id) => {
+      setIsLiked(p.likes.includes(id ?? ''))
+    })
   }, [])
 
   return (

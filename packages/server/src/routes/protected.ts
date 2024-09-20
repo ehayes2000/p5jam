@@ -182,7 +182,7 @@ export const makeProtectedRoutes = (
         )
     })
     .get('/users/:id/posts', async ({ userId, params: { id } }) => {
-      const posts = await client.post.findMany({
+      let posts = await client.post.findMany({
         include: {
           comments: {
             include: { author: true },
@@ -191,24 +191,24 @@ export const makeProtectedRoutes = (
             },
           },
           author: true,
-        },
-        orderBy: {
-          updatedAt: 'desc',
+          likes: {
+            select: {
+              userId: true,
+            },
+          },
         },
         where: {
-          authorId: userId,
-          ...(userId === id ? {} : { published: true }),
+          published: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
         },
       })
-      return posts ?? ([] as Post[])
-    })
-    .get('/users/likes', async ({ userId }) => {
-      return (
-        await client.like.findMany({
-          where: { userId },
-          select: { postId: true },
-        })
-      ).map(({ postId }) => postId)
+      // TODO
+      return posts.map((post) => ({
+        ...post,
+        likes: post.likes.map((like) => like.userId),
+      }))
     })
     .get('/greet', async ({ userId }) => {
       const user = await client.user.findUnique({

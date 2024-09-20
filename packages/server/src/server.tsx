@@ -19,7 +19,7 @@ export const api = new Elysia({ prefix: '/api' })
     return <ScriptTemplate script={post.script} />
   })
   .get('/posts', async () => {
-    const posts = await client.post.findMany({
+    let posts = await client.post.findMany({
       include: {
         comments: {
           include: { author: true },
@@ -28,12 +28,24 @@ export const api = new Elysia({ prefix: '/api' })
           },
         },
         author: true,
+        likes: {
+          select: {
+            userId: true,
+          },
+        },
       },
       where: {
         published: true,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     })
-    return (posts ?? ([] as Post[])).reverse()
+    // TODO
+    return posts.map((post) => ({
+      ...post,
+      likes: post.likes.map((like) => like.userId),
+    }))
   })
   .get('/users', async () => {
     return await client.user.findMany()
