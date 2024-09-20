@@ -22,6 +22,7 @@ model User {
   posts        Post[]
   sessions     Session[]
   comments     Comment[]
+  Like         Like[]
 }
 
 model Post {
@@ -38,6 +39,7 @@ model Post {
   author       User      @relation(fields: [authorId], references: [id])
   authorId     String
   comments     Comment[]
+  Like         Like[]
 }
 
 model Comment {
@@ -49,4 +51,13 @@ model Comment {
   authorId  String
   post      Post     @relation(fields: [postId], references: [id])
   postId    String
+}
+
+model Like {
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+  post   Post   @relation(fields: [postId], references: [id])
+  postId String
+
+  @@id([userId, postId])
 }

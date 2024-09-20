@@ -15,7 +15,15 @@ export function Sketch({ id }: { id: string }) {
   )
 }
 
-export default function Post({ post: p }: { post: TPost }) {
+export default function Post({
+  post: p,
+  liked,
+}: {
+  post: TPost
+  liked: boolean
+}) {
+  console.log('is liked,', liked, p.id)
+  const [isLiked, setIsLiked] = useState<boolean>(liked)
   const [openComments, setOpenComments] = useState<boolean>(false)
   const [comments, setComments] = useState<typeof p.comments>(p.comments)
 
@@ -50,7 +58,21 @@ export default function Post({ post: p }: { post: TPost }) {
       <div className=""> {p.description} </div>
       <div className="flex gap-4 justify-start">
         <span>
-          <i className="bi bi-heart"> </i>
+          <button
+            onClick={() => {
+              if (isLiked) {
+                client.api.posts({ id: p.id }).like.delete()
+                p.likeCount -= 1
+                setIsLiked(false)
+              } else {
+                client.api.posts({ id: p.id }).like.post()
+                p.likeCount += 1
+                setIsLiked(true)
+              }
+            }}
+          >
+            <i className={`bi ${isLiked ? 'bi-heart-fill' : 'bi-heart'}`}> </i>
+          </button>
           <span> {p.likeCount} </span>
         </span>
         <span className="px-1">

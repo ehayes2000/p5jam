@@ -88,6 +88,12 @@ export const makeProtectedRoutes = (
           select: { postCount: true },
         })
         await client.$transaction([
+          client.comment.deleteMany({
+            where: { postId: id },
+          }),
+          client.like.deleteMany({
+            where: { postId: id },
+          }),
           client.post.delete({
             where: {
               id,
@@ -118,8 +124,62 @@ export const makeProtectedRoutes = (
         })
         return posts
       } catch (e) {
+        console.log(e)
         return error(404)
       }
+    })
+    .post('/posts/:id/like', async ({ userId, params: { id } }) => {
+      try {
+        await client.like
+          .create({
+            data: {
+              postId: id,
+              userId,
+            },
+          })
+          .then(
+            async (_) =>
+              await client.post.findFirstOrThrow({
+                where: { id },
+                select: { likeCount: true },
+              }),
+          )
+          .then(
+            async (likes) =>
+              await client.post.update({
+                where: { id },
+                data: { likeCount: likes.likeCount + 1 },
+              }),
+          )
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
+    })
+    .delete('/posts/:id/like', async ({ userId, params: { id } }) => {
+      await client.like
+        .delete({
+          where: {
+            userId_postId: {
+              userId,
+              postId: id,
+            },
+          },
+        })
+        .then(
+          async () =>
+            await client.post.findFirstOrThrow({
+              where: { id },
+              select: { likeCount: true },
+            }),
+        )
+        .then(
+          async (likes) =>
+            await client.post.update({
+              where: { id },
+              data: { likeCount: likes.likeCount - 1 },
+            }),
+        )
     })
     .get('/users/:id/posts', async ({ userId, params: { id } }) => {
       const posts = await client.post.findMany({
@@ -141,6 +201,14 @@ export const makeProtectedRoutes = (
         },
       })
       return posts ?? ([] as Post[])
+    })
+    .get('/users/likes', async ({ userId }) => {
+      return (
+        await client.like.findMany({
+          where: { userId },
+          select: { postId: true },
+        })
+      ).map(({ postId }) => postId)
     })
     .get('/greet', async ({ userId }) => {
       const user = await client.user.findUnique({
