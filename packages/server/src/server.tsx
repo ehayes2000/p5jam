@@ -1,11 +1,11 @@
 import { Elysia, t } from 'elysia'
 import { Html, html } from '@elysiajs/html'
 import { staticPlugin } from '@elysiajs/static'
+import { swagger } from '@elysiajs/swagger'
 import ScriptTemplate from './scriptTemplate'
 import { login } from './routes/login'
 import protectedRoutes from './routes/protected'
 import client from './prisma'
-import { Post } from '@prisma/client'
 
 export const api = new Elysia({ prefix: '/api' })
   .use(html())
@@ -64,7 +64,7 @@ export const api = new Elysia({ prefix: '/api' })
     { body: t.Object({ id: t.String() }) },
   )
 
-const app = new Elysia().use(api)
+const app = new Elysia().use(api).use(swagger())
 
 if (process.env.NODE_ENV !== 'development') {
   app.use(

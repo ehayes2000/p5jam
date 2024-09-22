@@ -23,10 +23,11 @@
 5. Comments
 
 - [x] create, delete
-- [ ] ui for create / delete
-- [ ] ui to display
+- [x] ui for create / delete
+- [x] ui to display
 
-6. Likes
+6. - [x] Likes
+
 7. Views
 
 8. Better profiles
@@ -37,3 +38,8 @@
    - See other users profiles
 
 9. Branding
+
+10. Code Jam feature
+
+- Start a temp event that can be shared
+- Users can submit sketches to the event
