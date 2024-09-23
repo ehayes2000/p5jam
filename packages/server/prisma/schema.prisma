@@ -32,7 +32,6 @@ model Post {
   description  String    @default("")
   content      String    @default("")
   script       String    @default("")
-  published    Boolean   @default(false)
   likeCount    Int       @default(0)
   viewCount    Int       @default(0)
   commentCount Int       @default(0)

@@ -23,9 +23,9 @@ function Profile() {
   }, [])
 
   const deletePost = async (id: string) => {
-    const updated = await client.api.posts({ id }).delete()
-    if (updated.data) {
-      setMyPosts(updated.data)
+    await client.api.posts({ id }).delete()
+    if (myPosts) {
+      setMyPosts(myPosts.filter((p) => p.id !== id))
     }
   }
 

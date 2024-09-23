@@ -11,7 +11,7 @@ export const client = treaty<App>('', {
 export const getMyId = async (): Promise<string | null> => {
   const cachedId = localStorage.getItem('uid')
   if (cachedId) return cachedId
-  const id = await client.api.myid.get()
+  const id = await client.api.login.myid.get()
   if (id.data) {
     localStorage.setItem('uid', id.data.id)
     return id.data.id
@@ -21,5 +21,5 @@ export const getMyId = async (): Promise<string | null> => {
 }
 
 export type TPost = NonNullable<
-  Awaited<ReturnType<typeof client.api.posts.get>>['data']
+  Awaited<ReturnType<typeof client.api.feed.get>>['data']
 >[number]

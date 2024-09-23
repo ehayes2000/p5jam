@@ -1,8 +1,7 @@
 import { Outlet, Link } from 'react-router-dom'
-
 function Root() {
   return (
-    <div className="w-full h-full sm:grid sm:grid-flow-col sm:grid-cols-5 sm:divide-x">
+    <div className="w-full h-full sm:grid sm:grid-flow-col sm:grid-cols-5 sm:divide-x overflow-hidden">
       <div className="fixed bottom-0 w-full p-6 flex gap-8 font-bold sm:relative sm:flex-col sm:justify-start sm:gap-4">
         <Link to="explore">Explore</Link>
         <Link to="users">Users</Link>

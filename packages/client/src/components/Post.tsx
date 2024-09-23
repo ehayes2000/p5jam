@@ -10,24 +10,32 @@ export function Sketch({ id }: { id: string }) {
       height="360"
       scrolling="no" // TODO
       className="rounded-sm"
-      src={`${import.meta.env.VITE_API_BASE}/api/posts/script/${id}`}
+      src={`${import.meta.env.VITE_API_BASE}/api/posts/${id}/script`}
     ></iframe>
   )
 }
 
-export default function Post({ post: p }: { post: TPost }) {
+export default function Post({
+  post: p,
+  isComments,
+}: {
+  post: TPost
+  isComments?: boolean
+}) {
   const [myId, setMyId] = useState<string | null>(null)
   const [isLiked, setIsLiked] = useState<boolean>()
-  const [openComments, setOpenComments] = useState<boolean>(false)
+  const [openComments, setOpenComments] = useState<boolean>(isComments ?? false)
   const [comments, setComments] = useState<typeof p.comments>(p.comments)
 
   const postComment = async ({ text }: { text: string }) => {
-    const newComment = await client.api.comments.post({ text, postId: p.id })
+    const newComment = await client.api
+      .posts({ id: p.id })
+      .comments.post({ text })
     if (newComment.data) setComments([newComment.data, ...comments])
   }
 
   const deleteComment = async ({ id }: { id: string }) => {
-    await client.api.comments.delete({ id })
+    await client.api.posts({ id: p.id }).comments({ commentId: id }).delete()
     setComments(comments.filter((c) => c.id !== id))
   }
 
@@ -36,11 +44,13 @@ export default function Post({ post: p }: { post: TPost }) {
   // TODO
   useEffect(() => {
     if (pref.current) {
+      //@ts-ignore
       const width = pref.current.offsetWidth
+      //@ts-ignore
       pref.current.style.width = `${width}px`
     }
     getMyId().then((id) => {
-      setIsLiked(p.likes.includes(id ?? ''))
+      if (id) setIsLiked(id in p.likes)
     })
   }, [])
 
@@ -48,7 +58,7 @@ export default function Post({ post: p }: { post: TPost }) {
     <div
       ref={pref}
       key={p.id}
-      className="border rounded-md p-2 grid content-center justify-center gap-1"
+      className="border rounded-md p-2 grid content-center justify-center gap-1 cursor-pointer"
     >
       <h2 className=""> {p.author.name} </h2>
       <Sketch id={p.id} />
@@ -69,16 +79,24 @@ export default function Post({ post: p }: { post: TPost }) {
             }}
           >
             <i className={`bi ${isLiked ? 'bi-heart-fill' : 'bi-heart'}`}> </i>
+            <span> {p.likeCount} </span>
           </button>
-          <span> {p.likeCount} </span>
         </span>
         <span className="px-1">
-          <button onClick={() => setOpenComments(!openComments)}>
+          <button onClick={() => setOpenComments((p) => !p)}>
+            <i className={`bi bi-chat`}></i>
+            <span> {comments.length} </span>
+          </button>
+        </span>
+        <span>
+          <button>
             <i
-              className={`bi  ${openComments ? 'bi-chat-fill' : 'bi-chat'}`}
+              className={`bi bi-box-arrow-up`}
+              onClick={() => {
+                navigator.clipboard.writeText(`${origin}/posts/${p.id}`)
+              }}
             ></i>
           </button>
-          <span> {comments.length} </span>
         </span>
       </div>
       {openComments ? (

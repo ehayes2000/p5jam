@@ -1,6 +1,5 @@
-import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { client, TPost, getMyId } from '../client'
+import { TPost, getMyId } from '../client'
 
 export default function Comments({
   comments,
@@ -11,7 +10,7 @@ export default function Comments({
   postComment: (t: { text: string }) => Promise<void>
   deleteComment: (id: { id: string }) => Promise<void>
 }) {
-  const [myComment, setMyComment] = useState<string>('')
+  const [myComment, setMyComment] = useState<string>('') // who ?
   const [myId, setMyId] = useState<string | null>(null)
   useEffect(() => {
     ;(async () => {
