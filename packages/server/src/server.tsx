@@ -4,9 +4,9 @@ import { staticPlugin } from '@elysiajs/static'
 import { swagger } from '@elysiajs/swagger'
 import loginRoutes from './routes/login'
 import postsRoutes from './routes/posts'
-// import protectedRoutes from './routes/protected'
 import { feed, post, userPosts } from './queries'
 import client from './prisma'
+import jamRoutes from './routes/jams'
 
 export const api = new Elysia({ prefix: '/api' })
   .guard({
@@ -18,6 +18,7 @@ export const api = new Elysia({ prefix: '/api' })
   .use(html())
   .use(loginRoutes())
   .use(postsRoutes())
+  .use(jamRoutes())
   .get('/feed', feed)
   .get('/users', async () => {
     return await client.user.findMany()
