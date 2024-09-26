@@ -43,6 +43,7 @@ export default function NewJam({
       title,
       durationMs,
     })
+    console.log('NEW POST', newPost)
     if (newPost.data?.id) {
       nav(`/jam/${newPost.data.id}`)
     } else {

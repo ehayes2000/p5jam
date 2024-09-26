@@ -13,6 +13,7 @@ function Profile() {
       const myId = await getMyId()
       if (!myId) {
         setMyPosts([])
+        navigate('/login')
         return
       }
       const posts = await client.api.users({ id: myId }).posts.get()
@@ -42,21 +43,21 @@ function Profile() {
   }
 
   return (
-    <div className="grid gap-4 justify-center p-6">
+    <div className="grid justify-center gap-4 p-6">
       {myPosts ? (
         <>
           {myPosts.map((p) => (
             <div key={p.id}>
-              <div className="p-1 flex lex gap-1">
+              <div className="lex flex gap-1 p-1">
                 <button
                   onClick={() => editPost(p)}
-                  className="bg-gray-200 px-2 rounded-sm hover:bg-gray-300"
+                  className="rounded-sm bg-gray-200 px-2 hover:bg-gray-300"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => deletePost(p.id)}
-                  className="bg-gray-200 px-2 rounded-sm hover:bg-gray-300"
+                  className="rounded-sm bg-gray-200 px-2 hover:bg-gray-300"
                 >
                   Delete
                 </button>

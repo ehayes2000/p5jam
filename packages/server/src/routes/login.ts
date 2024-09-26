@@ -10,9 +10,8 @@ interface GitHubUser {
 }
 
 export default function loginRoutes() {
-  return new Elysia({ prefix: '/login' })
-    .use(authRoutes)
-    .get('/github', async ({ cookie, redirect }) => {
+  return new Elysia()
+    .get('/login/github', async ({ cookie, redirect }) => {
       const state = generateState()
       const url = await github.createAuthorizationURL(state)
       cookie.github_oauth_state.set({
@@ -26,7 +25,7 @@ export default function loginRoutes() {
       return redirect(url.toString())
     })
     .get(
-      '/github/callback',
+      '/login/github/callback',
       async ({
         cookie: { github_oauth_state, auth_session },
         query,
@@ -96,10 +95,6 @@ export default function loginRoutes() {
         }
       },
     )
-}
-
-const authRoutes = () =>
-  new Elysia()
     .derive(authMiddleware)
     .guard({
       as: 'local',
@@ -107,6 +102,7 @@ const authRoutes = () =>
         if (!isAuth) return error(401)
       },
     })
-    .get('/myid', async ({ userId }) => {
+    .get('/login/myid', async ({ userId }) => {
       return { id: userId }
     })
+}
