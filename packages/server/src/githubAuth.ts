@@ -2,7 +2,7 @@ import { Context } from 'elysia'
 import { Lucia } from 'lucia'
 import { GitHub } from 'arctic'
 import { PrismaAdapter } from '@lucia-auth/adapter-prisma'
-import client from './prisma'
+import client from '../prisma/prisma'
 import { User } from '@prisma/client'
 import { isAsync } from 'elysia/dist/compose'
 

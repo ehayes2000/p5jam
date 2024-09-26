@@ -5,7 +5,7 @@ import { swagger } from '@elysiajs/swagger'
 import loginRoutes from './routes/login'
 import postsRoutes from './routes/posts'
 import { feed, post, userPosts } from './queries'
-import client from './prisma'
+import client from '../prisma/prisma'
 import jamRoutes from './routes/jams'
 
 export const api = new Elysia({ prefix: '/api' })

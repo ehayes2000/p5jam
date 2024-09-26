@@ -3,7 +3,7 @@ import { OAuth2RequestError, generateState } from 'arctic'
 import { v4 as uuid } from 'uuid'
 import { github, lucia, authMiddleware } from '../githubAuth'
 import { type User } from '@prisma/client'
-import client from '../prisma'
+import client from '../../prisma/prisma'
 
 interface GitHubUser {
   login: string

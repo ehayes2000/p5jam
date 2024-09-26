@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid'
 import { Elysia, t } from 'elysia'
 import { Html, html } from '@elysiajs/html'
-import client from '../prisma'
+import client from '../../prisma/prisma'
 import { authMiddleware } from '../githubAuth'
 import ScriptTemplate from '../scriptTemplate'
 import { post, userPosts } from '../queries'

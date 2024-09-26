@@ -1,8 +1,8 @@
 import { v4 as uuid } from 'uuid'
 import { addMilliseconds } from 'date-fns'
-import { Elysia, t } from 'elysia'
+import { Elysia, t, Context } from 'elysia'
 import { authMiddleware } from '../githubAuth'
-import client from '../prisma'
+import client from '../../prisma/prisma'
 
 export const generateInviteCode = async (): Promise<string> => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -16,15 +16,20 @@ export const generateInviteCode = async (): Promise<string> => {
 }
 
 export default function jamRoutes() {
-  return new Elysia({ prefix: 'jams' })
-    .derive(authMiddleware)
+  return makeJamRoutes(authMiddleware)
+}
+
+export const makeJamRoutes = (
+  auth: (ctx: Context) => Promise<{ isAuth: boolean; userId: string }>,
+) => {
+  return new Elysia()
+    .derive(auth)
     .guard({
-      as: 'local',
       beforeHandle: async ({ isAuth, error }) => {
         if (!isAuth) return error(401)
       },
     })
-    .get('/', async () => {
+    .get('/jams', async () => {
       return await client.jam.findMany({
         include: {
           Post: true,
@@ -35,11 +40,15 @@ export default function jamRoutes() {
         },
       })
     })
-    .get('/:id', async ({ params: { id }, error }) => {
+    .get('/jams/:id', async ({ params: { id }, error }) => {
       const jams = await client.jam.findUnique({
         include: {
           Post: true,
-          JamParticipant: true,
+          JamParticipant: {
+            where: {
+              active: true,
+            },
+          },
         },
         where: {
           id,
@@ -49,30 +58,37 @@ export default function jamRoutes() {
       return jams
     })
     .post(
-      '/',
-      async ({ userId, body: { title, durationMs } }) => {
+      '/jams',
+      async ({ userId, error, body: { title, durationMs } }) => {
         const inviteCode = await generateInviteCode()
         const startTime = new Date()
         const endTime = addMilliseconds(startTime, durationMs)
-        const [comeOnandSlam, andWelcomeToTheJam] = await client.$transaction([
-          client.jam.create({
-            data: {
-              id: inviteCode,
-              ownerId: userId,
-              startTime: startTime,
-              endTime: endTime,
-              lateWindowMinutes: 60,
-              title,
-            },
-          }),
-          client.jamParticipant.create({
-            data: {
-              jamId: inviteCode,
-              userId,
-            },
-          }),
-        ])
-        return { id: comeOnandSlam.id }
+        try {
+          const [comeOnandSlam, andWelcomeToTheJam] = await client.$transaction(
+            [
+              client.jam.create({
+                data: {
+                  id: inviteCode,
+                  ownerId: userId,
+                  startTime: startTime,
+                  endTime: endTime,
+                  lateWindowMinutes: 60,
+                  title,
+                },
+              }),
+              client.jamParticipant.create({
+                data: {
+                  jamId: inviteCode,
+                  userId,
+                },
+              }),
+            ],
+          )
+          return { id: comeOnandSlam.id }
+        } catch (e) {
+          console.error(e)
+          return error(500)
+        }
       },
       {
         body: t.Object({
@@ -81,7 +97,7 @@ export default function jamRoutes() {
         }),
       },
     )
-    .delete('/:id', async ({ userId, params: { id } }) => {
+    .delete('/jams/:id', async ({ userId, params: { id } }) => {
       client.jam.update({
         where: {
           id,
@@ -93,34 +109,49 @@ export default function jamRoutes() {
         },
       })
     })
-    .post('/:id/join', async ({ userId, error, params: { id } }) => {
-      const activeJam = await client.jamParticipant.findFirst({
-        select: {
-          jam: {
-            select: {
-              id: true,
-              acceptingSubmisions: true,
+    .post('/jams/:id/join', async ({ userId, error, params: { id } }) => {
+      try {
+        const activeJam = await client.jamParticipant.findFirst({
+          select: {
+            jam: {
+              select: {
+                id: true,
+                acceptingSubmisions: true,
+              },
             },
           },
-        },
-        where: {
-          userId,
-          jam: {
-            acceptingSubmisions: true,
+          where: {
+            userId,
+            jam: {
+              acceptingSubmisions: true,
+            },
+            active: true,
           },
-        },
-      })
-      if (activeJam) {
-        return error(405)
+        })
+        if (activeJam) {
+          return error(405)
+        }
+        const a = await client.jamParticipant.upsert({
+          where: {
+            jamId_userId: {
+              userId,
+              jamId: id,
+            },
+          },
+          create: {
+            jamId: id,
+            userId,
+          },
+          update: {
+            active: true,
+          },
+        })
+      } catch (e) {
+        console.error(e)
+        return error(500)
       }
-      await client.jamParticipant.create({
-        data: {
-          userId,
-          jamId: id,
-        },
-      })
     })
-    .delete('/:id/leave', async ({ userId, params: { id } }) => {
+    .delete('/jams/:id/leave', async ({ userId, params: { id } }) => {
       await client.jamParticipant.update({
         where: {
           jamId_userId: {
@@ -133,7 +164,7 @@ export default function jamRoutes() {
         },
       })
     })
-    .get('/activeJam', async ({ userId }) => {
+    .get('/jams/activeJam', async ({ userId }) => {
       const activeJam = await client.jamParticipant.findFirst({
         select: {
           jam: {

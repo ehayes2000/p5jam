@@ -1,4 +1,4 @@
-import client from './prisma'
+import client from '../prisma/prisma'
 
 export const feed = async () =>
   client.post
@@ -24,10 +24,13 @@ export const feed = async () =>
     .then((posts) =>
       posts.map((post) => ({
         ...post,
-        likes: post.likes.reduce((acc, like) => {
-          acc[like.userId] = true
-          return acc
-        }, {} as { [key: string]: true }),
+        likes: post.likes.reduce(
+          (acc, like) => {
+            acc[like.userId] = true
+            return acc
+          },
+          {} as { [key: string]: true },
+        ),
       })),
     )
 
@@ -55,10 +58,13 @@ export const userPosts = async (userId: string) =>
     .then((posts) =>
       posts.map((post) => ({
         ...post,
-        likes: post.likes.reduce((a, l) => {
-          a[l.userId] = true
-          return a
-        }, {} as { [k: string]: true }),
+        likes: post.likes.reduce(
+          (a, l) => {
+            a[l.userId] = true
+            return a
+          },
+          {} as { [k: string]: true },
+        ),
       })),
     )
 
@@ -85,10 +91,13 @@ export const post = async (id: string) =>
       if (post) {
         return {
           ...post,
-          likes: post.likes.reduce((acc, like) => {
-            acc[like.userId] = true
-            return acc
-          }, {} as { [k: string]: true }),
+          likes: post.likes.reduce(
+            (acc, like) => {
+              acc[like.userId] = true
+              return acc
+            },
+            {} as { [k: string]: true },
+          ),
         }
       } else {
         return null

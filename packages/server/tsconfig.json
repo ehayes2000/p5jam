@@ -12,5 +12,5 @@
     "types": ["@elysiajs/html"],
     "skipLibCheck": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "prisma/prisma.ts"]
 }
