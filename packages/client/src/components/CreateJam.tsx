@@ -52,9 +52,9 @@ export default function NewJam({
 
   return (
     <div className="flex h-full w-full items-center justify-center">
-      <div className="content-left w-1/3">
+      <div className="content-left">
         <button
-          className="z-50 -ml-4 h-8 w-8 border border-black bg-red-400 hover:bg-red-600"
+          className="z-25 -ml-4 h-8 w-8 border border-black bg-red-400 hover:bg-red-600"
           onClick={closeCallback}
         >
           <i className="bi bi-x-lg" />

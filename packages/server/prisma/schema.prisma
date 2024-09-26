@@ -67,24 +67,24 @@ model Like {
 
 model JamParticipant {
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User    @relation(fields: [userId], references: [id])
   jamId  String
-  jam    Jam    @relation(fields: [jamId], references: [id])
+  jam    Jam     @relation(fields: [jamId], references: [id])
+  active Boolean @default(true)
 
   @@id([jamId, userId])
 }
 
 model Jam {
-  id                 String           @id
-  inviteCode         String
-  ownerId            String
-  creator            User             @relation(fields: [ownerId], references: [id])
-  startTime          DateTime         @default(now())
-  endTime            DateTime
-  lateWindowMinutes  Int
-  title              String
-  JamParticipant     JamParticipant[]
-  Post               Post[]
-  isDeleted          Boolean          @default(false)
-  acceptingSolutions Boolean          @default(true)
+  id                  String           @id
+  ownerId             String
+  creator             User             @relation(fields: [ownerId], references: [id])
+  startTime           DateTime         @default(now())
+  endTime             DateTime
+  lateWindowMinutes   Int
+  title               String
+  JamParticipant      JamParticipant[]
+  Post                Post[]
+  isDeleted           Boolean          @default(false)
+  acceptingSubmisions Boolean          @default(true)
 }
