@@ -5,7 +5,7 @@ import { authMiddleware } from '../githubAuth'
 import client from '../prisma'
 
 export const generateInviteCode = async (): Promise<string> => {
-  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
   const codeLen = 5
   // hehexd
   let code = ''
@@ -54,16 +54,24 @@ export default function jamRoutes() {
         const inviteCode = await generateInviteCode()
         const startTime = new Date()
         const endTime = addMilliseconds(startTime, durationMs)
-        const comeOnandSlam = await client.jam.create({
-          data: {
-            id: inviteCode,
-            ownerId: userId,
-            startTime: startTime,
-            endTime: endTime,
-            lateWindowMinutes: 60,
-            title,
-          },
-        })
+        const [comeOnandSlam, andWelcomeToTheJam] = await client.$transaction([
+          client.jam.create({
+            data: {
+              id: inviteCode,
+              ownerId: userId,
+              startTime: startTime,
+              endTime: endTime,
+              lateWindowMinutes: 60,
+              title,
+            },
+          }),
+          client.jamParticipant.create({
+            data: {
+              jamId: inviteCode,
+              userId,
+            },
+          }),
+        ])
         return { id: comeOnandSlam.id }
       },
       {
@@ -85,7 +93,7 @@ export default function jamRoutes() {
         },
       })
     })
-    .post(':id/joinJam', async ({ userId, error, params: { id } }) => {
+    .post('/:id/join', async ({ userId, error, params: { id } }) => {
       const activeJam = await client.jamParticipant.findFirst({
         select: {
           jam: {
@@ -112,7 +120,7 @@ export default function jamRoutes() {
         },
       })
     })
-    .delete('/:id/leaveJam', async ({ userId, params: { id } }) => {
+    .delete('/:id/leave', async ({ userId, params: { id } }) => {
       await client.jamParticipant.update({
         where: {
           jamId_userId: {
