@@ -71,7 +71,7 @@ export default function jamRoutes() {
         const inviteCode = await generateInviteCode()
         const startTime = new Date()
         const endTime = addMilliseconds(startTime, durationMs)
-        client.jam.create({
+        const comeOnandSlam = await client.jam.create({
           data: {
             id: uuid(),
             inviteCode,
@@ -82,6 +82,7 @@ export default function jamRoutes() {
             title,
           },
         })
+        return { id: comeOnandSlam.id }
       },
       {
         body: t.Object({

@@ -6,6 +6,7 @@ import {
   Navigate,
   ScrollRestoration,
 } from 'react-router-dom'
+
 import Root from './pages/root'
 import ErrorPage from './pages/errorPage'
 import Explore from './pages/explore'
@@ -16,6 +17,9 @@ import LoginPage from './pages/login'
 import Profile from './pages/profile'
 import EditPost from './pages/editPost'
 import PostDetails from './pages/PostDetails'
+import Home from './pages/home'
+import JoinJam from './pages/joinJam'
+import Jam from './pages/jam'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'highlight.js/styles/default.min.css'
 import './index.css'
@@ -28,7 +32,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/explore" replace />, // This will redirect to /explore
+        element: <Home />,
       },
       {
         path: 'explore',
@@ -62,6 +66,10 @@ export const router = createBrowserRouter([
         path: 'posts/:id',
         element: <PostDetails />,
       },
+      {
+        path: 'jam/:id',
+        element: <Jam />,
+      },
     ],
   },
 ])
@@ -69,5 +77,5 @@ export const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <RouterProvider router={router} />
-  </StrictMode>
+  </StrictMode>,
 )
