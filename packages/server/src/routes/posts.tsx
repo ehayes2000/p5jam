@@ -16,6 +16,39 @@ export const postMutators = () =>
       },
     })
     .post(
+      '/jam/:jamId',
+      async ({ body, userId, params: { jamId }, error }) => {
+        const postCount = await client.user.findUniqueOrThrow({
+          where: { id: userId },
+          select: { postCount: true },
+        })
+
+        const [newPost, _] = await client.$transaction([
+          client.post.create({
+            data: {
+              ...body,
+              id: uuid(),
+              content: '',
+              likeCount: 0,
+              viewCount: 0,
+              author: { connect: { id: userId } },
+            },
+          }),
+          client.user.update({
+            where: { id: userId },
+            data: { postCount: postCount.postCount + 1 },
+          }),
+        ])
+        return newPost
+      },
+      {
+        body: t.Object({
+          script: t.String(),
+          description: t.String(),
+        }),
+      },
+    )
+    .post(
       '/', // TODO "posts"
       async ({ body, userId, error }) => {
         try {
@@ -40,7 +73,7 @@ export const postMutators = () =>
             }),
           ])
           return { post: newPost }
-        } catch (error: any) {
+        } catch (e: any) {
           return error(400)
         }
       },

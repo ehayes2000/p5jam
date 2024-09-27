@@ -4,8 +4,12 @@ import client from './prisma'
 
 const userData: Prisma.UserCreateInput[] = [
   {
-    id: 'testUser',
-    name: 'testUser',
+    id: 'testUserOwner',
+    name: 'testUserOwner',
+  },
+  {
+    id: 'testUserParticipant',
+    name: 'testUserParticipant',
   },
 ]
 

@@ -8,7 +8,8 @@
     "build": "bun run clean && bunx prisma generate && tsc",
     "build:declaration": "tsc --emitDeclarationOnly ./src/server.tsx",
     "generate": "bunx prisma generate",
-    "test": "NODE_ENV=test bun scripts/test.ts  && bun test"
+    "test": "NODE_ENV=test bun scripts/test.ts  && bun test",
+    "inspect": "NODE_ENV=dev bunx prisma studio"
   },
   "prettier": {
     "semi": false,

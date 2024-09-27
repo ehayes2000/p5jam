@@ -4,7 +4,7 @@ import { type TJam, client } from '../client'
 import useStore from '../stateStore'
 
 export default function Jam({ jam }: { jam: TJam }) {
-  const { setJam } = useStore()
+  const { setJam, setPost } = useStore()
   const nav = useNavigate()
 
   const leaveJam = () => {
@@ -14,6 +14,28 @@ export default function Jam({ jam }: { jam: TJam }) {
         setJam(null)
         nav('/')
       }
+    })()
+  }
+
+  const newSketch = () => {
+    ;(async () => {
+      const { data } = await client.api.posts.jam({ jamId: jam.id }).post({
+        description: '',
+        script: `
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(220);
+}        
+        `,
+      })
+      if (data) {
+        console.log('CREATED POST!!!!!!!!!', data)
+        setPost(data)
+      }
+      if (data?.id) nav(`/editPost`)
     })()
   }
 
@@ -41,7 +63,10 @@ export default function Jam({ jam }: { jam: TJam }) {
         </div>
       </div>
       <div className="-my-6 flex items-center justify-around px-16 text-2xl">
-        <button className="border border-black bg-emerald-400 px-4 py-2 font-medium hover:bg-emerald-600">
+        <button
+          onClick={newSketch}
+          className="border border-black bg-emerald-400 px-4 py-2 font-medium hover:bg-emerald-600"
+        >
           <i className="italic"> + </i> New Sketch
         </button>
         <div className="flex gap-1">

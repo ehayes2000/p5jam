@@ -1,19 +1,10 @@
-import { useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import useStore from '../stateStore'
 import { client } from '../client'
 import PostEditor from '../components/PostEditor'
 
 function EditPost() {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { post } =
-    (location.state as {
-      post: { id: string; description: string; script: string }
-    }) || null
-
-  useEffect(() => {
-    if (!post) navigate('/')
-  }, [post])
+  const { post } = useStore()
+  console.log('EDIT POST', post)
 
   return (
     <div>
@@ -26,7 +17,7 @@ function EditPost() {
               .put({ script, description })
             return response.error === null
           }}
-          callbackText="Update Post"
+          callbackText="Post"
         /> // TODO reroute to profile?
       ) : (
         <></>

@@ -16,7 +16,7 @@ import NewPost from './pages/newPost'
 import LoginPage from './pages/login'
 import Profile from './pages/profile'
 import EditPost from './pages/editPost'
-import PostDetails from './pages/PostDetails'
+import PostDetails from './pages/postDetails'
 import Home from './pages/home'
 import Jam from './pages/jamPage'
 import 'bootstrap-icons/font/bootstrap-icons.css'
@@ -44,10 +44,6 @@ export const router = createBrowserRouter([
       {
         path: 'user/:id',
         element: <User />,
-      },
-      {
-        path: 'makePost',
-        element: <NewPost />,
       },
       {
         path: 'login',

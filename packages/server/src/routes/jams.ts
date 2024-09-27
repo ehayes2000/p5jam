@@ -72,7 +72,6 @@ export const makeJamRoutes = (
                   ownerId: userId,
                   startTime: startTime,
                   endTime: endTime,
-                  lateWindowMinutes: 60,
                   title,
                 },
               }),
@@ -102,8 +101,10 @@ export const makeJamRoutes = (
         where: {
           id,
           ownerId: userId,
+          endTime: {
+            lte: new Date(),
+          },
         },
-
         data: {
           isDeleted: true,
         },
@@ -111,27 +112,41 @@ export const makeJamRoutes = (
     })
     .post('/jams/:id/join', async ({ userId, error, params: { id } }) => {
       try {
-        const activeJam = await client.jamParticipant.findFirst({
+        const activeParticipant = await client.jamParticipant.findFirst({
           select: {
             jam: {
               select: {
                 id: true,
-                acceptingSubmisions: true,
               },
             },
           },
           where: {
             userId,
             jam: {
-              acceptingSubmisions: true,
+              endTime: {
+                gte: new Date(),
+              },
             },
             active: true,
           },
         })
-        if (activeJam) {
+        if (activeParticipant) {
           return error(405)
         }
-        const a = await client.jamParticipant.upsert({
+        const activeOwner = await client.jam.findFirst({
+          where: {
+            ownerId: userId,
+            endTime: {
+              gte: new Date(),
+            },
+          },
+        })
+
+        if (activeOwner) {
+          return error(405)
+        }
+
+        await client.jamParticipant.upsert({
           where: {
             jamId_userId: {
               userId,
@@ -146,6 +161,20 @@ export const makeJamRoutes = (
             active: true,
           },
         })
+        const jam = await client.jam.findUnique({
+          include: {
+            Post: true,
+            JamParticipant: {
+              where: {
+                active: true,
+              },
+            },
+          },
+          where: {
+            id,
+          },
+        })
+        return jam
       } catch (e) {
         console.error(e)
         return error(500)
@@ -154,6 +183,11 @@ export const makeJamRoutes = (
     .delete('/jams/:id/leave', async ({ userId, params: { id } }) => {
       await client.jamParticipant.update({
         where: {
+          jam: {
+            ownerId: {
+              not: userId,
+            },
+          },
           jamId_userId: {
             userId,
             jamId: id,
@@ -164,13 +198,12 @@ export const makeJamRoutes = (
         },
       })
     })
-    .get('/jams/activeJam', async ({ userId }) => {
+    .get('/jams/activeJam', async ({ userId, error }) => {
       const activeJam = await client.jamParticipant.findFirst({
         select: {
           jam: {
             select: {
               id: true,
-              acceptingSubmisions: true,
             },
           },
         },
@@ -178,10 +211,13 @@ export const makeJamRoutes = (
           userId,
           active: true,
           jam: {
-            acceptingSubmisions: true,
+            endTime: {
+              gte: new Date(),
+            },
           },
         },
       })
-      return activeJam
+      if (activeJam) return activeJam
+      return error(404)
     })
 }
