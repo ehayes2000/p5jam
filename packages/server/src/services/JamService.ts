@@ -1,14 +1,3 @@
-// what are the methods headers w
-/*
- * getJams - {opts: {filters: status / some other filter}}
- * getJamById
- * createJam - logic for adding jam creator as participants
- * deleteJam
- * joinJam
- * leaveJam
- *
- */
-
 import { addMilliseconds } from 'date-fns'
 import dbClient from '../prisma'
 
