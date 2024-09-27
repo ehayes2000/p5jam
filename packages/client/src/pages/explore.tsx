@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { client } from '../client'
 import Post from '../components/Post'
-import { QUERY_KEYS } from '../queries/client'
+import { QUERY_KEYS } from '../queries/queryClient'
 
 function Explore() {
   const { data: posts } = useQuery({

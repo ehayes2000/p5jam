@@ -1,7 +1,7 @@
 import { useSelector } from '@xstate/store/react'
 import { useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { useMyID } from '../queries/client'
+import { useMyID } from '../queries/queryClient'
 import { store } from '../stateStore'
 
 function Root() {

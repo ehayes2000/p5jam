@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import { client } from '../client'
 import Post from '../components/Post'
-import { QUERY_KEYS } from '../queries/client'
+import { QUERY_KEYS } from '../queries/queryClient'
 
 export default function User() {
   const { id } = useParams()

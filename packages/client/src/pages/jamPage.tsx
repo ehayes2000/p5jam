@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import { client } from '../client'
 import Jam from '../components/Jam'
-import { QUERY_KEYS } from '../queries/client'
+import { QUERY_KEYS } from '../queries/queryClient'
 
 export default function JamPage() {
   let { id } = useParams()

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { client } from '../client'
 import { useQuery } from '@tanstack/react-query'
-import { QUERY_KEYS } from '../queries/client'
+import { QUERY_KEYS } from '../queries/queryClient'
 
 function Users() {
   const { data: users } = useQuery({

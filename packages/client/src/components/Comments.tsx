@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { TPost } from '../client'
-import { useMyID } from '../queries/client'
+import { useMyID } from '../queries/queryClient'
 
 export default function Comments({
   comments,

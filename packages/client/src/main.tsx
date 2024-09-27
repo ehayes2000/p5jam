@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
@@ -17,7 +16,7 @@ import Profile from './pages/profile'
 import Root from './pages/root'
 import User from './pages/user'
 import Users from './pages/users'
-import { queryClient } from './queries/client'
+import { queryClient } from './queries/queryClient'
 
 export const router = createBrowserRouter([
   {

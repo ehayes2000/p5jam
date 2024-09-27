@@ -8,12 +8,6 @@ export const client = treaty<App>('', {
   },
 })
 
-export const getMyId = async (): Promise<string | null> => {
-  const myId = await client.api.login.myid.get()
-  if (myId.data) return myId.data.id
-  else return null
-}
-
 export type TPost = NonNullable<
   Awaited<ReturnType<typeof client.api.feed.get>>['data']
 >[number]

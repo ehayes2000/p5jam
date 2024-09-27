@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
 import { client } from '../client'
 import Post from '../components/Post'
-import { QUERY_KEYS, useMyID } from '../queries/client'
+import { QUERY_KEYS, useMyID } from '../queries/queryClient'
 
 function Profile() {
   const navigate = useNavigate()
