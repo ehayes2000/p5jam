@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { type TJam, client } from '../client'
-import useStore, { store } from '../stateStore'
+import { store } from '../stateStore'
 import Timer from './Timer'
 
 export default function Jam({ jam }: { jam: TJam }) {

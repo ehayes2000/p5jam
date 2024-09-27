@@ -1,24 +1,24 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-import { client, TPost } from '../client'
+import { client } from '../client'
 import Post from '../components/Post'
+import { QUERY_KEYS } from '../queries/client'
 
 export default function User() {
   const { id } = useParams()
-  const [myPosts, setMyPosts] = useState<TPost[]>([])
 
-  useEffect(() => {
-    if (!id) return
-    ;(async () => {
-      const posts = await client.api.posts.index.get({ query: { userId: id } })
-      if (posts.data) {
-        setMyPosts(posts.data)
-      }
-    })()
-  }, [])
+  const { data } = useQuery({
+    queryKey: QUERY_KEYS.USER_POSTS(id ?? ''),
+    queryFn: async () => {
+      return await client.api.posts.get({ query: { userId: id } })
+    },
+  })
+
+  const myPosts = data?.data
+
   return (
-    <div className="grid gap-4 justify-center p-6">
-      {myPosts.length ? (
+    <div className="grid justify-center gap-4 p-6">
+      {myPosts?.length ? (
         myPosts.map((p) => <Post key={p.id} post={p} />)
       ) : (
         <div> No posts for user {id} </div>

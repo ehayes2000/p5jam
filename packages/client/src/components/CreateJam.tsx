@@ -39,7 +39,7 @@ export default function NewJam({
     const durationMs =
       Number(hours) * 60 * 60 * 1000 + Number(minutes) * 60 * 1000
     if (!validateForm({ title, hours, minutes })) return
-    const newPost = await client.api.jams.index.post({
+    const newPost = await client.api.jams.post({
       title,
       durationMs,
     })

@@ -17,7 +17,7 @@ export default function NewPost() {
     <div className="">
       <PostEditor
         callback={async ({ description, script }) => {
-          const newPost = await client.api.posts.index.post({
+          const newPost = await client.api.posts.post({
             script,
             description,
           })

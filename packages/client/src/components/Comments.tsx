@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
-import { TPost, getMyId } from '../client'
+import { useState } from 'react'
+import { TPost } from '../client'
+import { useMyID } from '../queries/client'
 
 export default function Comments({
   comments,
@@ -10,13 +11,8 @@ export default function Comments({
   postComment: (t: { text: string }) => Promise<void>
   deleteComment: (id: { id: string }) => Promise<void>
 }) {
+  const { data: myId } = useMyID()
   const [myComment, setMyComment] = useState<string>('') // who ?
-  const [myId, setMyId] = useState<string | null>(null)
-  useEffect(() => {
-    ;(async () => {
-      setMyId(await getMyId())
-    })()
-  }, [])
 
   return (
     <div className="flex flex-col gap-1">
@@ -26,10 +22,10 @@ export default function Comments({
             onChange={(e) => setMyComment(e.target.value)}
             rows={3}
             value={myComment}
-            className="w-full border resize-none p-1"
+            className="w-full resize-none border p-1"
           />
           <button
-            className="relative border left hover:bg-gray-200 px-1"
+            className="left relative border px-1 hover:bg-gray-200"
             onClick={() => {
               setMyComment('')
               postComment({ text: myComment })
@@ -50,7 +46,7 @@ export default function Comments({
           <div key={c.id} className="flex-col justify-between border p-1">
             <div className="flex justify-start gap-2">
               <div>{c.author.name}</div>
-              <div className="text-gray-500 font-light">{dateString}</div>
+              <div className="font-light text-gray-500">{dateString}</div>
             </div>
             <div className="text-wrap"> {c.text} </div>
 

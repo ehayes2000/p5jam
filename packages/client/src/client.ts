@@ -23,5 +23,5 @@ export type TJam = NonNullable<
 >[number]
 
 export type TEditPost = NonNullable<
-  Awaited<ReturnType<typeof client.api.posts.index.post>>['data']
->['post']
+  Awaited<ReturnType<typeof client.api.posts.post>>['data']
+>

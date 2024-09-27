@@ -1,21 +1,17 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { client, TPost } from '../client'
 import Post from '../components/Post'
-import { client, getMyId, TPost } from '../client'
+import { useMyID } from '../queries/client'
 
 function Profile() {
   const navigate = useNavigate()
   const [myPosts, setMyPosts] = useState<TPost[]>()
+  // TODO: login redirect
+  const { data: myId } = useMyID()
 
   useEffect(() => {
     ;(async () => {
-      const myId = await getMyId()
-      if (!myId) {
-        setMyPosts([])
-        navigate('/login')
-        return
-      }
       const posts = await client.api.users({ id: myId }).posts.get()
       if (posts.data) {
         setMyPosts(posts.data)

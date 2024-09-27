@@ -22,7 +22,6 @@ export default function Post({
   post: TPost
   isComments?: boolean
 }) {
-  const [myId, setMyId] = useState<string | null>(null)
   const [isLiked, setIsLiked] = useState<boolean>()
   const [openComments, setOpenComments] = useState<boolean>(isComments ?? false)
   const [comments, setComments] = useState<typeof p.comments>(p.comments)
@@ -42,28 +41,28 @@ export default function Post({
   const pref = useRef(null)
 
   // TODO
-  useEffect(() => {
-    if (pref.current) {
-      //@ts-ignore
-      const width = pref.current.offsetWidth
-      //@ts-ignore
-      pref.current.style.width = `${width}px`
-    }
-    getMyId().then((id) => {
-      if (id) setIsLiked(id in p.likes)
-    })
-  }, [])
+  //useEffect(() => {
+  //  if (pref.current) {
+  //    //@ts-ignore
+  //    const width = pref.current.offsetWidth
+  //    //@ts-ignore
+  //    pref.current.style.width = `${width}px`
+  //  }
+  //  getMyId().then((id) => {
+  //    if (id) setIsLiked(id in p.likes)
+  //  })
+  //}, [])
 
   return (
     <div
       ref={pref}
       key={p.id}
-      className="border rounded-md p-2 grid content-center justify-center gap-1 cursor-pointer"
+      className="grid cursor-pointer content-center justify-center gap-1 rounded-md border p-2"
     >
       <h2 className=""> {p.author.name} </h2>
       <Sketch id={p.id} />
       <div className=""> {p.description} </div>
-      <div className="flex gap-4 justify-start">
+      <div className="flex justify-start gap-4">
         <span>
           <button
             onClick={() => {

@@ -17,17 +17,6 @@ export const postMutators = () =>
       },
     })
     .post(
-      '/posts/jam/:jamId',
-      async ({ userId, params: { jamId }, PostService }) => {
-        try {
-          return await PostService.create({ userId, jamId })
-        } catch (e) {
-          console.error(e)
-          return error(500)
-        }
-      },
-    )
-    .post(
       '/posts', // TODO "posts"
       async ({ userId, error, PostService }) => {
         try {
@@ -38,6 +27,18 @@ export const postMutators = () =>
         }
       },
     )
+    .post(
+      '/posts/jam/:jamId',
+      async ({ userId, params: { jamId }, PostService }) => {
+        try {
+          return await PostService.create({ userId, jamId })
+        } catch (e) {
+          console.error(e)
+          return error(500)
+        }
+      },
+    )
+
     .delete(
       '/posts/:id',
       async ({ userId, error, params: { id }, PostService }) => {
