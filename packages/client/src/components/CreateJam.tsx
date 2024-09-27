@@ -94,12 +94,10 @@ export default function NewJam({
                     placeholder="Hours"
                     value={hours}
                     onChange={(e) => {
+                      const parsed = Number(e.target.value)
                       if (e.target.value.length === 0) {
                         setHours('')
-                      } else if (
-                        e.target.value.length <= 2 &&
-                        Number(e.target.value)
-                      ) {
+                      } else if (!Number.isNaN(parsed)) {
                         setHours(e.target.value)
                       }
                     }}

@@ -19,10 +19,10 @@ export const makeJamRoutes = (
       },
     })
     .get('/jams', async ({ JamService }) => {
-      return await JamService.getJams()
+      return await JamService.list()
     })
     .get('/jams/:id', async ({ params: { id }, error, JamService }) => {
-      const jams = await JamService.getJamByID(id)
+      const jams = await JamService.get(id)
       if (!jams) return error(404)
       return jams
     })
@@ -30,7 +30,7 @@ export const makeJamRoutes = (
       '/jams',
       async ({ userId, error, body: { title, durationMs }, JamService }) => {
         try {
-          const { id } = await JamService.createJam({
+          const { id } = await JamService.create({
             userId,
             title,
             durationMs,
@@ -50,13 +50,13 @@ export const makeJamRoutes = (
       },
     )
     .delete('/jams/:id', async ({ userId, params: { id }, JamService }) => {
-      return await JamService.deleteJam({ id, userId })
+      return await JamService.delete({ id, userId })
     })
     .post(
       '/jams/:id/join',
       async ({ userId, error, params: { id }, JamService }) => {
         try {
-          return await JamService.joinJam({ id, userId })
+          return await JamService.join({ id, userId })
         } catch (e) {
           console.error(`${e} + L + bozo`)
           return error(405)
@@ -66,7 +66,7 @@ export const makeJamRoutes = (
     .delete(
       '/jams/:id/leave',
       async ({ userId, params: { id }, JamService }) => {
-        await JamService.leaveJam({ id, userId })
+        await JamService.leave({ id, userId })
       },
     )
     .get('/jams/activeJam', async ({ userId, error, JamService }) => {

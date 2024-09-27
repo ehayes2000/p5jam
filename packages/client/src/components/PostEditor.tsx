@@ -57,7 +57,7 @@ export default function PostEditor({
   ]
   let editSize = '550px'
   return (
-    <div className="w-full grid gap-1">
+    <div className="grid w-full gap-1">
       <form
         onSubmit={async (e) => {
           e.preventDefault()
@@ -67,7 +67,6 @@ export default function PostEditor({
       >
         <div className="flex flex-col gap-1">
           <div className="flex justify-between">
-            <h1 className="font-medium"> Script </h1>
             <span className="flex gap-2">
               Key bindings
               <select
@@ -81,7 +80,7 @@ export default function PostEditor({
             </span>
           </div>
           <div className="">
-            <div className="w-full flex gap-2">
+            <div className="flex w-full gap-2">
               <CodeMirror
                 value={post.script}
                 theme={githubLight}
@@ -93,8 +92,7 @@ export default function PostEditor({
                 height={editSize}
               />
               <div
-                className={`h-[${editSize}] overflow-hidden border-gray-400
-                 `}
+                className={`h-[${editSize}] overflow-hidden border-gray-400`}
               >
                 <div className="border">
                   <PostPreview draft={{ script, description }} />
@@ -105,8 +103,8 @@ export default function PostEditor({
 
           <div className="">
             <div className="flex justify-between">
-              <h1 className="font-medium content-end"> Description </h1>
-              <span className="text-sm  font-light content-end">
+              <h1 className="content-end font-medium"> Description </h1>
+              <span className="content-end text-sm font-light">
                 {description.length} / {MAX_DESCRIPTION}
               </span>
             </div>
@@ -122,7 +120,7 @@ export default function PostEditor({
           <div className="flex justify-end">
             <button
               type="submit"
-              className="px-2  bg-gray-200 hover:bg-gray-300"
+              className="bg-gray-200 px-2 hover:bg-gray-300"
             >
               {callbackText}
             </button>

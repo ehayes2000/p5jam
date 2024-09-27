@@ -1,13 +1,14 @@
-import { v4 as uuid } from 'uuid'
-import { Elysia, t } from 'elysia'
 import { Html, html } from '@elysiajs/html'
+import { Elysia, error, t } from 'elysia'
 import client from '../../prisma/prisma'
 import { authMiddleware } from '../githubAuth'
+import { post } from '../queries'
 import ScriptTemplate from '../scriptTemplate'
-import { post, userPosts } from '../queries'
+import PostService from '../services/PostService'
 
 export const postMutators = () =>
   new Elysia()
+    .decorate('PostService', new PostService(client))
     .derive(authMiddleware)
     .guard({
       as: 'local',
@@ -16,268 +17,44 @@ export const postMutators = () =>
       },
     })
     .post(
-      '/jam/:jamId',
-      async ({ body, userId, params: { jamId }, error }) => {
-        const postCount = await client.user.findUniqueOrThrow({
-          where: { id: userId },
-          select: { postCount: true },
-        })
-
-        const [newPost, _] = await client.$transaction([
-          client.post.create({
-            data: {
-              ...body,
-              id: uuid(),
-              content: '',
-              likeCount: 0,
-              viewCount: 0,
-              author: { connect: { id: userId } },
-            },
-          }),
-          client.user.update({
-            where: { id: userId },
-            data: { postCount: postCount.postCount + 1 },
-          }),
-        ])
-        return newPost
-      },
-      {
-        body: t.Object({
-          script: t.String(),
-          description: t.String(),
-        }),
+      '/posts/jam/:jamId',
+      async ({ userId, params: { jamId }, PostService }) => {
+        try {
+          return await PostService.create({ userId, jamId })
+        } catch (e) {
+          console.error(e)
+          return error(500)
+        }
       },
     )
     .post(
-      '/', // TODO "posts"
-      async ({ body, userId, error }) => {
+      '/posts', // TODO "posts"
+      async ({ userId, error, PostService }) => {
         try {
-          const postCount = await client.user.findUniqueOrThrow({
-            where: { id: userId },
-            select: { postCount: true },
-          })
-          const [newPost, _] = await client.$transaction([
-            client.post.create({
-              data: {
-                ...body,
-                id: uuid(),
-                content: '',
-                likeCount: 0,
-                viewCount: 0,
-                author: { connect: { id: userId } },
-              },
-            }),
-            client.user.update({
-              where: { id: userId },
-              data: { postCount: postCount.postCount + 1 },
-            }),
-          ])
-          return { post: newPost }
-        } catch (e: any) {
+          return await PostService.create({ userId })
+        } catch (e) {
+          console.error(e)
           return error(400)
         }
       },
-      {
-        body: t.Object({
-          script: t.String(),
-          description: t.String(),
-        }),
-      },
-    )
-    .post(
-      '/:id/comments',
-      async ({ userId, error, params: { id }, body: { text } }) => {
-        try {
-          const counts = await client.post.findFirstOrThrow({
-            where: {
-              id,
-            },
-            select: {
-              author: {
-                select: {
-                  commentCount: true,
-                },
-              },
-              commentCount: true,
-            },
-          })
-          const newComment = await client.comment.create({
-            data: {
-              id: uuid(),
-              text,
-              authorId: userId,
-              createdAt: new Date(),
-              postId: id,
-            },
-            include: {
-              author: true,
-            },
-          })
-          await client.user.update({
-            data: { commentCount: counts.author.commentCount + 1 },
-            where: { id: userId },
-          })
-          await client.post.update({
-            data: { commentCount: counts.commentCount + 1 },
-            where: { id },
-          })
-          return newComment
-        } catch (e) {
-          return error(404)
-        }
-      },
-      {
-        body: t.Object({ text: t.String() }),
-      },
     )
     .delete(
-      '/:id/comments/:commentId',
-      async ({ userId, error, params: { id, commentId } }) => {
+      '/posts/:id',
+      async ({ userId, error, params: { id }, PostService }) => {
         try {
-          const counts = await client.comment.findFirstOrThrow({
-            where: {
-              id: commentId,
-            },
-            select: {
-              author: {
-                select: {
-                  commentCount: true,
-                },
-              },
-              post: {
-                select: {
-                  commentCount: true,
-                  id: true,
-                },
-              },
-            },
-          })
-          await client.comment.delete({
-            where: {
-              id: commentId,
-              authorId: userId,
-            },
-          })
-          await client.user.update({
-            data: {
-              commentCount: counts.author.commentCount - 1,
-            },
-            where: {
-              id: userId,
-            },
-          })
-          await client.post.update({
-            data: {
-              commentCount: counts.post.commentCount - 1,
-            },
-            where: {
-              id: counts.post.id,
-            },
-          })
+          return await PostService.delete({ userId, id })
         } catch (e) {
           return error(404)
         }
       },
     )
-    .post('/:id/like', async ({ userId, params: { id } }) => {
-      try {
-        await client.like
-          .create({
-            data: {
-              postId: id,
-              userId,
-            },
-          })
-          .then(
-            async (_) =>
-              await client.post.findFirstOrThrow({
-                where: { id },
-                select: { likeCount: true },
-              }),
-          )
-          .then(
-            async (likes) =>
-              await client.post.update({
-                where: { id },
-                data: { likeCount: likes.likeCount + 1 },
-              }),
-          )
-      } catch (e) {
-        throw e
-      }
-    })
-    .delete('/:id/like', async ({ userId, params: { id } }) => {
-      await client.like
-        .delete({
-          where: {
-            userId_postId: {
-              userId,
-              postId: id,
-            },
-          },
-        })
-        .then(
-          async () =>
-            await client.post.findFirstOrThrow({
-              where: { id },
-              select: { likeCount: true },
-            }),
-        )
-        .then(
-          async (likes) =>
-            await client.post.update({
-              where: { id },
-              data: { likeCount: likes.likeCount - 1 },
-            }),
-        )
-    })
-    .delete('/:id', async ({ userId, error, params: { id } }) => {
-      try {
-        const postCount = await client.user.findUniqueOrThrow({
-          where: { id: userId },
-          select: { postCount: true },
-        })
-        await client.$transaction([
-          client.comment.deleteMany({
-            where: { postId: id },
-          }),
-          client.like.deleteMany({
-            where: { postId: id },
-          }),
-          client.post.delete({
-            where: {
-              id,
-              authorId: userId,
-            },
-          }),
-          client.user.update({
-            where: { id: userId },
-            data: {
-              postCount: postCount.postCount - 1,
-            },
-          }),
-        ])
-      } catch (e) {
-        return error(404)
-      }
-    })
     .put(
-      '/:id',
-      async ({ userId, error, body, params: { id } }) => {
+      '/posts/:id',
+      async ({ userId, error, body, params: { id }, PostService }) => {
         try {
-          const updated = await client.post.update({
-            where: {
-              id,
-              authorId: userId,
-            },
-            data: {
-              script: body.script,
-              description: body.description,
-              updatedAt: new Date(),
-            },
-          })
+          const post = await PostService.edit({ id, userId, ...body })
           return {
-            post: updated,
+            post,
           }
         } catch (e) {
           return error(404)
@@ -290,16 +67,62 @@ export const postMutators = () =>
         }),
       },
     )
+    .post(
+      '/posts/:id/comments',
+      async ({
+        userId,
+        error,
+        params: { id },
+        body: { text },
+        PostService,
+      }) => {
+        try {
+          return await PostService.createComment({ postId: id, userId, text })
+        } catch (e) {
+          return error(404)
+        }
+      },
+      {
+        body: t.Object({ text: t.String() }),
+      },
+    )
+    .delete(
+      '/posts/:id/comments/:commentId',
+      async ({ userId, error, params: { commentId }, PostService }) => {
+        try {
+          await PostService.deleteComment({ userId, commentId })
+        } catch (e) {
+          return error(404)
+        }
+      },
+    )
+    .post(
+      '/posts/:id/like',
+      async ({ userId, params: { id }, PostService }) => {
+        try {
+          return await PostService.like({ userId, id })
+        } catch (e) {
+          throw e
+        }
+      },
+    )
+    .delete(
+      '/posts/:id/like',
+      async ({ userId, params: { id }, PostService }) => {
+        return await PostService.deleteLike({ userId, id })
+      },
+    )
 
 export default function postsRoutes() {
-  return new Elysia({ prefix: '/posts' })
+  return new Elysia()
+    .decorate('PostService', new PostService(client))
     .use(html())
     .use(postMutators())
     .get(
-      '/',
-      async ({ query: { userId }, error }) => {
+      '/posts',
+      async ({ query: { userId }, error, PostService }) => {
         if (userId) {
-          const posts = await userPosts(userId)
+          const posts = await PostService.list()
           return posts
         }
         return error(404)
@@ -310,12 +133,13 @@ export default function postsRoutes() {
         }),
       },
     )
-    .get('/:id/script', async ({ params, error }) => {
-      const post = await client.post.findUnique({
-        where: { id: params.id },
-      })
-      if (!post) return error(404)
-      return <ScriptTemplate script={post.script} />
-    })
-    .get('/:id', async ({ params: { id } }) => post(id))
+    .get(
+      '/posts/:id/script',
+      async ({ params: { id }, error, PostService }) => {
+        const post = await PostService.get({ id })
+        if (!post) return error(404)
+        return <ScriptTemplate script={post.script} />
+      },
+    )
+    .get('/posts/:id', async ({ params: { id } }) => post(id))
 }

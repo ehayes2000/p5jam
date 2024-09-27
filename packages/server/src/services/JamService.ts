@@ -30,7 +30,7 @@ export default class JamService {
     this.client = client
   }
 
-  async getJams() {
+  async list() {
     return await this.client.jam.findMany({
       include: {
         Post: true,
@@ -42,7 +42,7 @@ export default class JamService {
     })
   }
 
-  async getJamByID(id: string) {
+  async get(id: string) {
     return await this.client.jam.findUnique({
       include: {
         Post: true,
@@ -58,11 +58,7 @@ export default class JamService {
     })
   }
 
-  async createJam(params: {
-    title: string
-    durationMs: number
-    userId: string
-  }) {
+  async create(params: { title: string; durationMs: number; userId: string }) {
     const { title, durationMs, userId } = params
     const inviteCode = await generateInviteCode()
     const startTime = new Date()
@@ -89,7 +85,7 @@ export default class JamService {
     return comeOnandSlam
   }
 
-  async deleteJam(params: { id: string; userId: string }) {
+  async delete(params: { id: string; userId: string }) {
     const { id, userId } = params
     return await this.client.jam.update({
       where: {
@@ -105,7 +101,7 @@ export default class JamService {
     })
   }
 
-  async joinJam(params: { userId: string; id: string }) {
+  async join(params: { userId: string; id: string }) {
     const { id, userId } = params
     const activeParticipant = await this.client.jamParticipant.findFirst({
       select: {
@@ -174,7 +170,7 @@ export default class JamService {
     return jam
   }
 
-  async leaveJam(params: { userId: string; id: string }) {
+  async leave(params: { userId: string; id: string }) {
     const { id, userId } = params
     await this.client.jamParticipant.update({
       where: {
