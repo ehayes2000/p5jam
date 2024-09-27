@@ -176,6 +176,7 @@ export const makeJamRoutes = (
         },
         where: {
           userId,
+          active: true,
           jam: {
             acceptingSubmisions: true,
           },

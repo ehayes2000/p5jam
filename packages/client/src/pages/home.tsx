@@ -1,6 +1,6 @@
 import NewJam from '../components/CreateJam'
 import JoinJam from '../components/JoinJam'
-import useStore from '../jamContext'
+import useStore from '../stateStore'
 
 export default function Home() {
   const { jamPopup, setPopup } = useStore()

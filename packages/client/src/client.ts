@@ -17,3 +17,7 @@ export const getMyId = async (): Promise<string | null> => {
 export type TPost = NonNullable<
   Awaited<ReturnType<typeof client.api.feed.get>>['data']
 >[number]
+
+export type TJam = NonNullable<
+  NonNullable<Awaited<ReturnType<typeof client.api.jams.get>>>['data']
+>[number]

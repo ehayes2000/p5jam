@@ -1,12 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect, act } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
-import useStore from '../jamContext'
+import useStore from '../stateStore'
+import { client } from '../client'
 
 function Root() {
   const [isSideBar, setIsSideBar] = useState(true)
   const nav = useNavigate()
   const location = useLocation()
-  const { setPopup } = useStore()
+  const { setPopup, jam, setJam } = useStore()
+
+  useEffect(() => {
+    ;(async () => {
+      const { data } = await client.api.jams.activeJam.get()
+
+      if (!data?.jam.id) return
+      const { data: jam } = await client.api.jams({ id: data.jam.id }).get()
+      if (jam) setJam(jam)
+    })()
+  }, [])
 
   const newJam = () => {
     setPopup('createJam')
@@ -39,18 +50,29 @@ function Root() {
         </div>
         <div className="flex h-full flex-col justify-center gap-4">
           <div className="flex flex-col items-end gap-2 text-4xl">
-            <button
-              className="hover:cursor-pointer hover:text-gray-500"
-              onClick={newJam}
-            >
-              New Jam
-            </button>
-            <button
-              className="hover:cursor-pointer hover:text-gray-500"
-              onClick={joinJam}
-            >
-              Join Jam
-            </button>
+            {jam ? (
+              <button
+                className="hover:cursor-pointer hover:text-gray-500"
+                onClick={() => nav(`/jam/${jam.id}`)}
+              >
+                Jam
+              </button>
+            ) : (
+              <>
+                <button
+                  className="hover:cursor-pointer hover:text-gray-500"
+                  onClick={newJam}
+                >
+                  New Jam
+                </button>
+                <button
+                  className="hover:cursor-pointer hover:text-gray-500"
+                  onClick={joinJam}
+                >
+                  Join Jam
+                </button>
+              </>
+            )}
           </div>
           <div className="flex flex-col items-end text-2xl text-gray-500">
             <Link
