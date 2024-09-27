@@ -16,6 +16,7 @@
     "@types/uuid": "^10.0.0",
     "@uiw/codemirror-theme-github": "^4.23.2",
     "@uiw/react-codemirror": "^4.23.2",
+    "@xstate/store": "^2.6.0",
     "bootstrap-icons": "^1.11.3",
     "highlight.js": "^11.10.0",
     "highlightjs": "^9.16.2",

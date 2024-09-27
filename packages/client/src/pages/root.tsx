@@ -1,13 +1,14 @@
-import { useState, useEffect, act } from 'react'
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
-import useStore from '../stateStore'
+import { useSelector } from '@xstate/store/react'
+import { useEffect, useState } from 'react'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { client } from '../client'
+import { store } from '../stateStore'
 
 function Root() {
   const [isSideBar, setIsSideBar] = useState(true)
   const nav = useNavigate()
   const location = useLocation()
-  const { setPopup, jam, setJam } = useStore()
+  const { jam } = useSelector(store, (state) => state.context)
 
   useEffect(() => {
     ;(async () => {
@@ -15,17 +16,17 @@ function Root() {
 
       if (!data?.jam.id) return
       const { data: jam } = await client.api.jams({ id: data.jam.id }).get()
-      if (jam) setJam(jam)
+      if (jam) store.send({ type: 'receivedJamFromServer', payload: { jam } })
     })()
   }, [])
 
   const newJam = () => {
-    setPopup('createJam')
+    store.send({ type: 'userClickedCreatedJam' })
     if (location.pathname !== '/') nav('/')
   }
 
   const joinJam = () => {
-    setPopup('joinJam')
+    store.send({ type: 'userClickedJoinJam' })
     if (location.pathname !== '/') nav('/')
   }
 

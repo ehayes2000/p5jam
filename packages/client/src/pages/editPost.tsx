@@ -1,9 +1,10 @@
-import useStore from '../stateStore'
+import { useSelector } from '@xstate/store/react'
 import { client } from '../client'
 import PostEditor from '../components/PostEditor'
+import { store } from '../stateStore'
 
 function EditPost() {
-  const { post } = useStore()
+  const post = useSelector(store, (state) => state.context.post)
   console.log('EDIT POST', post)
 
   return (

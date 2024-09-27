@@ -1,25 +1,54 @@
-import { create } from 'zustand'
-import { type TJam, type TEditPost } from './client'
+import { type TEditPost, type TJam } from './client'
+import { createStore } from '@xstate/store'
 
-type JamPopup = 'none' | 'createJam' | 'joinJam'
+export type JamPopup = 'none' | 'createJam' | 'joinJam'
 
-interface StoreType {
+export type StoreContext = {
   jamPopup: JamPopup
-  setPopup: (newState: JamPopup) => void
   jam: TJam | null
-  setJam: (newJam: TJam | null) => void
   post: TEditPost | null
-  setPost: (newPost: TEditPost | null) => void
 }
 
-const useStore = create<StoreType>((set) => ({
-  jamPopup: 'none',
-  setPopup: (newPopup) => set((state) => ({ ...state, jamPopup: newPopup })),
-  jam: null,
-  setJam: (newJam) => set((state) => ({ ...state, jam: newJam })),
-  post: null,
-  setPost: (newPost: TEditPost | null) =>
-    set((state) => ({ ...state, post: newPost })),
-}))
-
-export default useStore
+export const store = createStore({
+  // Initial context
+  context: { jam: null, post: null, jamPopup: 'none' } as StoreContext,
+  // Transitions
+  on: {
+    postCreated: (context, event: { payload: { post: TEditPost } }) => {
+      return {
+        ...context,
+        post: event.payload.post,
+      }
+    },
+    leftJam: (context) => {
+      return {
+        ...context,
+        jam: null,
+      }
+    },
+    receivedJamFromServer: (context, event: { payload: { jam: TJam } }) => {
+      return {
+        ...context,
+        jam: event.payload.jam,
+      }
+    },
+    userClickedJoinJam: (context) => {
+      return {
+        ...context,
+        jamPopup: 'joinJam' as const,
+      }
+    },
+    userClickedCreatedJam: (context) => {
+      return {
+        ...context,
+        jamPopup: 'createJam' as const,
+      }
+    },
+    userClosedPopup: (context) => {
+      return {
+        ...context,
+        jamPopup: 'none' as const,
+      }
+    },
+  },
+})

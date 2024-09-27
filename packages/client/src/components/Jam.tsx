@@ -1,17 +1,16 @@
 import { useNavigate } from 'react-router-dom'
-import Timer from './Timer'
 import { type TJam, client } from '../client'
-import useStore from '../stateStore'
+import useStore, { store } from '../stateStore'
+import Timer from './Timer'
 
 export default function Jam({ jam }: { jam: TJam }) {
-  const { setJam, setPost } = useStore()
   const nav = useNavigate()
 
   const leaveJam = () => {
     ;(async () => {
       if (confirm('Are you sure you want to leave the Jam?') === true) {
         client.api.jams({ id: jam.id }).leave.delete()
-        setJam(null)
+        store.send({ type: 'leftJam' })
         nav('/')
       }
     })()
@@ -33,7 +32,7 @@ function draw() {
       })
       if (data) {
         console.log('CREATED POST!!!!!!!!!', data)
-        setPost(data)
+        store.send({ type: 'postCreated', payload: { post: data } })
       }
       if (data?.id) nav(`/editPost`)
     })()
@@ -57,7 +56,7 @@ function draw() {
               </div>
             ))}
           </div>
-          <h4 className="animate-oscillate relative -ml-6 mt-10 h-0 w-0 -rotate-45 text-amber-400">
+          <h4 className="relative -ml-6 mt-10 h-0 w-0 -rotate-45 animate-oscillate text-amber-400">
             Join
           </h4>
         </div>
