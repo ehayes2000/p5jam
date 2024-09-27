@@ -2,11 +2,11 @@
   "name": "server",
   "license": "MIT",
   "scripts": {
-    "dev": "NODE_ENV=development bun --watch src/server.tsx",
-    "start:prod": "NODE_ENV=production bun src/server.tsx",
+    "dev": "NODE_ENV=development bun --watch src/server.ts",
+    "start:prod": "NODE_ENV=production bun src/server.ts",
     "clean": "rm -rf dist",
     "build": "bun run clean && bunx prisma generate && tsc",
-    "build:declaration": "tsc --emitDeclarationOnly ./src/server.tsx",
+    "build:declaration": "tsc --emitDeclarationOnly ./src/server.ts",
     "generate": "bunx prisma generate",
     "test": "NODE_ENV=test bun scripts/test.ts  && bun test",
     "inspect": "NODE_ENV=dev bunx prisma studio"

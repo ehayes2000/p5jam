@@ -1,12 +1,12 @@
-import { Elysia, t } from 'elysia'
-import { Html, html } from '@elysiajs/html'
+import { html } from '@elysiajs/html'
 import { staticPlugin } from '@elysiajs/static'
 import { swagger } from '@elysiajs/swagger'
+import { Elysia, t } from 'elysia'
+import client from '../prisma/prisma'
+import { feed, userPosts } from './queries'
+import jamRoutes from './routes/jams'
 import loginRoutes from './routes/login'
 import postsRoutes from './routes/posts'
-import { feed, post, userPosts } from './queries'
-import client from '../prisma/prisma'
-import jamRoutes from './routes/jams'
 
 export const api = new Elysia({ prefix: '/api' })
   .guard({
