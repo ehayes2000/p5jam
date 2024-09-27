@@ -7,14 +7,13 @@ import { QUERY_KEYS } from '../queries/client'
 export default function User() {
   const { id } = useParams()
 
-  const { data } = useQuery({
+  const { data: myPosts } = useQuery({
     queryKey: QUERY_KEYS.USER_POSTS(id ?? ''),
     queryFn: async () => {
-      return await client.api.posts.get({ query: { userId: id } })
+      const { data } = await client.api.posts.get({ query: { userId: id } })
+      return data
     },
   })
-
-  const myPosts = data?.data
 
   return (
     <div className="grid justify-center gap-4 p-6">

@@ -1,7 +1,6 @@
 import { useSelector } from '@xstate/store/react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { client } from '../client'
 import { useMyID } from '../queries/client'
 import { store } from '../stateStore'
 
@@ -11,16 +10,6 @@ function Root() {
   const location = useLocation()
   const { jam } = useSelector(store, (state) => state.context)
   const { data: _id } = useMyID()
-
-  // useEffect(() => {
-  //   ;(async () => {
-  //     const { data } = await client.api.jams.activeJam.get()
-
-  //     if (!data?.jam.id) return
-  //     const { data: jam } = await client.api.jams({ id: data.jam.id }).get()
-  //     if (jam) store.send({ type: 'receivedJamFromServer', payload: { jam } })
-  //   })()
-  // }, [])
 
   const newJam = () => {
     store.send({ type: 'userClickedCreatedJam' })

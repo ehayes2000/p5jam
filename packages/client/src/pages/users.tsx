@@ -4,13 +4,13 @@ import { useQuery } from '@tanstack/react-query'
 import { QUERY_KEYS } from '../queries/client'
 
 function Users() {
-  const { data } = useQuery({
+  const { data: users } = useQuery({
     queryKey: QUERY_KEYS.USERS,
     queryFn: async () => {
-      return await client.api.users.get()
+      const { data } = await client.api.users.get()
+      return data
     },
   })
-  const users = data?.data
 
   return (
     <div className="grid gap-4">

@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
-import { client, TPost, getMyId } from '../client'
+import { useRef, useState } from 'react'
+import { client, TPost } from '../client'
 import Comments from './Comments'
 
 export function Sketch({ id }: { id: string }) {
@@ -39,19 +39,6 @@ export default function Post({
   }
 
   const pref = useRef(null)
-
-  // TODO
-  //useEffect(() => {
-  //  if (pref.current) {
-  //    //@ts-ignore
-  //    const width = pref.current.offsetWidth
-  //    //@ts-ignore
-  //    pref.current.style.width = `${width}px`
-  //  }
-  //  getMyId().then((id) => {
-  //    if (id) setIsLiked(id in p.likes)
-  //  })
-  //}, [])
 
   return (
     <div

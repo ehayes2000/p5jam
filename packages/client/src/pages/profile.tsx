@@ -1,29 +1,24 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
-import { client, TPost } from '../client'
+import { client } from '../client'
 import Post from '../components/Post'
-import { useMyID } from '../queries/client'
+import { QUERY_KEYS, useMyID } from '../queries/client'
 
 function Profile() {
   const navigate = useNavigate()
-  const [myPosts, setMyPosts] = useState<TPost[]>()
   // TODO: login redirect
   const { data: myId } = useMyID()
-
-  useEffect(() => {
-    ;(async () => {
-      const posts = await client.api.users({ id: myId }).posts.get()
-      if (posts.data) {
-        setMyPosts(posts.data)
-      }
-    })()
-  }, [])
+  const { data: myPosts } = useQuery({
+    queryKey: QUERY_KEYS.USER_POSTS(myId ?? ''),
+    queryFn: async () => {
+      const { data } = await client.api.users({ id: myId ?? '' }).posts.get()
+      return data
+    },
+    enabled: !!myId,
+  })
 
   const deletePost = async (id: string) => {
     await client.api.posts({ id }).delete()
-    if (myPosts) {
-      setMyPosts(myPosts.filter((p) => p.id !== id))
-    }
   }
 
   // TODO fix

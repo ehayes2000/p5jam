@@ -4,14 +4,13 @@ import Post from '../components/Post'
 import { QUERY_KEYS } from '../queries/client'
 
 function Explore() {
-  const { data } = useQuery({
+  const { data: posts } = useQuery({
     queryKey: QUERY_KEYS.POSTS,
     queryFn: async () => {
-      return await client.api.feed.get()
+      const { data } = await client.api.feed.get()
+      return data
     },
   })
-
-  const posts = data?.data
 
   return (
     <div className="grid justify-center gap-4 p-6">

@@ -12,9 +12,11 @@ export const queryClient = new QueryClient({
 export const QUERY_KEYS = {
   USERS: ['users'],
   MY_ID: ['myID'],
-  USER: (id: string) => ['user', id] as const,
-  USER_POSTS: (id: string) => ['user', id, 'posts'] as const,
+  USER: (id: string) => ['users', id] as const,
+  USER_POSTS: (id: string) => ['users', id, 'posts'] as const,
   POSTS: ['posts'] as const,
+  POSTS_BY_ID: (id: string) => ['posts', id] as const,
+  JAM_BY_ID: (id: string) => ['jams', id],
 } as const
 
 export const useMyID = () =>

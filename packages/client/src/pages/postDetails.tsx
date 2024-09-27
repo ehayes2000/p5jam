@@ -1,28 +1,21 @@
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { client, TPost } from '../client'
+import { useQuery } from '@tanstack/react-query'
+import { useParams } from 'react-router-dom'
+import { client } from '../client'
 import Post from '../components/Post'
+import { QUERY_KEYS } from '../queries/client'
 
 export default function PostDetails() {
   const { id } = useParams()
-  const navigate = useNavigate()
-  const [post, setPost] = useState<TPost | null>(null)
-  useEffect(() => {
-    ;(async () => {
-      if (!id) {
-        navigate('/error')
-      } else {
-        const post = await client.api.posts({ id }).get()
-        if (post.data) {
-          setPost(post.data)
-        } else {
-          navigate('/error')
-        }
-      }
-    })()
-  }, [])
+  const { data: post } = useQuery({
+    queryKey: QUERY_KEYS.POSTS_BY_ID(id ?? ''),
+    queryFn: async () => {
+      const { data } = await client.api.posts({ id: id ?? '' }).get()
+      return data
+    },
+  })
+
   return (
-    <div className="grid gap-4 justify-center p-6">
+    <div className="grid justify-center gap-4 p-6">
       {post ? <Post post={post} isComments={true} /> : 'loading ...'}
     </div>
   )

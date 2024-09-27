@@ -5,7 +5,6 @@ import { store } from '../stateStore'
 
 function EditPost() {
   const post = useSelector(store, (state) => state.context.post)
-  console.log('EDIT POST', post)
 
   return (
     <div>
