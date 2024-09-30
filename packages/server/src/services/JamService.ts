@@ -49,6 +49,9 @@ export default class JamService {
 
   async create(params: { title: string; durationMs: number; userId: string }) {
     const { title, durationMs, userId } = params
+    const activeJamId = await this.getUsersActiveJam({ userId })
+    if (activeJamId)
+      throw new Error('Cannot participate in / own multiple jams')
     const inviteCode = await generateInviteCode()
     const startTime = new Date()
     const endTime = addMilliseconds(startTime, durationMs)
@@ -181,7 +184,8 @@ export default class JamService {
 
   async getUsersActiveJam(params: { userId: string }) {
     const { userId } = params
-    return await this.client.jamParticipant.findFirst({
+
+    const participantJamId = await this.client.jamParticipant.findFirst({
       select: {
         jam: {
           select: {
@@ -199,5 +203,18 @@ export default class JamService {
         },
       },
     })
+    if (participantJamId) return { id: participantJamId.jam.id }
+    const ownerJamId = await this.client.jam.findFirst({
+      where: {
+        endTime: {
+          lte: new Date(),
+        },
+        ownerId: userId,
+      },
+      select: {
+        id: true,
+      },
+    })
+    return ownerJamId
   }
 }

@@ -36,7 +36,11 @@ export const makeJamRoutes = (
             durationMs,
           })
 
-          return { id }
+          const jam = await JamService.get(id)
+          if (!jam) {
+            return error(500, 'Expected jam after creation')
+          }
+          return jam
         } catch (e) {
           console.error(e)
           return error(500)

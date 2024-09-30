@@ -1,10 +1,27 @@
+import { useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useSelector } from '@xstate/store/react'
 import { client } from '../client'
 import PostEditor from '../components/PostEditor'
 import { store } from '../stateStore'
+import { useEffect } from 'react'
 
 function EditPost() {
   const post = useSelector(store, (state) => state.context.post)
+  const { id } = useParams()
+  const nav = useNavigate()
+  useEffect(() => {
+    console.log('ID', id, 'POST', post)
+    if (!post && id) {
+      client.api
+        .posts({ id })
+        .get()
+        .then((p) => {
+          if (p.data)
+            store.send({ type: 'postCreated', payload: { post: p.data } })
+        })
+    }
+  }, [])
 
   return (
     <div>
@@ -12,10 +29,15 @@ function EditPost() {
         <PostEditor
           post={{ description: post.description, script: post.script }}
           callback={async ({ script, description }) => {
-            const response = await client.api
+            const { data } = await client.api
               .posts({ id: post.id })
               .put({ script, description })
-            return response.error === null
+
+            if (data && data.post.jamId) {
+              nav(`/jam/${data.post.jamId}`)
+            } else {
+              nav(`/profile`)
+            }
           }}
           callbackText="Post"
         /> // TODO reroute to profile?

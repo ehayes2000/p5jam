@@ -27,7 +27,7 @@ function Profile() {
     description: string
     script: string
   }) => {
-    return navigate(`/editPost`, {
+    return navigate(`/editPost/${post.id}`, {
       state: {
         post,
       },

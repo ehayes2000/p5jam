@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { client } from '../client'
+import { store } from '../stateStore'
 
 export default function NewJam({
   closeCallback,
@@ -39,13 +40,16 @@ export default function NewJam({
     const durationMs =
       Number(hours) * 60 * 60 * 1000 + Number(minutes) * 60 * 1000
     if (!validateForm({ title, hours, minutes })) return
-    const newPost = await client.api.jams.post({
+    const newJam = await client.api.jams.post({
       title,
       durationMs,
     })
-    console.log('NEW POST', newPost)
-    if (newPost.data?.id) {
-      nav(`/jam/${newPost.data.id}`)
+    if (newJam.data?.id) {
+      store.send({
+        type: 'receivedJamFromServer',
+        payload: { jam: newJam.data },
+      })
+      nav(`/jam/${newJam.data.id}`)
     } else {
       alert(':P')
     }

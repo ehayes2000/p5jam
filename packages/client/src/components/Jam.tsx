@@ -18,23 +18,11 @@ export default function Jam({ jam }: { jam: TJam }) {
 
   const newSketch = () => {
     ;(async () => {
-      const { data } = await client.api.posts.jam({ jamId: jam.id }).post({
-        description: '',
-        script: `
-function setup() {
-  createCanvas(400, 400);
-}
-
-function draw() {
-  background(220);
-}        
-        `,
-      })
+      const { data } = await client.api.posts.jam({ jamId: jam.id }).post()
       if (data) {
-        console.log('CREATED POST!!!!!!!!!', data)
         store.send({ type: 'postCreated', payload: { post: data } })
       }
-      if (data?.id) nav(`/editPost`)
+      if (data?.id) nav(`/editPost/${data.id}`)
     })()
   }
 

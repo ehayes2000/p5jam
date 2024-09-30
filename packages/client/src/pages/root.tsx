@@ -1,8 +1,9 @@
 import { useSelector } from '@xstate/store/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useMyID } from '../queries/queryClient'
 import { store } from '../stateStore'
+import { client } from '../client'
 
 function Root() {
   const [isSideBar, setIsSideBar] = useState(true)
@@ -20,6 +21,22 @@ function Root() {
     store.send({ type: 'userClickedJoinJam' })
     if (location.pathname !== '/') nav('/')
   }
+
+  useEffect(() => {
+    client.api.jams.activeJam.get().then(async (j) => {
+      if (j.data) {
+        const myJam = await client.api.jams({ id: j.data.id }).get()
+        if (!myJam.data) {
+          alert('expecetd active jam data :)')
+          return
+        }
+        store.send({
+          type: 'receivedJamFromServer',
+          payload: { jam: myJam.data },
+        })
+      }
+    })
+  }, [])
 
   return (
     <div className="grid h-full w-full grid-flow-col grid-cols-5 divide-x divide-black overflow-hidden">

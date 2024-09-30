@@ -95,7 +95,7 @@ export default class PostService {
 
   async create(params: { userId: string; jamId?: string }) {
     // TODO: make jam id actually work
-    const { userId, jamId: _jamId } = params
+    const { userId, jamId } = params
     const postCount = await this.client.user.findUniqueOrThrow({
       where: { id: userId },
       select: { postCount: true },
@@ -110,6 +110,7 @@ export default class PostService {
           likeCount: 0,
           viewCount: 0,
           author: { connect: { id: userId } },
+          jam: { connect: { id: jamId } },
         },
       }),
       this.client.user.update({

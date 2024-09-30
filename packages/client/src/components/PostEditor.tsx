@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import PostPreview from './PostPreview'
 import CodeMirror, { EditorView, EditorState } from '@uiw/react-codemirror'
 import { vim } from '@replit/codemirror-vim'
@@ -12,7 +11,6 @@ const MAX_DESCRIPTION = 255
 
 export default function PostEditor({
   post,
-  callbackText,
   callback,
 }: {
   callback: ({
@@ -21,11 +19,10 @@ export default function PostEditor({
   }: {
     description: string
     script: string
-  }) => Promise<boolean>
+  }) => void
   callbackText: string
   post: { description: string; script: string }
 }) {
-  const nav = useNavigate()
   const [script, setScript] = useState<string>(post.script)
   const [description, setDescription] = useState<string>(post.description)
   const [keybind, setKeyBind] = useState<Keybind>(() => {
@@ -61,8 +58,7 @@ export default function PostEditor({
       <form
         onSubmit={async (e) => {
           e.preventDefault()
-          const success = await callback({ description, script })
-          if (success) nav('/profile')
+          callback({ description, script })
         }}
       >
         <div className="flex flex-col gap-1">
@@ -122,7 +118,7 @@ export default function PostEditor({
               type="submit"
               className="bg-gray-200 px-2 hover:bg-gray-300"
             >
-              {callbackText}
+              Post
             </button>
           </div>
         </div>
