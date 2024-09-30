@@ -1,8 +1,9 @@
-import { Lucia } from 'lucia'
-import { GitHub } from 'arctic'
 import { PrismaAdapter } from '@lucia-auth/adapter-prisma'
-import client from './prisma'
 import { User } from '@prisma/client'
+import { GitHub } from 'arctic'
+import { Context } from 'elysia'
+import { Lucia } from 'lucia'
+import client from '../prisma/prisma'
 
 const adapter = new PrismaAdapter(client.session, client.user)
 
@@ -41,4 +42,32 @@ declare module 'lucia' {
     Lucia: typeof lucia
     DatabaseUserAttributes: User
   }
+}
+
+export const authMiddleware = async ({
+  headers,
+  cookie: { auth_session },
+}: Context) => {
+  const sessionId = lucia.readSessionCookie(
+    headers.cookie === undefined ? '' : headers.cookie,
+  )
+  if (!sessionId) return { isAuth: false, userId: 'null' }
+  const { session, user } = await lucia.validateSession(sessionId)
+  if (!session || !user) {
+  }
+  if (session && session.fresh) {
+    const sessionCookie = lucia.createSessionCookie(session.id)
+    auth_session.set({ ...sessionCookie.attributes })
+    if (user) {
+      return { isAuth: true, userId: user.id }
+    } else {
+      return { isAuth: false, userId: 'null' }
+    }
+  }
+  if (session && user) {
+    return { isAuth: true, userId: user.id }
+  }
+  const blankCookie = lucia.createBlankSessionCookie()
+  auth_session.set({ ...blankCookie.attributes })
+  return { isAuth: false, userId: 'null' }
 }

@@ -1,19 +1,23 @@
-import { useEffect, useState } from 'react'
-import { client, TPost } from '../client'
+import { useQuery } from '@tanstack/react-query'
+import { client } from '../client'
 import Post from '../components/Post'
+import { QUERY_KEYS } from '../queries/queryClient'
 
 function Explore() {
-  const [posts, setPosts] = useState<TPost[]>([])
-  useEffect(() => {
-    ;(async () => {
-      const { data } = await client.api.posts.get()
-      if (data) setPosts(data)
-    })()
-  }, [])
+  const { data: posts } = useQuery({
+    queryKey: QUERY_KEYS.POSTS,
+    queryFn: async () => {
+      const { data } = await client.api.feed.get()
+      return data
+    },
+  })
+
   return (
-    <div className="grid gap-4 justify-center p-6">
-      {posts.map((p) => (
-        <Post key={p.id} post={p} />
+    <div className="grid justify-center gap-4 p-6">
+      {posts?.map((p) => (
+        <div key={p.id}>
+          <Post key={p.id} post={p} />
+        </div>
       ))}
     </div>
   )

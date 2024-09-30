@@ -1,34 +1,27 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { Link, useNavigate } from 'react-router-dom'
+import { client } from '../client'
 import Post from '../components/Post'
-import { client, getMyId, TPost } from '../client'
+import { QUERY_KEYS, useMyID } from '../queries/queryClient'
 
 function Profile() {
   const navigate = useNavigate()
-  const [myPosts, setMyPosts] = useState<TPost[]>()
-
-  useEffect(() => {
-    ;(async () => {
-      const myId = await getMyId()
-      if (!myId) {
-        setMyPosts([])
-        return
-      }
-      const posts = await client.api.users({ id: myId }).posts.get()
-      if (posts.data) {
-        setMyPosts(posts.data)
-      }
-    })()
-  }, [])
+  // TODO: login redirect
+  const { data: myId } = useMyID()
+  const { data: myPosts } = useQuery({
+    queryKey: QUERY_KEYS.USER_POSTS(myId ?? ''),
+    queryFn: async () => {
+      const { data } = await client.api.users({ id: myId ?? '' }).posts.get()
+      return data
+    },
+    enabled: !!myId,
+  })
 
   const deletePost = async (id: string) => {
-    const updated = await client.api.posts({ id }).delete()
-    if (updated.data) {
-      setMyPosts(updated.data)
-    }
+    await client.api.posts({ id }).delete()
   }
 
+  // TODO fix
   const editPost = (post: {
     id: string
     description: string
@@ -42,21 +35,21 @@ function Profile() {
   }
 
   return (
-    <div className="grid gap-4 justify-center p-6">
+    <div className="grid justify-center gap-4 p-6">
       {myPosts ? (
         <>
           {myPosts.map((p) => (
             <div key={p.id}>
-              <div className="p-1 flex lex gap-1">
+              <div className="lex flex gap-1 p-1">
                 <button
                   onClick={() => editPost(p)}
-                  className="bg-gray-200 px-2 rounded-sm hover:bg-gray-300"
+                  className="rounded-sm bg-gray-200 px-2 hover:bg-gray-300"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => deletePost(p.id)}
-                  className="bg-gray-200 px-2 rounded-sm hover:bg-gray-300"
+                  className="rounded-sm bg-gray-200 px-2 hover:bg-gray-300"
                 >
                   Delete
                 </button>

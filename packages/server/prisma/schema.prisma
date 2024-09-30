@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
 }
 
 model Session {
@@ -15,14 +15,16 @@ model Session {
 }
 
 model User {
-  id           String    @id
-  name         String    @unique
-  commentCount Int       @default(0)
-  postCount    Int       @default(0)
-  posts        Post[]
-  sessions     Session[]
-  comments     Comment[]
-  likes        Like[]
+  id             String           @id
+  name           String           @unique
+  commentCount   Int              @default(0)
+  postCount      Int              @default(0)
+  posts          Post[]
+  sessions       Session[]
+  comments       Comment[]
+  likes          Like[]
+  jams           Jam[]
+  JamParticipant JamParticipant[]
 }
 
 model Post {
@@ -32,7 +34,6 @@ model Post {
   description  String    @default("")
   content      String    @default("")
   script       String    @default("")
-  published    Boolean   @default(false)
   likeCount    Int       @default(0)
   viewCount    Int       @default(0)
   commentCount Int       @default(0)
@@ -40,6 +41,8 @@ model Post {
   authorId     String
   comments     Comment[]
   likes        Like[]
+  jamId        String?
+  jam          Jam?      @relation(fields: [jamId], references: [id])
 }
 
 model Comment {
@@ -60,4 +63,26 @@ model Like {
   postId String
 
   @@id([userId, postId])
+}
+
+model JamParticipant {
+  userId String
+  user   User    @relation(fields: [userId], references: [id])
+  jamId  String
+  jam    Jam     @relation(fields: [jamId], references: [id])
+  active Boolean @default(true)
+
+  @@id([jamId, userId])
+}
+
+model Jam {
+  id             String           @id
+  ownerId        String
+  creator        User             @relation(fields: [ownerId], references: [id])
+  startTime      DateTime         @default(now())
+  endTime        DateTime
+  title          String
+  JamParticipant JamParticipant[]
+  Post           Post[]
+  isDeleted      Boolean          @default(false)
 }
