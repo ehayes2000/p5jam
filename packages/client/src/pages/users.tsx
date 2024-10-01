@@ -17,16 +17,6 @@ function Users() {
       {users?.map((u) => (
         <Link key={u.id} className="rounded-md border p-4" to={`/user/${u.id}`}>
           <span className="fw-bold">{u.name}</span>
-          <div className="d-flex gap-4">
-            <span className="comment-icon">
-              <i className="bi bi-chat"> </i>
-              <span> {u.commentCount} </span>
-            </span>
-            <span className="comment-icon">
-              <i className="bi bi-bar-chart"></i>
-              <span> {u.postCount} </span>
-            </span>
-          </div>
         </Link>
       ))}
     </div>

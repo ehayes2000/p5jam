@@ -1,6 +1,4 @@
 import { Context, Elysia, t } from 'elysia'
-import client from '../../prisma/prisma'
-import Models from '../services/models'
 import { authMiddleware } from '../githubAuth'
 import JamService from '../services/JamService'
 
@@ -12,7 +10,7 @@ export const makeJamRoutes = (
   auth: (ctx: Context) => Promise<{ isAuth: boolean; userId: string }>,
 ) => {
   return new Elysia()
-    .decorate('JamService', new JamService(new Models(client)))
+    .decorate('JamService', new JamService())
     .derive(auth)
     .guard({
       beforeHandle: async ({ isAuth, error }) => {

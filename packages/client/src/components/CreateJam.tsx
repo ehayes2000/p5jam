@@ -93,7 +93,6 @@ export default function NewJam({
                   <input
                     className="w-full border border-black p-1"
                     type="text"
-                    required
                     name="hours"
                     placeholder="Hours"
                     value={hours}
@@ -106,15 +105,11 @@ export default function NewJam({
                       }
                     }}
                   />
-                  <span className="-mx-[50px] font-light text-gray-600">
-                    Hours
-                  </span>
                 </div>
                 <div className="flex flex-1 items-center gap-1">
                   <input
                     className="w-full border border-black p-1"
                     type="text"
-                    required
                     name="minutes"
                     placeholder="Minutes"
                     value={minutes}
@@ -126,9 +121,6 @@ export default function NewJam({
                         setMinutes(e.target.value)
                     }}
                   />
-                  <span className="-mx-[68px] font-light text-gray-500">
-                    Minutes
-                  </span>
                 </div>
               </div>
             </div>

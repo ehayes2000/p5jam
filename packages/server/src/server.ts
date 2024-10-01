@@ -3,12 +3,9 @@ import { staticPlugin } from '@elysiajs/static'
 import { swagger } from '@elysiajs/swagger'
 import { Elysia, t } from 'elysia'
 import client from '../prisma/prisma'
-import { userPosts } from './queries'
 import jamRoutes from './routes/jams'
 import loginRoutes from './routes/login'
 import postsRoutes from './routes/posts'
-import Model from './services/models'
-import prisma from './prisma'
 
 export const api = new Elysia({ prefix: '/api' })
   .guard({

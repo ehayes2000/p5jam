@@ -55,17 +55,15 @@ export default function Post({
             onClick={() => {
               if (isLiked) {
                 client.api.posts({ id: p.id }).like.delete()
-                p.likeCount -= 1
                 setIsLiked(false)
               } else {
                 client.api.posts({ id: p.id }).like.post()
-                p.likeCount += 1
                 setIsLiked(true)
               }
             }}
           >
             <i className={`bi ${isLiked ? 'bi-heart-fill' : 'bi-heart'}`}> </i>
-            <span> {p.likeCount} </span>
+            <span> {p.likes.length} </span>
           </button>
         </span>
         <span className="px-1">

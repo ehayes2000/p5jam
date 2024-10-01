@@ -71,8 +71,6 @@ export default function loginRoutes() {
             const newUser: User = {
               id: id,
               name: githubUser.login,
-              postCount: 0,
-              commentCount: 0,
             }
             await client.user.create({ data: newUser })
             const session = await lucia.createSession(id, {})

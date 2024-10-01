@@ -1,43 +1,47 @@
-import { addMilliseconds } from 'date-fns'
-import client from './models'
-
+import jamPrimatives from './primatives/jams'
 export default class JamService {
-  private client: client
-
-  constructor(client: client) {
-    this.client = client
-  }
+  constructor() {}
 
   async get(id: string) {
-    return await this.client.getJam({ id })
+    return await jamPrimatives.getJam({ id })
   }
 
   async create(params: { title: string; durationMs: number; userId: string }) {
-    const { id } = await this.client.createJam(params)
-    const jam = await this.client.getJam({ id })
+    const jamIdParticipant = await jamPrimatives.getUserActiveJam({
+      userId: params.userId,
+    })
+    if (jamIdParticipant) throw new Error('Already a participant')
+    const { id } = await jamPrimatives.createJam(params)
+    const jam = await jamPrimatives.getJam({ id })
     if (!jam) throw new Error('Expected Jam on creation')
     return jam
   }
 
   async delete(params: { id: string; userId: string }) {
-    return await this.client.deleteJam(params)
+    return await jamPrimatives.deleteJam(params)
   }
 
   async join(params: { userId: string; id: string }) {
     const { id, userId } = params
-    const jamIdParticipant = await this.client.getUserActiveJam({ userId })
+    const jamIdParticipant = await jamPrimatives.getUserActiveJam({ userId })
     if (jamIdParticipant) throw new Error('Already a participant')
-    const { id: jamid } = await this.client.joinJam({ userId, id })
-    const jam = await this.client.getJam({ id })
+    const { id: jamId } = await jamPrimatives.joinJam({ userId, id })
+    const jam = await jamPrimatives.getJam({ id: jamId })
     if (!jam) throw new Error('Expected Jam on creation')
     return jam
   }
 
   async leave(params: { userId: string; id: string }) {
-    await this.client.leaveJam(params)
+    await jamPrimatives.leaveJam(params)
   }
 
   async getUserActiveJam(params: { userId: string }) {
-    return await this.client.getUserActiveJam({ userId: params.userId })
+    return await jamPrimatives.getUserActiveJam({ userId: params.userId })
+  }
+
+  async isActiveJam(params: { id: string }) {
+    const jam = await jamPrimatives.getJam({ id: params.id })
+    if (!jam) return false
+    return jam.endTime > new Date()
   }
 }

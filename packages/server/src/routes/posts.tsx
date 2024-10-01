@@ -1,6 +1,4 @@
 import { Elysia, error, t } from 'elysia'
-import Models from '../services/models'
-import prisma from '../prisma'
 import { authMiddleware } from '../githubAuth'
 import PostService from '../services/PostService'
 import { Html, html } from '@elysiajs/html'
@@ -8,7 +6,7 @@ import ScriptTemplate from '../scriptTemplate'
 
 export const postMutators = () =>
   new Elysia()
-    .decorate('PostService', new PostService(new Models(prisma)))
+    .decorate('PostService', new PostService())
     .derive(authMiddleware)
     .guard({
       as: 'local',
@@ -115,7 +113,7 @@ export const postMutators = () =>
 export default function postsRoutes() {
   return new Elysia()
     .use(html())
-    .decorate('PostService', new PostService(new Models(prisma)))
+    .decorate('PostService', new PostService())
     .use(postMutators())
     .get(
       '/posts',

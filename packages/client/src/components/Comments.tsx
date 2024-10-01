@@ -50,18 +50,13 @@ export default function Comments({
             </div>
             <div className="text-wrap"> {c.text} </div>
 
-            <div className="flex justify-between">
-              <span>
-                <i className="bi bi-heart" /> {c.likeCount}
-              </span>
-              {c.authorId === myId ? (
-                <button onClick={() => deleteComment({ id: c.id })}>
-                  <i className="bi bi-trash3" />
-                </button>
-              ) : (
-                <></>
-              )}
-            </div>
+            {c.authorId === myId ? (
+              <button onClick={() => deleteComment({ id: c.id })}>
+                <i className="bi bi-trash3" />
+              </button>
+            ) : (
+              <></>
+            )}
           </div>
         )
       })}

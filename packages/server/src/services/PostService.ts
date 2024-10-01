@@ -1,35 +1,31 @@
-import dbClient from '../prisma'
-import { v4 as uuid } from 'uuid'
-import Models from './models'
+import commentPrimatives from './primatives/comments'
+import likePrimatives from './primatives/likes'
+import primatives from './primatives/posts'
 
 export default class PostService {
-  private client: Models
-
-  constructor(client: Models) {
-    this.client = client
-  }
+  constructor() {}
 
   async list(params: { userId?: string; jamId?: string }) {
-    return await this.client.getPosts({ filters: params })
+    return await primatives.getPosts({ filters: params })
   }
 
   async get(params: { id: string }) {
-    return await this.client.getPost({ id: params.id })
+    return await primatives.getPost({ id: params.id })
   }
 
   async create(params: { userId: string; jamId?: string }) {
     // TODO: make jam id actually work
     const { userId, jamId } = params
-    const postId = await this.client.createPost({ userId, jamId })
+    const { id: postId } = await primatives.createPost({ userId, jamId })
     if (!postId) throw new Error('Unexpected null postId on creation')
-    const post = await this.client.getPost({ id: postId })
+    const post = await primatives.getPost({ id: postId })
     if (!post) throw new Error('Unexpected null post on creation')
     return post
   }
 
   async delete(params: { userId: string; id: string }) {
     const { userId, id } = params
-    await this.client.deletePost({ userId, id })
+    await primatives.deletePost({ userId, id })
   }
 
   async edit(params: {
@@ -38,29 +34,42 @@ export default class PostService {
     script: string
     description: string
   }) {
-    const { id: editedId } = await this.client.editPost(params)
-    return await this.client.getPost({ id: editedId })
+    const { id: editedId } = await primatives.editPost(params)
+    return await primatives.getPost({ id: editedId })
   }
 
-  async like(params: { id: string; userId: string }) {
-    await this.client.likePost(params)
+  async like({ id, userId }: { id: string; userId: string }) {
+    await likePrimatives.createLike({ postId: id, userId })
   }
 
-  async deleteLike(params: { userId: string; id: string }) {
-    await this.client.unlikePost(params)
+  async deleteLike({ id, userId }: { userId: string; id: string }) {
+    await likePrimatives.deleteLike({ postId: id, userId })
   }
 
-  async createComment(params: {
+  async createComment({
+    postId,
+    text,
+    userId,
+  }: {
     postId: string
     text: string
     userId: string
   }) {
-    const { id } = await this.client.createComment(params)
-    const comment = await this.client.getComment({ id })
-    return comment
+    const { id: commentId } = await commentPrimatives.createComment({
+      postId,
+      text,
+      userId,
+    })
+    return await commentPrimatives.getComment({ id: commentId })
   }
 
-  async deleteComment(params: { commentId: string; userId: string }) {
-    return await this.client.deleteComment(params)
+  async deleteComment({
+    commentId,
+    userId,
+  }: {
+    commentId: string
+    userId: string
+  }) {
+    await commentPrimatives.deleteComment({ commentId, userId })
   }
 }

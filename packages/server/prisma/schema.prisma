@@ -17,8 +17,6 @@ model Session {
 model User {
   id             String           @id
   name           String           @unique
-  commentCount   Int              @default(0)
-  postCount      Int              @default(0)
   posts          Post[]
   sessions       Session[]
   comments       Comment[]
@@ -28,28 +26,24 @@ model User {
 }
 
 model Post {
-  id           String    @id
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  description  String    @default("")
-  content      String    @default("")
-  script       String    @default("")
-  likeCount    Int       @default(0)
-  viewCount    Int       @default(0)
-  commentCount Int       @default(0)
-  author       User      @relation(fields: [authorId], references: [id])
-  authorId     String
-  comments     Comment[]
-  likes        Like[]
-  jamId        String?
-  jam          Jam?      @relation(fields: [jamId], references: [id])
+  id          String    @id
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  description String    @default("")
+  content     String    @default("")
+  script      String    @default("")
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    String
+  comments    Comment[]
+  likes       Like[]
+  jamId       String?
+  jam         Jam?      @relation(fields: [jamId], references: [id])
 }
 
 model Comment {
   id        String   @id
   createdAt DateTime @default(now())
   text      String
-  likeCount Int      @default(0)
   author    User     @relation(fields: [authorId], references: [id])
   authorId  String
   post      Post     @relation(fields: [postId], references: [id])

@@ -64,7 +64,7 @@ function Root() {
             {jam ? (
               <button
                 className="hover:cursor-pointer hover:text-gray-500"
-                onClick={() => nav(`/jam/${jam.jam.id}`)}
+                onClick={() => nav(`/jam/${jam.id}`)}
               >
                 Jam
               </button>

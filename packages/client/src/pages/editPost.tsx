@@ -7,11 +7,11 @@ import { store } from '../stateStore'
 import { useEffect } from 'react'
 
 function EditPost() {
-  const post = useSelector(store, (state) => state.context.post)
+  const { post, jam } = useSelector(store, (state) => state.context)
   const { id } = useParams()
   const nav = useNavigate()
+
   useEffect(() => {
-    console.log('ID', id, 'POST', post)
     if (!post && id) {
       client.api
         .posts({ id })
@@ -23,22 +23,31 @@ function EditPost() {
     }
   }, [])
 
+  const updatePost = async ({
+    script,
+    description,
+  }: {
+    script: string
+    description: string
+  }) => {
+    if (!post) return
+    const { data } = await client.api
+      .posts({ id: post.id })
+      .put({ script, description })
+    if (!data) return
+
+    if (data && data.jamId && jam && data.jamId === jam.id) {
+      nav(`/jam/${data.jamId}`)
+    } else {
+      nav(`/profile`)
+    }
+  }
   return (
     <div>
       {post ? (
         <PostEditor
           post={{ description: post.description, script: post.script }}
-          callback={async ({ script, description }) => {
-            const { data } = await client.api
-              .posts({ id: post.id })
-              .put({ script, description })
-            if (!data) return
-            if (data && data.jamId) {
-              nav(`/jam/${data.jamId}`)
-            } else {
-              nav(`/profile`)
-            }
-          }}
+          callback={updatePost}
           callbackText="Post"
         /> // TODO reroute to profile?
       ) : (
