@@ -9,12 +9,12 @@ export const client = treaty<App>('', {
 })
 
 export type TPost = NonNullable<
-  Awaited<ReturnType<typeof client.api.feed.get>>['data']
->[number]
+  Awaited<ReturnType<ReturnType<typeof client.api.posts>['get']>>['data']
+>
 
 export type TJam = NonNullable<
-  NonNullable<Awaited<ReturnType<typeof client.api.jams.get>>>['data']
->[number]
+  Awaited<ReturnType<ReturnType<typeof client.api.jams>['get']>>['data']
+>
 
 export type TEditPost = NonNullable<
   Awaited<ReturnType<typeof client.api.posts.post>>['data']

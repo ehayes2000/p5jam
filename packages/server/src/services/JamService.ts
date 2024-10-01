@@ -1,220 +1,43 @@
 import { addMilliseconds } from 'date-fns'
-import dbClient from '../prisma'
-
-export const generateInviteCode = async (): Promise<string> => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-  const codeLen = 5
-  // hehexd
-  let code = ''
-  for (let i = 0; i < codeLen; ++i) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
-  return code
-}
+import client from './models'
 
 export default class JamService {
-  private client: typeof dbClient
+  private client: client
 
-  constructor(client: typeof dbClient) {
+  constructor(client: client) {
     this.client = client
   }
 
-  async list() {
-    return await this.client.jam.findMany({
-      include: {
-        Post: true,
-        JamParticipant: true,
-      },
-      where: {
-        isDeleted: false,
-      },
-    })
-  }
-
   async get(id: string) {
-    return await this.client.jam.findUnique({
-      include: {
-        Post: true,
-        JamParticipant: {
-          where: {
-            active: true,
-          },
-        },
-      },
-      where: {
-        id,
-      },
-    })
+    return await this.client.getJam({ id })
   }
 
   async create(params: { title: string; durationMs: number; userId: string }) {
-    const { title, durationMs, userId } = params
-    const activeJamId = await this.getUsersActiveJam({ userId })
-    if (activeJamId)
-      throw new Error('Cannot participate in / own multiple jams')
-    const inviteCode = await generateInviteCode()
-    const startTime = new Date()
-    const endTime = addMilliseconds(startTime, durationMs)
-    const [comeOnandSlam, _andWelcomeToTheJam] = await this.client.$transaction(
-      [
-        this.client.jam.create({
-          data: {
-            id: inviteCode,
-            ownerId: userId,
-            startTime: startTime,
-            endTime: endTime,
-            title,
-          },
-        }),
-        this.client.jamParticipant.create({
-          data: {
-            jamId: inviteCode,
-            userId,
-          },
-        }),
-      ],
-    )
-    return comeOnandSlam
+    const { id } = await this.client.createJam(params)
+    const jam = await this.client.getJam({ id })
+    if (!jam) throw new Error('Expected Jam on creation')
+    return jam
   }
 
   async delete(params: { id: string; userId: string }) {
-    const { id, userId } = params
-    return await this.client.jam.update({
-      where: {
-        id,
-        ownerId: userId,
-        endTime: {
-          lte: new Date(),
-        },
-      },
-      data: {
-        isDeleted: true,
-      },
-    })
+    return await this.client.deleteJam(params)
   }
 
   async join(params: { userId: string; id: string }) {
     const { id, userId } = params
-    const activeParticipant = await this.client.jamParticipant.findFirst({
-      select: {
-        jam: {
-          select: {
-            id: true,
-          },
-        },
-      },
-      where: {
-        userId,
-        jam: {
-          endTime: {
-            gte: new Date(),
-          },
-        },
-        active: true,
-      },
-    })
-    if (activeParticipant) {
-      throw new Error(
-        'This should be a structured error: already active participant in jam',
-      )
-    }
-    const activeOwner = await this.client.jam.findFirst({
-      where: {
-        ownerId: userId,
-        endTime: {
-          gte: new Date(),
-        },
-      },
-    })
-
-    if (activeOwner) {
-      throw new Error('You are already an active owner in a jam')
-    }
-
-    await this.client.jamParticipant.upsert({
-      where: {
-        jamId_userId: {
-          userId,
-          jamId: id,
-        },
-      },
-      create: {
-        jamId: id,
-        userId,
-      },
-      update: {
-        active: true,
-      },
-    })
-    const jam = await this.client.jam.findUnique({
-      include: {
-        Post: true,
-        JamParticipant: {
-          where: {
-            active: true,
-          },
-        },
-      },
-      where: {
-        id,
-      },
-    })
+    const jamIdParticipant = await this.client.getUserActiveJam({ userId })
+    if (jamIdParticipant) throw new Error('Already a participant')
+    const { id: jamid } = await this.client.joinJam({ userId, id })
+    const jam = await this.client.getJam({ id })
+    if (!jam) throw new Error('Expected Jam on creation')
     return jam
   }
 
   async leave(params: { userId: string; id: string }) {
-    const { id, userId } = params
-    await this.client.jamParticipant.update({
-      where: {
-        jam: {
-          ownerId: {
-            not: userId,
-          },
-        },
-        jamId_userId: {
-          userId,
-          jamId: id,
-        },
-      },
-      data: {
-        active: false,
-      },
-    })
+    await this.client.leaveJam(params)
   }
 
-  async getUsersActiveJam(params: { userId: string }) {
-    const { userId } = params
-
-    const participantJamId = await this.client.jamParticipant.findFirst({
-      select: {
-        jam: {
-          select: {
-            id: true,
-          },
-        },
-      },
-      where: {
-        userId,
-        active: true,
-        jam: {
-          endTime: {
-            gte: new Date(),
-          },
-        },
-      },
-    })
-    if (participantJamId) return { id: participantJamId.jam.id }
-    const ownerJamId = await this.client.jam.findFirst({
-      where: {
-        endTime: {
-          lte: new Date(),
-        },
-        ownerId: userId,
-      },
-      select: {
-        id: true,
-      },
-    })
-    return ownerJamId
+  async getUserActiveJam(params: { userId: string }) {
+    return await this.client.getUserActiveJam({ userId: params.userId })
   }
 }

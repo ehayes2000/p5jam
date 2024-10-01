@@ -67,39 +67,3 @@ export const userPosts = async (userId: string) =>
         ),
       })),
     )
-
-export const post = async (id: string) =>
-  client.post
-    .findUnique({
-      where: { id },
-      include: {
-        comments: {
-          include: { author: true },
-          orderBy: {
-            createdAt: 'desc',
-          },
-        },
-        author: true,
-        likes: {
-          select: {
-            userId: true,
-          },
-        },
-      },
-    })
-    .then((post) => {
-      if (post) {
-        return {
-          ...post,
-          likes: post.likes.reduce(
-            (acc, like) => {
-              acc[like.userId] = true
-              return acc
-            },
-            {} as { [k: string]: true },
-          ),
-        }
-      } else {
-        return null
-      }
-    })

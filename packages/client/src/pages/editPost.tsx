@@ -32,9 +32,9 @@ function EditPost() {
             const { data } = await client.api
               .posts({ id: post.id })
               .put({ script, description })
-
-            if (data && data.post.jamId) {
-              nav(`/jam/${data.post.jamId}`)
+            if (!data) return
+            if (data && data.jamId) {
+              nav(`/jam/${data.jamId}`)
             } else {
               nav(`/profile`)
             }

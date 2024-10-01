@@ -1,14 +1,14 @@
-import { Html, html } from '@elysiajs/html'
 import { Elysia, error, t } from 'elysia'
-import client from '../../prisma/prisma'
+import Models from '../services/models'
+import prisma from '../prisma'
 import { authMiddleware } from '../githubAuth'
-import { post } from '../queries'
-import ScriptTemplate from '../scriptTemplate'
 import PostService from '../services/PostService'
+import { Html, html } from '@elysiajs/html'
+import ScriptTemplate from '../scriptTemplate'
 
 export const postMutators = () =>
   new Elysia()
-    .decorate('PostService', new PostService(client))
+    .decorate('PostService', new PostService(new Models(prisma)))
     .derive(authMiddleware)
     .guard({
       as: 'local',
@@ -54,9 +54,7 @@ export const postMutators = () =>
       async ({ userId, error, body, params: { id }, PostService }) => {
         try {
           const post = await PostService.edit({ id, userId, ...body })
-          return {
-            post,
-          }
+          return post
         } catch (e) {
           return error(404)
         }
@@ -116,14 +114,14 @@ export const postMutators = () =>
 
 export default function postsRoutes() {
   return new Elysia()
-    .decorate('PostService', new PostService(client))
     .use(html())
+    .decorate('PostService', new PostService(new Models(prisma)))
     .use(postMutators())
     .get(
       '/posts',
       async ({ query: { userId }, error, PostService }) => {
         if (userId) {
-          const posts = await PostService.list()
+          const posts = await PostService.list({ userId })
           return posts
         }
         return error(404)
@@ -142,5 +140,11 @@ export default function postsRoutes() {
         return <ScriptTemplate script={post.script} />
       },
     )
-    .get('/posts/:id', async ({ params: { id } }) => post(id))
+    .get(
+      '/posts/:id',
+      async ({ params: { id }, PostService }) => await PostService.get({ id }),
+    )
+    .get('/users/:id/posts', async ({ params: { id }, PostService }) => {
+      return await PostService.list({ userId: id })
+    })
 }

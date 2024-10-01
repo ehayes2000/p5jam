@@ -24,15 +24,17 @@ function Root() {
 
   useEffect(() => {
     client.api.jams.activeJam.get().then(async (j) => {
+      console.log('GET ACTIVE JAM', j)
       if (j.data) {
-        const myJam = await client.api.jams({ id: j.data.id }).get()
-        if (!myJam.data) {
+        const { data } = await client.api.jams({ id: j.data.id }).get()
+        console.log('JAM FOUND', data)
+        if (!data) {
           alert('expecetd active jam data :)')
           return
         }
         store.send({
           type: 'receivedJamFromServer',
-          payload: { jam: myJam.data },
+          payload: { jam: data },
         })
       }
     })
@@ -62,7 +64,7 @@ function Root() {
             {jam ? (
               <button
                 className="hover:cursor-pointer hover:text-gray-500"
-                onClick={() => nav(`/jam/${jam.id}`)}
+                onClick={() => nav(`/jam/${jam.jam.id}`)}
               >
                 Jam
               </button>

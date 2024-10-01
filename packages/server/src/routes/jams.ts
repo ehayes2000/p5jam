@@ -1,5 +1,6 @@
 import { Context, Elysia, t } from 'elysia'
 import client from '../../prisma/prisma'
+import Models from '../services/models'
 import { authMiddleware } from '../githubAuth'
 import JamService from '../services/JamService'
 
@@ -11,15 +12,12 @@ export const makeJamRoutes = (
   auth: (ctx: Context) => Promise<{ isAuth: boolean; userId: string }>,
 ) => {
   return new Elysia()
-    .decorate('JamService', new JamService(client))
+    .decorate('JamService', new JamService(new Models(client)))
     .derive(auth)
     .guard({
       beforeHandle: async ({ isAuth, error }) => {
         if (!isAuth) return error(401)
       },
-    })
-    .get('/jams', async ({ JamService }) => {
-      return await JamService.list()
     })
     .get('/jams/:id', async ({ params: { id }, error, JamService }) => {
       const jams = await JamService.get(id)
@@ -30,13 +28,11 @@ export const makeJamRoutes = (
       '/jams',
       async ({ userId, error, body: { title, durationMs }, JamService }) => {
         try {
-          const { id } = await JamService.create({
+          const jam = await JamService.create({
             userId,
             title,
             durationMs,
           })
-
-          const jam = await JamService.get(id)
           if (!jam) {
             return error(500, 'Expected jam after creation')
           }
@@ -74,7 +70,7 @@ export const makeJamRoutes = (
       },
     )
     .get('/jams/activeJam', async ({ userId, error, JamService }) => {
-      const activeJam = await JamService.getUsersActiveJam({ userId })
+      const activeJam = await JamService.getUserActiveJam({ userId })
       if (activeJam) return activeJam
       return error(404)
     })

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { type TJam, client } from '../client'
 import { store } from '../stateStore'
+import Post from '../components/Post'
 import Timer from './Timer'
 
 export default function Jam({ jam }: { jam: TJam }) {
@@ -9,7 +10,7 @@ export default function Jam({ jam }: { jam: TJam }) {
   const leaveJam = () => {
     ;(async () => {
       if (confirm('Are you sure you want to leave the Jam?') === true) {
-        client.api.jams({ id: jam.id }).leave.delete()
+        client.api.jams({ id: jam.jam.id }).leave.delete()
         store.send({ type: 'leftJam' })
         nav('/')
       }
@@ -18,7 +19,7 @@ export default function Jam({ jam }: { jam: TJam }) {
 
   const newSketch = () => {
     ;(async () => {
-      const { data } = await client.api.posts.jam({ jamId: jam.id }).post()
+      const { data } = await client.api.posts.jam({ jamId: jam.jam.id }).post()
       if (data) {
         store.send({ type: 'postCreated', payload: { post: data } })
       }
@@ -29,13 +30,13 @@ export default function Jam({ jam }: { jam: TJam }) {
   return (
     <div className="">
       <div className="grid grid-cols-3 justify-center gap-8 border-b border-black p-16 text-4xl font-bold">
-        <h1 className="align-center px-2 text-right"> {jam.title} </h1>
+        <h1 className="align-center px-2 text-right"> {jam.jam.title} </h1>
         <div className="align-center flex content-center items-center justify-center">
-          <Timer endTime={jam.endTime} />
+          <Timer endTime={jam.jam.endTime} />
         </div>
         <div className="flex text-center text-sm">
           <div className="flex gap-2 text-2xl text-black">
-            {Array.from(jam.id).map((c, i) => (
+            {Array.from(jam.jam.id).map((c, i) => (
               <div
                 key={i}
                 className="w-[2.7rem] border border-black py-1 text-center font-light"
@@ -64,6 +65,11 @@ export default function Jam({ jam }: { jam: TJam }) {
             Leave
           </button>
         </div>
+      </div>
+      <div>
+        {jam.posts.map((p) => (
+          <Post post={p} key={p.id} />
+        ))}
       </div>
     </div>
   )

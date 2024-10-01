@@ -10,7 +10,8 @@
     "declaration": true,
     "strict": true,
     "types": ["@elysiajs/html"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "plugins": [{ "name": "@kitajs/ts-html-plugin" }]
   },
   "include": ["src/**/*", "prisma/prisma.ts"]
 }
