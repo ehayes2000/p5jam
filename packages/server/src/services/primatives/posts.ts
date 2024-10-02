@@ -2,10 +2,8 @@ import { v4 as uuid } from 'uuid'
 import client from '../../prisma'
 
 const DEFAULT_SCRIPT = `
-const WIDTH=360
-const HEIGHT=360
 function setup() {
-  createCanvas(WIDTH, HEIGHT);
+  createCanvas(WINDOW_HEIGHT, WINDOW_WIDTH);
 }
 function draw() {
   // TODO

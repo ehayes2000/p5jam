@@ -43,3 +43,35 @@
 
 - Start a temp event that can be shared
 - Users can submit sketches to the event
+
+- stats
+
+  - Jam stats
+    - N Submissions
+    - N Participants
+    - List of Participants
+  - User Stats
+    - Posts
+    - Jams participated in
+    - Jams created
+    - Comments
+    - Likes Recieved
+  - Post Stats
+    - N Likes
+    - N Comments
+
+- Multi Size Post
+
+  - Feed display size to post
+  - Post preview and Full Screen View
+
+- Home screen background
+
+  - Send display size to post
+  - Write one view for home post
+
+- Live update jam participants on post
+
+  - Socketio management
+
+- Deploy somewhere

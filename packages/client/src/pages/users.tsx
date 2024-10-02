@@ -13,9 +13,9 @@ function Users() {
   })
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-4 p-6">
       {users?.map((u) => (
-        <Link key={u.id} className="rounded-md border p-4" to={`/user/${u.id}`}>
+        <Link key={u.id} className="border p-4" to={`/user/${u.id}`}>
           <span className="fw-bold">{u.name}</span>
         </Link>
       ))}

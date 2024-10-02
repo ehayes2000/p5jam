@@ -44,7 +44,7 @@ export default function Post({
     <div
       ref={pref}
       key={p.id}
-      className="grid cursor-pointer content-center justify-center gap-1 rounded-md border p-2"
+      className="grid cursor-pointer content-center justify-center gap-1 border p-2"
     >
       <h2 className=""> {p.author.name} </h2>
       <Sketch id={p.id} />

@@ -24,10 +24,8 @@ function Root() {
 
   useEffect(() => {
     client.api.jams.activeJam.get().then(async (j) => {
-      console.log('GET ACTIVE JAM', j)
       if (j.data) {
         const { data } = await client.api.jams({ id: j.data.id }).get()
-        console.log('JAM FOUND', data)
         if (!data) {
           alert('expecetd active jam data :)')
           return
@@ -85,7 +83,7 @@ function Root() {
               </>
             )}
           </div>
-          <div className="flex flex-col items-end text-2xl text-gray-500">
+          <div className="flex flex-col items-end text-2xl font-normal text-black">
             {/* <Link
               className="hover:cursor-pointer hover:text-gray-400"
               to="explore"
@@ -93,19 +91,19 @@ function Root() {
               Explore
             </Link> */}
             <Link
-              className="hover:cursor-pointer hover:text-gray-400"
-              to="jam/complete"
+              className="hover:cursor-pointer hover:text-gray-500"
+              to="jam/myJams"
             >
               My Jams
             </Link>
             <Link
-              className="hover:cursor-pointer hover:text-gray-400"
+              className="hover:cursor-pointer hover:text-gray-500"
               to="profile"
             >
               Profile
             </Link>
             <Link
-              className="hover:cursor-pointer hover:text-gray-400"
+              className="hover:cursor-pointer hover:text-gray-500"
               to="users"
             >
               Users

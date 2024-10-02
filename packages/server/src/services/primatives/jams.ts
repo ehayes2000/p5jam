@@ -28,6 +28,21 @@ async function getJams({
       },
       isDeleted: false,
     },
+    orderBy: {
+      endTime: 'desc',
+    },
+    include: {
+      _count: {
+        select: {
+          JamParticipant: {
+            where: {
+              active: true,
+            },
+          },
+          Post: true,
+        },
+      },
+    },
   })
 }
 
@@ -47,6 +62,16 @@ async function getJam({ id }: { id: string }) {
             },
           },
           author: true,
+        },
+      },
+      _count: {
+        select: {
+          JamParticipant: {
+            where: {
+              active: true,
+            },
+          },
+          Post: true,
         },
       },
     },

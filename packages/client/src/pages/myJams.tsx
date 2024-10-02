@@ -10,18 +10,24 @@ export default function CompleteJams() {
 
   useEffect(() => {
     if (!myId) nav('/login')
-
-    client.api.jams.get({ query: { userId: myId } }).then((jams) => {
-      if (jams.data) setJams(jams.data)
-    })
+    else {
+      client.api.jams.get({ query: { userId: myId } }).then((jams) => {
+        if (jams.data) setJams(jams.data)
+      })
+    }
   }, [])
 
   return (
-    <div>
+    <div className="flex flex-col gap-2 px-6 py-4">
       {jams ? (
         jams.map((jam) => (
-          <div key={jam.id}>
-            <Link to={`/jam/${jam.id}`}> {jam.title} </Link>
+          <div key={jam.id} className="border p-2">
+            <Link to={`/jam/${jam.id}`}>
+              <h2 className=""> {jam.title} </h2>
+              <h3 className="text-gray-600"> {jam.endTime.toString()} </h3>
+
+              <div> </div>
+            </Link>
           </div>
         ))
       ) : (

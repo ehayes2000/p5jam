@@ -5,6 +5,11 @@ export default function ScriptTemplate({
 }: {
   script: string
 }): JSX.Element {
+  const sizington = `
+    var WINDOW_WIDTH = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    var WINDOW_HEIGHT = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  `
+
   return (
     <html lang="en">
       <style>
@@ -22,6 +27,7 @@ export default function ScriptTemplate({
         <meta charset="utf-8" />
       </head>
       <body>
+        <script> {sizington}</script>
         <script>{script}</script>
       </body>
     </html>

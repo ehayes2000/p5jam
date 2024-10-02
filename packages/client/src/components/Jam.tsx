@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { type TJam, client } from '../client'
 import { store } from '../stateStore'
+
 import Post from '../components/Post'
 import Timer from './Timer'
 
