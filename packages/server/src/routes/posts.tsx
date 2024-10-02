@@ -116,6 +116,11 @@ export default function postsRoutes() {
     .use(html())
     .decorate('PostService', new PostService(new JamService()))
     .use(postMutators())
+    .get('/posts/featured', async ({ PostService }) => {
+      return await PostService.get({
+        id: 'e5859d82-a26a-4a82-8244-175baeeb5d67',
+      })
+    })
     .get(
       '/posts',
       async ({ query: { userId }, error, PostService }) => {

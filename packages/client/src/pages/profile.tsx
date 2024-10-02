@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
-import { client } from '../client'
+import { client, type TPost } from '../client'
 import Post from '../components/Post'
 import { QUERY_KEYS, useMyID } from '../queries/queryClient'
+import { store } from '../stateStore'
 
 function Profile() {
   const navigate = useNavigate()
@@ -22,16 +23,9 @@ function Profile() {
   }
 
   // TODO fix
-  const editPost = (post: {
-    id: string
-    description: string
-    script: string
-  }) => {
-    return navigate(`/editPost/${post.id}`, {
-      state: {
-        post,
-      },
-    })
+  const editPost = (post: TPost) => {
+    store.send({ type: 'postCreated', payload: { post: post } })
+    return navigate(`/editPost/${post.id}`)
   }
 
   return (

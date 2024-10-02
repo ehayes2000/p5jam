@@ -1,4 +1,4 @@
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { client, type TJamPreview } from '../client'
 import { useMyID } from '../queries/queryClient'
@@ -6,10 +6,9 @@ import { useMyID } from '../queries/queryClient'
 export default function CompleteJams() {
   const [jams, setJams] = useState<TJamPreview[] | null>()
   const { data: myId } = useMyID()
-  const nav = useNavigate()
 
   useEffect(() => {
-    if (!myId) nav('/login')
+    if (!myId) return
     else {
       client.api.jams.get({ query: { userId: myId } }).then((jams) => {
         if (jams.data) setJams(jams.data)

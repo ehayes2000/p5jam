@@ -12,7 +12,18 @@ function EditPost() {
   const nav = useNavigate()
 
   useEffect(() => {
+    // no post but have id -> get post
     if (!post && id) {
+      client.api
+        .posts({ id })
+        .get()
+        .then((p) => {
+          if (p.data)
+            store.send({ type: 'postCreated', payload: { post: p.data } })
+        })
+    } else if (!id) {
+      nav('/')
+    } else if (post && id !== post.id) {
       client.api
         .posts({ id })
         .get()

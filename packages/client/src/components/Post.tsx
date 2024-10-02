@@ -1,6 +1,7 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { client, TPost } from '../client'
 import Comments from './Comments'
+import { useMyID } from '../queries/queryClient'
 
 export function Sketch({ id }: { id: string }) {
   return (
@@ -25,6 +26,17 @@ export default function Post({
   const [isLiked, setIsLiked] = useState<boolean>()
   const [openComments, setOpenComments] = useState<boolean>(isComments ?? false)
   const [comments, setComments] = useState<typeof p.comments>(p.comments)
+  const { data: myId } = useMyID()
+
+  // TODO delete :)
+  useEffect(() => {
+    if (!myId) return
+    p.likes.forEach((l) => {
+      if (l.userId === myId) {
+        setIsLiked(true)
+      }
+    })
+  }, [])
 
   const postComment = async ({ text }: { text: string }) => {
     const newComment = await client.api
@@ -55,14 +67,20 @@ export default function Post({
             onClick={() => {
               if (isLiked) {
                 client.api.posts({ id: p.id }).like.delete()
+                p.likes = p.likes.filter((l) => l.userId !== 'me')
                 setIsLiked(false)
               } else {
                 client.api.posts({ id: p.id }).like.post()
+                p.likes = [...p.likes, { postId: p.id, userId: 'me' }]
                 setIsLiked(true)
               }
             }}
           >
-            <i className={`bi ${isLiked ? 'bi-heart-fill' : 'bi-heart'}`}> </i>
+            <i
+              className={`bi ${isLiked ? 'bi-heart-fill text-rose-400' : 'bi-heart'}`}
+            >
+              {' '}
+            </i>
             <span> {p.likes.length} </span>
           </button>
         </span>

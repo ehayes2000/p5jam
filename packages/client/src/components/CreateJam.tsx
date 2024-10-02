@@ -56,84 +56,80 @@ export default function NewJam({
   }
 
   return (
-    <div className="flex h-full w-full items-center justify-center">
-      <div className="content-left">
-        <button
-          className="z-25 -ml-4 h-8 w-8 border border-black bg-red-400 hover:bg-red-600"
-          onClick={closeCallback}
+    <div className="content-left">
+      <button
+        className="z-25 -ml-4 h-8 w-8 border border-black bg-red-400 hover:bg-red-600"
+        onClick={closeCallback}
+      >
+        <i className="bi bi-x-lg" />
+      </button>
+      <div className="-mt-4 w-full content-center border border-black bg-white p-6 text-center">
+        <div className="text-4xl font-bold">Create New Jam</div>
+        <form
+          id="createEvent"
+          onSubmit={(e) => {
+            createJam(e)
+          }}
+          className="flex flex-col gap-2 text-left"
         >
-          <i className="bi bi-x-lg" />
-        </button>
-        <div className="-mt-4 w-full content-center border border-black bg-white p-6 text-center">
-          <div className="text-4xl font-bold">Create New Jam</div>
-          <form
-            id="createEvent"
-            onSubmit={(e) => {
-              createJam(e)
-            }}
-            className="flex flex-col gap-2 text-left"
-          >
+          <div>
             <div>
-              <div>
-                <label htmlFor="title">Title</label>
-              </div>
+              <label htmlFor="title">Title</label>
+            </div>
+            <input
+              className="w-full border border-black p-1"
+              type="text"
+              name="title"
+              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
+          <div className="w-full">
+            <div>Duration</div>
+
+            <div className="grid grid-cols-2 gap-1">
               <input
-                className="w-full border border-black p-1"
+                className="min-w-0 border border-black p-1"
                 type="text"
-                name="title"
-                required
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                name="hours"
+                placeholder="Hours"
+                value={hours}
+                size={1}
+                onChange={(e) => {
+                  const parsed = Number(e.target.value)
+                  if (e.target.value.length === 0) {
+                    setHours('')
+                  } else if (!Number.isNaN(parsed)) {
+                    setHours(e.target.value)
+                  }
+                }}
+              />
+              <input
+                className="border border-black p-1"
+                type="text"
+                name="minutes"
+                placeholder="Minutes"
+                size={1}
+                value={minutes}
+                onChange={(e) => {
+                  const parsed = Number(e.target.value)
+                  if (e.target.value.length === 0) setMinutes('')
+                  else if (parsed < 60 && parsed > 0) setMinutes(e.target.value)
+                }}
               />
             </div>
-            <div className="w-full">
-              <div>Duration</div>
-
-              <div className="grid grid-cols-2 gap-1">
-                <input
-                  className="min-w-0 border border-black p-1"
-                  type="text"
-                  name="hours"
-                  placeholder="Hours"
-                  value={hours}
-                  size={1}
-                  onChange={(e) => {
-                    const parsed = Number(e.target.value)
-                    if (e.target.value.length === 0) {
-                      setHours('')
-                    } else if (!Number.isNaN(parsed)) {
-                      setHours(e.target.value)
-                    }
-                  }}
-                />
-                <input
-                  className="border border-black p-1"
-                  type="text"
-                  name="minutes"
-                  placeholder="Minutes"
-                  size={1}
-                  value={minutes}
-                  onChange={(e) => {
-                    if (e.target.value.length === 0) setMinutes('')
-                    else if (e.target.value.length < 2)
-                      setMinutes(e.target.value)
-                    else if (Number(e.target.value) < 60)
-                      setMinutes(e.target.value)
-                  }}
-                />
-              </div>
-            </div>
-          </form>
-        </div>
-        <div className="-mr-6 -mt-4 text-right">
-          <button
-            type="submit"
-            form="createEvent"
-            className="relative z-50 border border-black bg-emerald-400 p-1 hover:bg-emerald-600"
-          >
-            Create
-          </button>
-        </div>
+          </div>
+        </form>
+      </div>
+      <div className="-mr-6 -mt-4 text-right">
+        <button
+          type="submit"
+          form="createEvent"
+          className="relative z-50 border border-black bg-emerald-400 p-1 hover:bg-emerald-600"
+        >
+          Create
+        </button>
       </div>
     </div>
   )

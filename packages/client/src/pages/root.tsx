@@ -10,7 +10,7 @@ function Root() {
   const nav = useNavigate()
   const location = useLocation()
   const { jam } = useSelector(store, (state) => state.context)
-  const { data: _id } = useMyID()
+  const { data: myID } = useMyID()
 
   const newJam = () => {
     store.send({ type: 'userClickedCreatedJam' })
@@ -39,80 +39,87 @@ function Root() {
   }, [])
 
   return (
-    <div className="grid h-full w-full grid-flow-col grid-cols-5 divide-x divide-black overflow-hidden">
+    <div className="grid h-full w-full grid-flow-col grid-cols-5 overflow-hidden">
       <div
-        className={`${isSideBar ? 'hidden' : ''} absolute p-4 text-xl text-black hover:text-gray-500`}
+        className={`${isSideBar ? 'hidden' : ''} absolute z-50 p-4 text-xl text-black hover:text-gray-500`}
       >
         <button onClick={() => setIsSideBar(true)}>
           <i className="bi bi-layout-sidebar"></i>
         </button>
       </div>
       <div
-        className={`${isSideBar ? '' : 'hidden'} fixed bottom-0 flex h-full w-full p-4 font-bold sm:relative sm:flex-col sm:justify-start`}
+        className={`z-50 bg-white ${isSideBar ? '' : 'hidden'} fixed bottom-0 flex h-full w-full border-r border-black p-4 font-bold sm:relative sm:flex-col sm:justify-start`}
       >
-        <div
-          className={`content-end text-right text-xl text-black hover:text-gray-500`}
-        >
-          <button onClick={() => setIsSideBar(false)}>
-            <i className="bi bi-x-lg text-black hover:text-gray-500"></i>
-          </button>
-        </div>
-        <div className="flex h-full flex-col justify-center gap-4">
-          <div className="flex flex-col items-end gap-2 text-4xl">
-            {jam ? (
-              <button
-                className="hover:cursor-pointer hover:text-gray-500"
-                onClick={() => nav(`/jam/${jam.id}`)}
-              >
-                Jam
+        {myID ? (
+          <>
+            <div
+              className={`content-end text-right text-xl text-black hover:text-gray-500`}
+            >
+              <button onClick={() => setIsSideBar(false)}>
+                <i className="bi bi-x-lg text-black hover:text-gray-500"></i>
               </button>
-            ) : (
-              <>
-                <button
-                  className="hover:cursor-pointer hover:text-gray-500"
-                  onClick={joinJam}
-                >
-                  Join Jam
-                </button>
-                <button
-                  className="hover:cursor-pointer hover:text-gray-500"
-                  onClick={newJam}
-                >
-                  New Jam
-                </button>
-              </>
-            )}
-          </div>
-          <div className="flex flex-col items-end text-2xl font-normal text-black">
-            {/* <Link
+            </div>
+
+            <div className="flex h-full flex-col justify-center gap-4">
+              <div className="flex flex-col items-end gap-2 text-4xl">
+                {jam ? (
+                  <button
+                    className="hover:cursor-pointer hover:text-gray-500"
+                    onClick={() => nav(`/jam/${jam.id}`)}
+                  >
+                    Jam
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      className="hover:cursor-pointer hover:text-gray-500"
+                      onClick={joinJam}
+                    >
+                      Join Jam
+                    </button>
+                    <button
+                      className="hover:cursor-pointer hover:text-gray-500"
+                      onClick={newJam}
+                    >
+                      New Jam
+                    </button>
+                  </>
+                )}
+              </div>
+              <div className="flex flex-col items-end text-2xl font-normal text-black">
+                {/* <Link
               className="hover:cursor-pointer hover:text-gray-400"
               to="explore"
             >
               Explore
             </Link> */}
-            <Link
-              className="hover:cursor-pointer hover:text-gray-500"
-              to="jam/myJams"
-            >
-              My Jams
-            </Link>
-            <Link
-              className="hover:cursor-pointer hover:text-gray-500"
-              to="profile"
-            >
-              Profile
-            </Link>
-            <Link
-              className="hover:cursor-pointer hover:text-gray-500"
-              to="users"
-            >
-              Users
-            </Link>
-          </div>
-        </div>
+                <Link
+                  className="hover:cursor-pointer hover:text-gray-500"
+                  to="jam/myJams"
+                >
+                  My Jams
+                </Link>
+                <Link
+                  className="hover:cursor-pointer hover:text-gray-500"
+                  to="profile"
+                >
+                  Profile
+                </Link>
+                <Link
+                  className="hover:cursor-pointer hover:text-gray-500"
+                  to="users"
+                >
+                  Users
+                </Link>
+              </div>
+            </div>
+          </>
+        ) : (
+          <Link to="/login"> Login </Link>
+        )}
       </div>
       <div
-        className={`${isSideBar ? 'col-span-4' : 'col-span-full'} g-amber-400 h-full w-full overflow-y-auto`}
+        className={`${isSideBar ? 'col-span-4' : 'col-span-full'} g-amber-400 h-full w-full overflow-hidden overflow-y-auto`}
       >
         <Outlet />
       </div>
