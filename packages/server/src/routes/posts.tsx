@@ -1,12 +1,13 @@
 import { Elysia, error, t } from 'elysia'
 import { authMiddleware } from '../githubAuth'
+import JamService from '../services/JamService'
 import PostService from '../services/PostService'
 import { Html, html } from '@elysiajs/html'
 import ScriptTemplate from '../scriptTemplate'
 
 export const postMutators = () =>
   new Elysia()
-    .decorate('PostService', new PostService())
+    .decorate('PostService', new PostService(new JamService()))
     .derive(authMiddleware)
     .guard({
       as: 'local',
@@ -113,7 +114,7 @@ export const postMutators = () =>
 export default function postsRoutes() {
   return new Elysia()
     .use(html())
-    .decorate('PostService', new PostService())
+    .decorate('PostService', new PostService(new JamService()))
     .use(postMutators())
     .get(
       '/posts',

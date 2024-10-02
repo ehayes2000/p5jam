@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { type TJam, client } from '../client'
 import { store } from '../stateStore'
@@ -6,6 +7,20 @@ import Timer from './Timer'
 
 export default function Jam({ jam }: { jam: TJam }) {
   const nav = useNavigate()
+  const [isComplete, setIsComplete] = useState(
+    new Date(jam.endTime) <= new Date(),
+  )
+
+  useEffect(() => {
+    const timer = setTimeout(
+      () => {
+        setIsComplete(true)
+        store.send({ type: 'jamEnded' })
+      },
+      new Date(jam.endTime).getTime() - new Date().getTime(),
+    )
+    return () => clearTimeout(timer)
+  }, [])
 
   const leaveJam = () => {
     ;(async () => {
@@ -32,7 +47,7 @@ export default function Jam({ jam }: { jam: TJam }) {
       <div className="grid grid-cols-3 justify-center gap-8 border-b border-black p-16 text-4xl font-bold">
         <h1 className="align-center px-2 text-right"> {jam.title} </h1>
         <div className="align-center flex content-center items-center justify-center">
-          <Timer endTime={jam.endTime} />
+          {isComplete ? <div> Jam Over </div> : <Timer endTime={jam.endTime} />}{' '}
         </div>
         <div className="flex text-center text-sm">
           <div className="flex gap-2 text-2xl text-black">
@@ -45,12 +60,17 @@ export default function Jam({ jam }: { jam: TJam }) {
               </div>
             ))}
           </div>
-          <h4 className="relative -ml-6 mt-10 h-0 w-0 -rotate-45 animate-oscillate text-amber-400">
-            Join
-          </h4>
+
+          {isComplete || (
+            <h4 className="relative -ml-6 mt-10 h-0 w-0 -rotate-45 animate-oscillate text-amber-400">
+              Join!
+            </h4>
+          )}
         </div>
       </div>
-      <div className="-my-6 flex items-center justify-around px-16 text-2xl">
+      <div
+        className={`-my-6 ${isComplete ? 'invisible' : ''} flex items-center justify-around px-16 text-2xl`}
+      >
         <button
           onClick={newSketch}
           className="border border-black bg-emerald-400 px-4 py-2 font-medium hover:bg-emerald-600"
@@ -66,8 +86,8 @@ export default function Jam({ jam }: { jam: TJam }) {
           </button>
         </div>
       </div>
-      <div>
-        {jam.posts.map((p) => (
+      <div className="mt-6 flex justify-center p-4">
+        {jam.Post.map((p) => (
           <Post post={p} key={p.id} />
         ))}
       </div>

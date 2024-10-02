@@ -10,6 +10,7 @@ import ErrorPage from './pages/errorPage'
 import Explore from './pages/explore'
 import Home from './pages/home'
 import Jam from './pages/jamPage'
+import CompleteJams from './pages/completeJams'
 import LoginPage from './pages/login'
 import PostDetails from './pages/postDetails'
 import Profile from './pages/profile'
@@ -28,10 +29,10 @@ export const router = createBrowserRouter([
         index: true,
         element: <Home />,
       },
-      {
-        path: 'explore',
-        element: <Explore />,
-      },
+      // {
+      //   path: 'explore',
+      //   element: <Explore />,
+      // },
       {
         path: 'users',
         element: <Users />,
@@ -59,6 +60,10 @@ export const router = createBrowserRouter([
       {
         path: 'jam/:id',
         element: <Jam />,
+      },
+      {
+        path: 'jam/complete',
+        element: <CompleteJams />,
       },
     ],
   },

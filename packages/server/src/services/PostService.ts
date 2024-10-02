@@ -1,31 +1,40 @@
 import commentPrimatives from './primatives/comments'
 import likePrimatives from './primatives/likes'
-import primatives from './primatives/posts'
+import postPrimatives from './primatives/posts'
+import JamService from './JamService'
 
 export default class PostService {
-  constructor() {}
+  private readonly jamService: JamService
+
+  constructor(jamService: JamService) {
+    this.jamService = jamService
+  }
 
   async list(params: { userId?: string; jamId?: string }) {
-    return await primatives.getPosts({ filters: params })
+    return await postPrimatives.getPosts({ filters: params })
   }
 
   async get(params: { id: string }) {
-    return await primatives.getPost({ id: params.id })
+    return await postPrimatives.getPost({ id: params.id })
   }
 
   async create(params: { userId: string; jamId?: string }) {
     // TODO: make jam id actually work
     const { userId, jamId } = params
-    const { id: postId } = await primatives.createPost({ userId, jamId })
+    if (jamId) {
+      const isActive = await this.jamService.isActiveJam({ id: jamId })
+      if (!isActive) throw new Error('Cannot create post for expired Jam')
+    }
+    const { id: postId } = await postPrimatives.createPost({ userId, jamId })
     if (!postId) throw new Error('Unexpected null postId on creation')
-    const post = await primatives.getPost({ id: postId })
+    const post = await postPrimatives.getPost({ id: postId })
     if (!post) throw new Error('Unexpected null post on creation')
     return post
   }
 
   async delete(params: { userId: string; id: string }) {
     const { userId, id } = params
-    await primatives.deletePost({ userId, id })
+    await postPrimatives.deletePost({ userId, id })
   }
 
   async edit(params: {
@@ -34,8 +43,8 @@ export default class PostService {
     script: string
     description: string
   }) {
-    const { id: editedId } = await primatives.editPost(params)
-    return await primatives.getPost({ id: editedId })
+    const { id: editedId } = await postPrimatives.editPost(params)
+    return await postPrimatives.getPost({ id: editedId })
   }
 
   async like({ id, userId }: { id: string; userId: string }) {

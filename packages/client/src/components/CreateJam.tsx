@@ -9,8 +9,8 @@ export default function NewJam({
   closeCallback: () => void
 }) {
   const [title, setTitle] = useState('')
-  const [hours, setHours] = useState('1')
-  const [minutes, setMinutes] = useState('30')
+  const [hours, setHours] = useState('')
+  const [minutes, setMinutes] = useState('')
   const nav = useNavigate()
 
   const validateForm = ({
@@ -86,45 +86,43 @@ export default function NewJam({
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
-            <div>
+            <div className="w-full">
               <div>Duration</div>
-              <div className="flex gap-2">
-                <div className="flex flex-1 items-center">
-                  <input
-                    className="w-full border border-black p-1"
-                    type="text"
-                    name="hours"
-                    placeholder="Hours"
-                    value={hours}
-                    onChange={(e) => {
-                      const parsed = Number(e.target.value)
-                      if (e.target.value.length === 0) {
-                        setHours('')
-                      } else if (!Number.isNaN(parsed)) {
-                        setHours(e.target.value)
-                      }
-                    }}
-                  />
-                </div>
-                <div className="flex flex-1 items-center gap-1">
-                  <input
-                    className="w-full border border-black p-1"
-                    type="text"
-                    name="minutes"
-                    placeholder="Minutes"
-                    value={minutes}
-                    onChange={(e) => {
-                      if (e.target.value.length === 0) setMinutes('')
-                      else if (e.target.value.length < 2)
-                        setMinutes(e.target.value)
-                      else if (Number(e.target.value) < 60)
-                        setMinutes(e.target.value)
-                    }}
-                  />
-                </div>
+
+              <div className="grid grid-cols-2 gap-1">
+                <input
+                  className="min-w-0 border border-black p-1"
+                  type="text"
+                  name="hours"
+                  placeholder="Hours"
+                  value={hours}
+                  size={1}
+                  onChange={(e) => {
+                    const parsed = Number(e.target.value)
+                    if (e.target.value.length === 0) {
+                      setHours('')
+                    } else if (!Number.isNaN(parsed)) {
+                      setHours(e.target.value)
+                    }
+                  }}
+                />
+                <input
+                  className="border border-black p-1"
+                  type="text"
+                  name="minutes"
+                  placeholder="Minutes"
+                  size={1}
+                  value={minutes}
+                  onChange={(e) => {
+                    if (e.target.value.length === 0) setMinutes('')
+                    else if (e.target.value.length < 2)
+                      setMinutes(e.target.value)
+                    else if (Number(e.target.value) < 60)
+                      setMinutes(e.target.value)
+                  }}
+                />
               </div>
             </div>
-            {/* <button className="mt-4 bg-blue-500 p-2 text-white">Submit</button> */}
           </form>
         </div>
         <div className="-mr-6 -mt-4 text-right">

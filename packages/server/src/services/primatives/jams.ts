@@ -13,16 +13,44 @@ export const generateInviteCode = async (): Promise<string> => {
   return code
 }
 
-async function getJam({ id }: { id: string }) {
-  const jam = await client.jam.findUnique({
-    where: { id },
+async function getJams({
+  filters,
+}: {
+  filters: { userId?: string; id?: string }
+}) {
+  return await client.jam.findMany({
+    where: {
+      id: filters.id,
+      JamParticipant: {
+        some: {
+          userId: filters.userId,
+        },
+      },
+      isDeleted: false,
+    },
   })
-  if (!jam) return null
-  const posts = await postPrimatives.getPosts({ filters: { jamId: id } })
-  return {
-    ...jam,
-    posts: posts,
-  }
+}
+
+async function getJam({ id }: { id: string }) {
+  return await client.jam.findUnique({
+    where: {
+      id: id,
+      isDeleted: false,
+    },
+    include: {
+      Post: {
+        include: {
+          likes: true,
+          comments: {
+            include: {
+              author: true,
+            },
+          },
+          author: true,
+        },
+      },
+    },
+  })
 }
 
 async function createJam(params: {
@@ -149,6 +177,7 @@ async function getUserActiveJam({ userId }: { userId: string }) {
 
 const jamPrimatives = {
   getJam,
+  getJams,
   createJam,
   deleteJam,
   joinJam,

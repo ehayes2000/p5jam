@@ -22,6 +22,18 @@ export const makeJamRoutes = (
       if (!jams) return error(404)
       return jams
     })
+
+    .get(
+      '/jams',
+      async ({ query: { userId }, error, JamService }) => {
+        return await JamService.list({ userId })
+      },
+      {
+        query: t.Object({
+          userId: t.Optional(t.String()),
+        }),
+      },
+    )
     .post(
       '/jams',
       async ({ userId, error, body: { title, durationMs }, JamService }) => {

@@ -6,6 +6,10 @@ export default class JamService {
     return await jamPrimatives.getJam({ id })
   }
 
+  async list(params: { userId?: string }) {
+    return await jamPrimatives.getJams({ filters: { userId: params.userId } })
+  }
+
   async create(params: { title: string; durationMs: number; userId: string }) {
     const jamIdParticipant = await jamPrimatives.getUserActiveJam({
       userId: params.userId,

@@ -26,6 +26,12 @@ export const store = createStore({
         jam: null,
       }
     },
+    jamEnded: (context) => {
+      return {
+        ...context,
+        jam: null,
+      }
+    },
     receivedJamFromServer: (context, event: { payload: { jam: TJam } }) => {
       return {
         ...context,

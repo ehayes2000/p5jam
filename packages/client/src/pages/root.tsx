@@ -72,37 +72,43 @@ function Root() {
               <>
                 <button
                   className="hover:cursor-pointer hover:text-gray-500"
-                  onClick={newJam}
-                >
-                  New Jam
-                </button>
-                <button
-                  className="hover:cursor-pointer hover:text-gray-500"
                   onClick={joinJam}
                 >
                   Join Jam
+                </button>
+                <button
+                  className="hover:cursor-pointer hover:text-gray-500"
+                  onClick={newJam}
+                >
+                  New Jam
                 </button>
               </>
             )}
           </div>
           <div className="flex flex-col items-end text-2xl text-gray-500">
-            <Link
+            {/* <Link
               className="hover:cursor-pointer hover:text-gray-400"
               to="explore"
             >
               Explore
-            </Link>
+            </Link> */}
             <Link
               className="hover:cursor-pointer hover:text-gray-400"
-              to="users"
+              to="jam/complete"
             >
-              Users
+              My Jams
             </Link>
             <Link
               className="hover:cursor-pointer hover:text-gray-400"
               to="profile"
             >
               Profile
+            </Link>
+            <Link
+              className="hover:cursor-pointer hover:text-gray-400"
+              to="users"
+            >
+              Users
             </Link>
           </div>
         </div>
