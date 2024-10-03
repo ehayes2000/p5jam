@@ -44,5 +44,8 @@
   },
   "prisma": {
     "seed": "bun prisma/seed.ts"
-  }
+  },
+  "trustedDependencies": [
+    "my-trusted-package"
+  ]
 }
