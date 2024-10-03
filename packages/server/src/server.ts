@@ -25,12 +25,19 @@ export const api = new Elysia({ prefix: '/api' })
 const app = new Elysia().use(api).use(swagger())
 
 if (process.env.NODE_ENV !== 'development') {
-  app.use(
-    staticPlugin({
-      assets: '../client/dist',
-      prefix: '',
-    }),
-  )
+  console.log('CWD', process.cwd())
+
+  app
+    .onRequest(({ request: { url } }) => {
+      console.log('REQUESTED', url)
+    })
+    .use(
+      staticPlugin({
+        prefix: '',
+        assets: 'public',
+      }),
+    )
+    .get('*', () => Bun.file('public/index.html')) // KEVIN!!!!!!
 } else {
   app.get('/', ({ redirect }) => redirect(process.env.DEV_SERVER!))
 }
