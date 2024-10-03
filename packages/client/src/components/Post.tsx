@@ -56,8 +56,9 @@ export default function Post({
     <div
       ref={pref}
       key={p.id}
-      className="grid cursor-pointer content-center justify-center gap-1 border p-2"
+      className="grid cursor-pointer content-center justify-center"
     >
+      <div className="border p-2 gap-1 grid">
       <h2 className=""> {p.author.name} </h2>
       <Sketch id={p.id} />
       <div className=""> {p.description} </div>
@@ -112,6 +113,7 @@ export default function Post({
       ) : (
         <></>
       )}
+    </div>
     </div>
   )
 }

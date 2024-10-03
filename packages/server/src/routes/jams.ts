@@ -68,12 +68,11 @@ export const makeJamRoutes = (
         try {
           return await JamService.join({ id, userId })
         } catch (e) {
-          console.error(`${e} + L + bozo`)
           return error(405)
         }
       },
     )
-    .delete(
+    .post(
       '/jams/:id/leave',
       async ({ userId, params: { id }, JamService }) => {
         await JamService.leave({ id, userId })

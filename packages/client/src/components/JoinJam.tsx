@@ -23,7 +23,7 @@ export default function JoinJam({
       alert(
         'https://i.pinimg.com/originals/8f/59/68/8f5968f03ab0b891f58ba7d7ad4d0ede.jpg',
       )
-    else nav(`/jam/${joinCode}`)
+    else nav(`/jam/${joinCode.toUpperCase()}`)
   }
 
   return (

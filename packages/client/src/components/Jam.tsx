@@ -26,7 +26,7 @@ export default function Jam({ jam }: { jam: TJam }) {
   const leaveJam = () => {
     ;(async () => {
       if (confirm('Are you sure you want to leave the Jam?') === true) {
-        client.api.jams({ id: jam.id }).leave.delete()
+        client.api.jams({ id: jam.id }).leave.post()
         store.send({ type: 'leftJam' })
         nav('/')
       }
@@ -87,7 +87,7 @@ export default function Jam({ jam }: { jam: TJam }) {
           </button>
         </div>
       </div>
-      <div className="mt-6 flex justify-center p-4">
+      <div className="mt-6 flex justify-center p-4 flex-col gap-2">
         {jam.Post.map((p) => (
           <Post post={p} key={p.id} />
         ))}

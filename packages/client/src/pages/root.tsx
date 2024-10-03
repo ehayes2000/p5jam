@@ -115,7 +115,12 @@ function Root() {
             </div>
           </>
         ) : (
-          <Link to="/login"> Login </Link>
+
+          <div
+            className={`content-center text-right h-full text-xl text-black hover:text-gray-500`}
+          >
+            <Link to="/login"> Login </Link>
+          </div>
         )}
       </div>
       <div

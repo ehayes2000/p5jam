@@ -4,6 +4,7 @@ import JamService from '../services/JamService'
 import PostService from '../services/PostService'
 import { Html, html } from '@elysiajs/html'
 import ScriptTemplate from '../scriptTemplate'
+import client from "../prisma"
 
 export const postMutators = () =>
   new Elysia()
@@ -116,10 +117,26 @@ export default function postsRoutes() {
     .use(html())
     .decorate('PostService', new PostService(new JamService()))
     .use(postMutators())
-    .get('/posts/featured', async ({ PostService }) => {
-      return await PostService.get({
-        id: 'e5859d82-a26a-4a82-8244-175baeeb5d67',
+    .get('/posts/featured', async ({ error }) => { // TODO fix this 
+      const posts = await client.post.findMany({where: { 
+          author: { 
+            name: "ehayes2000"
+          }
+        },
+        include: { 
+          comments: { 
+            include: { author: true}
+          },
+          likes: true,
+          author: true
+        },
+        orderBy: { 
+          createdAt: 'asc'
+        }
       })
+      if (!posts)
+        return error(404)
+      return posts[0]
     })
     .get(
       '/posts',

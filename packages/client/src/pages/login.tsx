@@ -1,13 +1,15 @@
 function LoginPage() {
   return (
-    <div className="group text-gray-700 hover:text-black">
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="group flex text-black hover:text-gray-500 ">
       <a
         href={`${import.meta.env.VITE_API_BASE}/api/login/github`}
-        className="border py-1 px-2 font-semibold cursor-pointer rounded-md bg-gray-200 group-hover:bg-gray-300"
+        className="border border-black  group-hover:border-gray-500 py-1 px-2 font-semibold cursor-pointer group-hover:text-gray-500"
       >
         Login with Github
-        <i className="pl-1 bi bi-github text-gray-600 group-hover:text-black" />
+        <i className="pl-1 bi bi-github group-hover:text-gray-500 " />
       </a>
+      </div>
     </div>
   )
 }

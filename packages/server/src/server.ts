@@ -25,8 +25,6 @@ export const api = new Elysia({ prefix: '/api' })
 const app = new Elysia().use(api).use(swagger())
 
 if (process.env.NODE_ENV !== 'development') {
-  console.log('CWD', process.cwd())
-
   app
     .use(
       staticPlugin({

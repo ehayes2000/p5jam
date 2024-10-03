@@ -3,7 +3,7 @@ export default class JamService {
   constructor() {}
 
   async get(id: string) {
-    return await jamPrimatives.getJam({ id })
+    return await jamPrimatives.getJam({ id: id.toUpperCase() })
   }
 
   async list(params: { userId?: string }) {
@@ -29,9 +29,10 @@ export default class JamService {
     const { id, userId } = params
     const jamIdParticipant = await jamPrimatives.getUserActiveJam({ userId })
     if (jamIdParticipant) throw new Error('Already a participant')
-    const { id: jamId } = await jamPrimatives.joinJam({ userId, id })
+    const joinCode = id.toUpperCase()
+    const { id: jamId } = await jamPrimatives.joinJam({ userId, id: joinCode})
     const jam = await jamPrimatives.getJam({ id: jamId })
-    if (!jam) throw new Error('Expected Jam on creation')
+    if (!jam) throw new Error('Expected Jam on join')
     return jam
   }
 

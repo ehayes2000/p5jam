@@ -75,3 +75,10 @@
   - Socketio management
 
 - Deploy somewhere
+
+<!-- - make login pretty -->
+<!-- - figure out featured post with deploy -->
+- jam web socket
+- favicon + tab title
+
+
