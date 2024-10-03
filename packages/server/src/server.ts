@@ -28,9 +28,6 @@ if (process.env.NODE_ENV !== 'development') {
   console.log('CWD', process.cwd())
 
   app
-    .onRequest(({ request: { url } }) => {
-      console.log('REQUESTED', url)
-    })
     .use(
       staticPlugin({
         prefix: '',
