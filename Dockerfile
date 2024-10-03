@@ -6,7 +6,7 @@ RUN cd /app/ && bun i
 
 COPY . /app/
 WORKDIR /app/packages/server
-RUN bun run build
+RUN bun i && bun run build
 RUN NODE_ENV=production bunx prisma migrate deploy
 
 EXPOSE 3000/tcp
