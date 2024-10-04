@@ -32,7 +32,7 @@ if (process.env.NODE_ENV !== 'development') {
         assets: 'public',
       }),
     )
-    .get('*', () => Bun.file('public/index.html')) // KEVIN!!!!!!
+    .get('*', () => Bun.file('public/index.html')) 
 } else {
   app.get('/', ({ redirect }) => redirect(process.env.DEV_SERVER!))
 }

@@ -3,7 +3,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development bun --watch src/server.ts",
-    "start:prod": "NODE_ENV=production bun src/server.ts",
+    "start:prod": "NODE_ENV=production bunx prisma migrate deploy && NODE_ENV=production bun src/server.ts",
     "clean": "rm -rf dist",
     "build": "bun run clean && bunx prisma generate && tsc",
     "build:declaration": "tsc --emitDeclarationOnly ./src/server.ts",
@@ -45,7 +45,6 @@
   "prisma": {
     "seed": "bun prisma/seed.ts"
   },
-  "trustedDependencies": [
-    "my-trusted-package"
-  ]
+  "trustedDependencies": ["electron","esbuild", "prisma", "@prisma/client", "@prisma/engines"]
+
 }
