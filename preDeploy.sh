@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eou pipefail
+set -euo pipefail
 
 (cd packages/client && bun run build)
 rm -rf packages/server/public
