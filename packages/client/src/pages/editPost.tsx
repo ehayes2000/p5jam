@@ -1,58 +1,23 @@
-import { useNavigate } from 'react-router-dom'
-import { useParams } from 'react-router-dom'
-import { useSelector } from '@xstate/store/react'
-import { client } from '../client'
-import PostEditor from '../components/PostEditor'
-import { store } from '../stateStore'
-import { useEffect } from 'react'
+import { client, type TPost } from '../client';
+import { useLoaderData, useNavigate } from 'react-router-dom';
+import PostEditor from '../components/PostEditor';
 
 function EditPost() {
-  const { post, jam } = useSelector(store, (state) => state.context)
-  const { id } = useParams()
-  const nav = useNavigate()
-
-  useEffect(() => {
-    // no post but have id -> get post
-    if (!post && id) {
-      client.api
-        .posts({ id })
-        .get()
-        .then((p) => {
-          if (p.data)
-            store.send({ type: 'postCreated', payload: { post: p.data } })
-        })
-    } else if (!id) {
-      nav('/')
-    } else if (post && id !== post.id) {
-      client.api
-        .posts({ id })
-        .get()
-        .then((p) => {
-          if (p.data)
-            store.send({ type: 'postCreated', payload: { post: p.data } })
-        })
-    }
-  }, [])
-
+  const post = useLoaderData() as TPost;
+  const nav = useNavigate();
   const updatePost = async ({
     script,
     description,
   }: {
-    script: string
-    description: string
+    script: string;
+    description: string;
   }) => {
-    if (!post) return
-    const { data } = await client.api
-      .posts({ id: post.id })
-      .put({ script, description })
-    if (!data) return
+    // TODO use return code?
+    await client.api.posts({ id: post.id }).put({ script, description });
+    if (post.jamId) nav(`/jam/${post.jamId}`);
+    else nav('/profile');
+  };
 
-    if (data && data.jamId && jam && data.jamId === jam.id) {
-      nav(`/jam/${data.jamId}`)
-    } else {
-      nav(`/profile`)
-    }
-  }
   return (
     <div>
       {post ? (
@@ -65,7 +30,7 @@ function EditPost() {
         <></>
       )}
     </div>
-  )
+  );
 }
 
-export default EditPost
+export default EditPost;

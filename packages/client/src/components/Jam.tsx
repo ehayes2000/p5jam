@@ -1,47 +1,46 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { type TJam, client } from '../client'
-import { store } from '../stateStore'
-
-import Post from '../components/Post'
-import Timer from './Timer'
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { type TJam, type TPost, client } from '../client';
+import Post from '../components/Post';
+import Timer from './Timer';
 
 export default function Jam({ jam }: { jam: TJam }) {
-  const nav = useNavigate()
+  const nav = useNavigate();
   const [isComplete, setIsComplete] = useState(
     new Date(jam.endTime) <= new Date(),
-  )
+  );
 
-  useEffect(() => {
-    const timer = setTimeout(
-      () => {
-        setIsComplete(true)
-        store.send({ type: 'jamEnded' })
-      },
-      new Date(jam.endTime).getTime() - new Date().getTime(),
-    )
-    return () => clearTimeout(timer)
-  }, [])
+  // useEffect(() => {
+  //   const timer = setTimeout(
+  //     () => {
+  //       setIsComplete(true);
+  //       store.send({ type: 'jamEnded' });
+  //     },
+  //     new Date(jam.endTime).getTime() - new Date().getTime(),
+  //   );
+  //   return () => clearTimeout(timer);
+  // }, []);
 
-  const leaveJam = () => {
-    ;(async () => {
-      if (confirm('Are you sure you want to leave the Jam?') === true) {
-        client.api.jams({ id: jam.id }).leave.post()
-        store.send({ type: 'leftJam' })
-        nav('/')
-      }
-    })()
-  }
+  // const leaveJam = () => {
+  //   (async () => {
+  //     if (confirm('Are you sure you want to leave the Jam?') === true) {
+  //       client.api.jams({ id: jam.id }).leave.post();
+  //       store.send({ type: 'leftJam' });
+  //       nav('/');
+  //     }
+  //   })();
+  // };
 
-  const newSketch = () => {
-    ;(async () => {
-      const { data } = await client.api.posts.jam({ jamId: jam.id }).post()
-      if (data) {
-        store.send({ type: 'postCreated', payload: { post: data } })
-      }
-      if (data?.id) nav(`/editPost/${data.id}`)
-    })()
-  }
+  const newSketch = async () => {
+    const response = await client.api.posts.post({ jamId: jam.id });
+    // TODO fix error inference
+    if (response.error !== null) {
+      nav('/login');
+      return;
+    }
+    const newPost = response.data;
+    nav(`/editPost/${newPost.id}`);
+  };
 
   return (
     <div className="">
@@ -78,20 +77,38 @@ export default function Jam({ jam }: { jam: TJam }) {
         >
           <i className="italic"> + </i> New Sketch
         </button>
-        <div className="flex gap-1">
-          <button
-            onClick={leaveJam}
-            className="border border-black bg-red-400 px-2 py-1 text-sm hover:bg-red-600"
-          >
-            Leave
-          </button>
-        </div>
       </div>
       <div className="mt-6 flex justify-center p-4 flex-col gap-2">
-        {jam.Post.map((p) => (
-          <Post post={p} key={p.id} />
-        ))}
+        <JamPosts jamId={jam.id} />
       </div>
     </div>
-  )
+  );
 }
+
+const JamPosts = ({ jamId }: { jamId: string }) => {
+  const [posts, setPosts] = useState<TPost[] | null>(null);
+  useEffect(() => {
+    client.api.posts.get({ query: { jamId } }).then((response) => {
+      if (response.data) {
+        setPosts(response.data);
+      } else {
+        alert('handle this');
+      }
+    });
+  }, []);
+
+  return (
+    <>
+      {posts ? (
+        <>
+          {' '}
+          {posts.map((p) => (
+            <Post post={p} key={p.id} />
+          ))}
+        </>
+      ) : (
+        <> loading ... </>
+      )}
+    </>
+  );
+};

@@ -1,20 +1,21 @@
-import { useState, useEffect } from 'react'
-import { useSelector } from '@xstate/store/react'
-import NewJam from '../components/CreateJam'
-import JoinJam from '../components/JoinJam'
-import { store } from '../stateStore'
-import HighlightedPost from '../components/highlightedPost'
-import { client, TPost } from '../client'
+import { useState, useEffect } from 'react';
+import { useSelector } from '@xstate/store/react';
+import NewJam from '../components/CreateJam';
+import JoinJam from '../components/JoinJam';
+import HighlightedPost from '../components/highlightedPost';
+import { client, TPost } from '../client';
+import { useContext } from 'react';
+import { PopupContext } from '../state';
 
 export default function Home() {
-  const { jamPopup } = useSelector(store, (state) => state.context)
-  const [featuredPost, setFeaturedPost] = useState<TPost | null>()
+  const { popup, setPopup } = useContext(PopupContext);
+  const [featuredPost, setFeaturedPost] = useState<TPost | null>();
 
   useEffect(() => {
     client.api.posts.featured.get().then((response) => {
-      if (response.data) setFeaturedPost(response.data)
-    })
-  }, [])
+      if (response.data) setFeaturedPost(response.data);
+    });
+  }, []);
 
   return (
     <div className="-z-50 flex h-full w-full items-center justify-center">
@@ -23,24 +24,20 @@ export default function Home() {
           <HighlightedPost post={featuredPost} />
         </div>
       )}
-      {jamPopup === 'createJam' ? (
+      {popup === 'create' ? (
         <div className="z-50">
-          <NewJam
-            closeCallback={() => store.send({ type: 'userClosedPopup' })}
-          />
+          <NewJam closeCallback={() => setPopup('closed')} />
         </div>
       ) : (
         <></>
       )}
-      {jamPopup === 'joinJam' ? (
+      {popup === 'join' ? (
         <div className="z-50">
-          <JoinJam
-            closeCallback={() => store.send({ type: 'userClosedPopup' })}
-          />
+          <JoinJam closeCallback={() => setPopup('closed')} />
         </div>
       ) : (
         <></>
       )}
     </div>
-  )
+  );
 }

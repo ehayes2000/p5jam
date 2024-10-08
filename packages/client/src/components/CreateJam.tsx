@@ -1,59 +1,56 @@
-import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import { client } from '../client'
-import { store } from '../stateStore'
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { client } from '../client';
 
 export default function NewJam({
   closeCallback,
 }: {
-  closeCallback: () => void
+  closeCallback: () => void;
 }) {
-  const [title, setTitle] = useState('')
-  const [hours, setHours] = useState('')
-  const [minutes, setMinutes] = useState('')
-  const nav = useNavigate()
+  const [title, setTitle] = useState('');
+  const [hours, setHours] = useState('');
+  const [minutes, setMinutes] = useState('');
+  const nav = useNavigate();
 
   const validateForm = ({
     title,
     hours,
     minutes,
   }: {
-    title: string
-    hours: string
-    minutes: string
+    title: string;
+    hours: string;
+    minutes: string;
   }) => {
     try {
-      if (title.length > 255 || title.length <= 0) return false
-      if (minutes.length && Number(minutes) >= 60) return false
-      if (hours.length && Number(hours) >= 96) return false
-      if (!hours && !minutes) return false
-      return true
+      if (title.length > 255 || title.length <= 0) return false;
+      if (minutes.length && Number(minutes) >= 60) return false;
+      if (hours.length && Number(hours) >= 96) return false;
+      if (!hours && !minutes) return false;
+      return true;
     } catch (e) {
       {
-        return false
+        return false;
       }
     }
-  }
+  };
 
   const createJam: React.FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     const durationMs =
-      Number(hours) * 60 * 60 * 1000 + Number(minutes) * 60 * 1000
-    if (!validateForm({ title, hours, minutes })) return
-    const newJam = await client.api.jams.post({
+      Number(hours) * 60 * 60 * 1000 + Number(minutes) * 60 * 1000;
+    if (!validateForm({ title, hours, minutes })) return;
+    const response = await client.api.jams.post({
       title,
       durationMs,
-    })
-    if (newJam.data?.id) {
-      store.send({
-        type: 'receivedJamFromServer',
-        payload: { jam: newJam.data },
-      })
-      nav(`/jam/${newJam.data.id}`)
+    });
+    if (response.data) {
+      const jam = response.data;
+      console.log('CREATED JAM!', jam);
+      nav(`/jam/${jam.id}`);
     } else {
-      alert(':P')
+      alert('handle me failed to create jam');
     }
-  }
+  };
 
   return (
     <div className="content-left">
@@ -68,7 +65,7 @@ export default function NewJam({
         <form
           id="createEvent"
           onSubmit={(e) => {
-            createJam(e)
+            createJam(e);
           }}
           className="flex flex-col gap-2 text-left"
         >
@@ -97,11 +94,11 @@ export default function NewJam({
                 value={hours}
                 size={1}
                 onChange={(e) => {
-                  const parsed = Number(e.target.value)
+                  const parsed = Number(e.target.value);
                   if (e.target.value.length === 0) {
-                    setHours('')
+                    setHours('');
                   } else if (!Number.isNaN(parsed)) {
-                    setHours(e.target.value)
+                    setHours(e.target.value);
                   }
                 }}
               />
@@ -113,9 +110,10 @@ export default function NewJam({
                 size={1}
                 value={minutes}
                 onChange={(e) => {
-                  const parsed = Number(e.target.value)
-                  if (e.target.value.length === 0) setMinutes('')
-                  else if (parsed < 60 && parsed > 0) setMinutes(e.target.value)
+                  const parsed = Number(e.target.value);
+                  if (e.target.value.length === 0) setMinutes('');
+                  else if (parsed < 60 && parsed > 0)
+                    setMinutes(e.target.value);
                 }}
               />
             </div>
@@ -132,5 +130,5 @@ export default function NewJam({
         </button>
       </div>
     </div>
-  )
+  );
 }
