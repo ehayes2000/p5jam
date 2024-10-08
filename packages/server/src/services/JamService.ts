@@ -1,52 +1,59 @@
-import jamPrimatives from './primatives/jams'
+// import jamPrimatives from './primitives/jams'
+import type { TJam } from './primitives/types'
+import { create, get, update } from './primitives/jams'
+import { addMilliseconds } from 'date-fns'
+
+export const generateInviteCode = (): string => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  const codeLen = 5
+  // hehexd
+  let code = ''
+  for (let i = 0; i < codeLen; ++i) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return code
+}
+
 export default class JamService {
   constructor() {}
 
-  async get(id: string) {
-    return await jamPrimatives.getJam({ id: id.toUpperCase() })
+  async get(id: string): Promise<TJam | undefined> {
+    return (await get({ id: id.toUpperCase() }))[0]
   }
 
-  async list(params: { userId?: string }) {
-    return await jamPrimatives.getJams({ filters: { userId: params.userId } })
+  async list(params: { userId?: string }): Promise<{
+    owner: TJam[]
+    participant: TJam[]
+  }> {
+    const owned = await get({ ownerId: params.userId })
+    const overlap = new Set<string>()
+    owned.forEach((j) => overlap.add(j.id))
+    const participated = await get({ participantId: params.userId })
+    return {
+      owner: owned,
+      participant: participated.filter((j) => !overlap.has(j.id)),
+    }
   }
 
-  async create(params: { title: string; durationMs: number; userId: string }) {
-    const jamIdParticipant = await jamPrimatives.getUserActiveJam({
-      userId: params.userId,
+  async create(params: {
+    title: string
+    durationMs: number
+    userId: string
+  }): Promise<TJam> {
+    const { durationMs, title, userId } = params
+    // check if user is already in an active Jam
+    const endTime = addMilliseconds(new Date(), durationMs)
+    return await create({
+      id: generateInviteCode(),
+      startTime: new Date(),
+      ownerId: userId,
+      isDeleted: false,
+      title,
+      endTime,
     })
-    if (jamIdParticipant) throw new Error('Already a participant')
-    const { id } = await jamPrimatives.createJam(params)
-    const jam = await jamPrimatives.getJam({ id })
-    if (!jam) throw new Error('Expected Jam on creation')
-    return jam
   }
 
-  async delete(params: { id: string; userId: string }) {
-    return await jamPrimatives.deleteJam(params)
-  }
-
-  async join(params: { userId: string; id: string }) {
-    const { id, userId } = params
-    const jamIdParticipant = await jamPrimatives.getUserActiveJam({ userId })
-    if (jamIdParticipant) throw new Error('Already a participant')
-    const joinCode = id.toUpperCase()
-    const { id: jamId } = await jamPrimatives.joinJam({ userId, id: joinCode})
-    const jam = await jamPrimatives.getJam({ id: jamId })
-    if (!jam) throw new Error('Expected Jam on join')
-    return jam
-  }
-
-  async leave(params: { userId: string; id: string }) {
-    await jamPrimatives.leaveJam(params)
-  }
-
-  async getUserActiveJam(params: { userId: string }) {
-    return await jamPrimatives.getUserActiveJam({ userId: params.userId })
-  }
-
-  async isActiveJam(params: { id: string }) {
-    const jam = await jamPrimatives.getJam({ id: params.id })
-    if (!jam) return false
-    return jam.endTime > new Date()
+  async end(params: { id: string; owerId: string }) {
+    // TODO
   }
 }
