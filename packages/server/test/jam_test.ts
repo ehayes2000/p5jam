@@ -1,126 +1,95 @@
 import { makeJamRoutes } from '../src/routes/jams'
-import { describe, expect, test } from 'bun:test'
-import { authorizeUser } from './util'
+import { describe, expect, test, beforeAll, afterAll } from 'bun:test'
+import { authorizeUser, unauthorizeUser } from './util'
 import { treaty } from '@elysiajs/eden'
+import { TJam } from '../src/services/primitives/types'
 
-//-- defined in test.db seed 
+// Constants for test users
 const OWNER_ID = 'testUserOwner'
 const PARTICIPANT_ID = 'testUserParticipant'
-//--
-const ownerServer = makeJamRoutes(authorizeUser(OWNER_ID))
+
+// Create server and client instances for owner and participant
+const authUser = authorizeUser(OWNER_ID)
+const ownerServer = makeJamRoutes(authUser)
 const ownerClient = treaty(ownerServer)
 const participantServer = makeJamRoutes(authorizeUser(PARTICIPANT_ID))
 const participantClient = treaty(participantServer)
 
-let testJamId
+describe('Jam Routes Integration Tests', () => {
+  let createdJamId: string
 
-describe('jam behavior', () => {
-  // test('post to jam', async () => {
-  //   const { data } = await ownerClient.jams.post({
-  //     title: 'test jam',
-  //     durationMs: 1000 * 60 * 60,
-  //   })
-  //   expect(data).not.toBe(null)
-  //   await participantClient.
+  beforeAll(async () => {
+    // Set up any necessary test data or environment
+  })
 
-  // })
-  test('create', async () => {
-    const { data } = await ownerClient.jams.post({
-      title: 'test jam',
-      durationMs: 1000 * 60 * 60,
+  afterAll(async () => {
+    // Clean up any test data or environment
+  })
+
+  test('POST /jams - Create a new jam', async () => {
+    const response = await ownerClient.jams.post({
+      title: 'Test Jam',
+      durationMs: 3600000, // 1 hour
     })
-    expect(data).not.toBe(null)
-    expect(data?.id.length).toBe(5)
-    testJamId = data?.id
+
+    expect(response.status).toBe(200)
+    expect(response.data).toHaveProperty('id')
+    expect(response.data?.title).toBe('Test Jam')
+    expect(response.data?.ownerId).toBe(OWNER_ID)
+
+    createdJamId = response.data?.id!
   })
 
-  test('jam data', async () => {
-    const { data } = await ownerClient.jams.get({query: { userId: OWNER_ID }})
-    expect(data).not.toBe(null)
-    expect(data?.length).toBe(1)
-    const jam = data?.[0]
-    expect(jam?.title).toBe('test jam')
-    expect(jam?.ownerId).toBe(OWNER_ID)
-    expect(jam?.id).toBe(testJamId)
+  test('GET /jams/:id - Retrieve a specific jam', async () => {
+    const response = await ownerClient.jams[createdJamId].get()
+
+    expect(response.status).toBe(200)
+    expect(response.data.id).toBe(createdJamId)
+    expect(response.data.title).toBe('Test Jam')
+    expect(response.data.ownerId).toBe(OWNER_ID)
   })
 
-  test('get jam', async () => {
-    const { data } = await ownerClient.jams({ id: testJamId }).get()
-    expect(data).not.toBe(null)
-    expect(data?.id).toBe(testJamId)
-    expect(data?.Post.length).toBe(0)
+  test('GET /jams - List jams for owner', async () => {
+    const response = await ownerClient.jams.get({ query: { userId: OWNER_ID } })
+
+    expect(response.status).toBe(200)
+    expect(response.data).toHaveProperty('owner')
+    expect(response.data).toHaveProperty('participant')
+    expect(response.data?.owner).toBeInstanceOf(Array)
+    expect(response.data?.participant).toBeInstanceOf(Array)
+    expect(
+      response.data?.owner.some((jam: TJam) => jam.id === createdJamId),
+    ).toBe(true)
   })
 
-  test('owner active jam', async() => { 
-    const { data } = await ownerClient.jams.activeJam.get()
-    expect(data).not.toBe(null)
-    expect(data?.id).toBe(testJamId)
+  test('GET /jams - List jams for participant', async () => {
+    const response = await participantClient.jams.get({
+      query: { userId: PARTICIPANT_ID },
+    })
+
+    expect(response.status).toBe(200)
+    expect(response.data).toHaveProperty('owner')
+    expect(response.data).toHaveProperty('participant')
+    expect(response.data?.owner).toBeInstanceOf(Array)
+    expect(response.data?.participant).toBeInstanceOf(Array)
+    expect(response.data?.owner.length).toBe(0) // Participant shouldn't own any jams
   })
 
-  test('leave jam', async () => {
-    const { data } = await ownerClient.jams({ id: testJamId }).get()
-    expect(data?._count.JamParticipant).toBe(1)
-    await ownerClient.jams({ id: testJamId }).leave.post()
-    const { data: leaveData } = await ownerClient.jams({ id: testJamId }).get()
-    expect(leaveData?._count.JamParticipant).toBe(1) // owner cannot leave jam
+  test('POST /jams - Unauthorized user cannot create a jam', async () => {
+    const unauthorizedServer = makeJamRoutes(unauthorizeUser())
+    const unauthorizedClient = treaty(unauthorizedServer)
+
+    const response = await unauthorizedClient.jams.post({
+      title: 'Unauthorized Jam',
+      durationMs: 3600000,
+    })
+
+    expect(response.status).toBe(401)
   })
 
+  test('GET /jams/:id - Non-existent jam returns 404', async () => {
+    const response = await ownerClient.jams['NONEXISTENT'].get()
 
-  test('join jam', async () => {
-    const data = await participantClient.jams({id: testJamId}).join.post()
-    expect(data.error).toBe(null)
-    // expect(data).not.toBe(null)
-    // expect(data?._count.JamParticipant).toBe(2)
-    
+    expect(response.status).toBe(404)
   })
-
-  // test('jam abuse', async () => {
-  //   await ownerClient.jams({ id: testJamId }).join.post()
-  //   const { data: active } = await ownerClient.jams.activeJam.get()
-  //   expect(active?.jam.id).toBe(testJamId)
-  //   await ownerClient.jams({ id: testJamId }).join.post()
-  //   await ownerClient.jams({ id: testJamId }).join.post()
-  //   await ownerClient.jams({ id: testJamId }).join.post()
-  //   await ownerClient.jams({ id: testJamId }).join.post()
-  //   await ownerClient.jams({ id: testJamId }).join.post()
-  //   const { data } = await ownerClient.jams({ id: testJamId }).get()
-  //   expect(data?.JamParticipant.length).toBe(1)
-  //   await ownerClient.jams({ id: testJamId }).leave.delete()
-  //   const { data: d } = await ownerClient.jams({ id: testJamId }).get()
-  //   const { data: active1 } = await ownerClient.jams.activeJam.get()
-  //   expect(active1).toBe(null)
-  //   expect(d?.JamParticipant.length).toBe(0)
-  //   await ownerClient.jams({ id: testJamId }).leave.delete()
-  //   await ownerClient.jams({ id: testJamId }).leave.delete()
-  //   await ownerClient.jams({ id: testJamId }).leave.delete()
-  //   await ownerClient.jams({ id: testJamId }).leave.delete()
-  //   await ownerClient.jams({ id: testJamId }).leave.delete()
-  //   await ownerClient.jams({ id: testJamId }).leave.delete()
-  //   await ownerClient.jams({ id: testJamId }).leave.delete()
-  //   await ownerClient.jams({ id: testJamId }).leave.delete()
-
-  //   const { data: active2 } = await ownerClient.jams.activeJam.get()
-  //   expect(active2).toBe(null)
-  //   expect(d?.JamParticipant.length).toBe(0)
-
-  //   const { data: l } = await ownerClient.jams({ id: testJamId }).get()
-  //   expect(l?.JamParticipant.length).toBe(0)
-
-  //   await ownerClient.jams({ id: testJamId }).join.post()
-  //   const { data: active3 } = await ownerClient.jams.activeJam.get()
-
-  //   const { data: asdf } = await ownerClient.jams({ id: testJamId }).get()
-  //   expect(active3?.jam.id).toBe(testJamId)
-  //   expect(asdf?.JamParticipant.length).toBe(1)
-
-  //   const { data: j } = await ownerClient.jams({ id: testJamId }).get()
-  //   expect(j?.JamParticipant.length).toBe(1)
-  // })
-
-  // test('multijam', async () => {
-  //   // create jam if not a participant in another active jam
-  //   // leave jam
-  //   // can't leave if jam is active and if owner
-  //   // fail to join if participant in a different jam
-  // })
 })

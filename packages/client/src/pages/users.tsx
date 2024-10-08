@@ -1,28 +1,21 @@
-import { Link } from 'react-router-dom'
-import { client } from '../client'
-import { useQuery } from '@tanstack/react-query'
-import { QUERY_KEYS } from '../queries/queryClient'
+import { Link, useLoaderData } from 'react-router-dom';
+import { type TUser } from '../client';
 
 function Users() {
-  const { data: users } = useQuery({
-    queryKey: QUERY_KEYS.USERS,
-    queryFn: async () => {
-      const { data } = await client.api.users.get()
-      return data
-    },
-  })
-
+  const users = useLoaderData() as TUser[];
   return (
     <div className="grid gap-4 p-6">
-      {users ? users.map((u) => (
-        <Link key={u.id} className="border p-4" to={`/user/${u.id}`}>
-          <span className="fw-bold">{u.name}</span>
-        </Link>
-      ))
-      : <> No Users :( </>
-    }
+      {users ? (
+        users.map((u) => (
+          <Link key={u.id} className="border p-4" to={`/user/${u.name}`}>
+            <span className="fw-bold">{u.name}</span>
+          </Link>
+        ))
+      ) : (
+        <> No Users :( </>
+      )}
     </div>
-  )
+  );
 }
 
-export default Users
+export default Users;

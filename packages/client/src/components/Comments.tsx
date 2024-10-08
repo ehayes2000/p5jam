@@ -1,18 +1,18 @@
-import { useState } from 'react'
-import { TPost } from '../client'
-import { useMyID } from '../queries/queryClient'
+import { useState } from 'react';
+import { TPost } from '../client';
+import { useMyID } from '../queries/queryClient';
 
 export default function Comments({
   comments,
   postComment,
   deleteComment,
 }: {
-  comments: TPost['comments']
-  postComment: (t: { text: string }) => Promise<void>
-  deleteComment: (id: { id: string }) => Promise<void>
+  comments: TPost['comments'];
+  postComment: (t: { text: string }) => Promise<void>;
+  deleteComment: (id: { id: string }) => Promise<void>;
 }) {
-  const { data: myId } = useMyID()
-  const [myComment, setMyComment] = useState<string>('') // who ?
+  const { data: myId } = useMyID();
+  const [myComment, setMyComment] = useState<string>(''); // who ?
 
   return (
     <div className="flex flex-col gap-1">
@@ -27,8 +27,8 @@ export default function Comments({
           <button
             className="left relative border px-1 hover:bg-gray-200"
             onClick={() => {
-              setMyComment('')
-              postComment({ text: myComment })
+              setMyComment('');
+              postComment({ text: myComment });
             }}
           >
             Post
@@ -38,9 +38,9 @@ export default function Comments({
         <a href="/login"> login </a>
       )}
       {comments.map((c) => {
-        let dateString = ''
+        let dateString = '';
         try {
-          dateString = new Date(c.createdAt).toDateString()
+          dateString = new Date(c.createdAt).toDateString();
         } catch {}
         return (
           <div key={c.id} className="flex-col justify-between border p-1">
@@ -58,8 +58,8 @@ export default function Comments({
               <></>
             )}
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

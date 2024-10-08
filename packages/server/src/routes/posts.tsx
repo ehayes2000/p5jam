@@ -1,65 +1,80 @@
-import { Elysia, error, t } from 'elysia'
-import { authMiddleware } from '../githubAuth'
-import JamService from '../services/JamService'
-import PostService from '../services/PostService'
+import { Elysia, Context, t } from 'elysia'
+import { auth } from '../githubAuth'
+import { create as createLike, deleteLike } from '../services/primitives/likes'
+import { create, get, update, deletePost } from '../services/primitives/posts'
+import {
+  create as createComment,
+  deleteComment,
+} from '../services/primitives/comments'
 import { Html, html } from '@elysiajs/html'
 import ScriptTemplate from '../scriptTemplate'
-import client from "../prisma"
 
-export const postMutators = () =>
+const DEFAULT_SCRIPT = `
+function setup() {
+  createCanvas(WINDOW_WIDTH, WINDOW_HEIGHT);
+}
+
+function draw() {
+  background(220);
+}` as const
+
+export const postMutators = (authPlugin: typeof auth) =>
   new Elysia()
-    .decorate('PostService', new PostService(new JamService()))
-    .derive(authMiddleware)
+    .use(authPlugin)
     .guard({
-      as: 'local',
-      beforeHandle: async ({ isAuth, error }) => {
-        if (!isAuth) return error(401)
+      response: {
+        401: t.String(),
+        404: t.String(),
       },
     })
     .post(
       '/posts', // TODO "posts"
-      async ({ userId, error, PostService }) => {
-        try {
-          return await PostService.create({ userId })
-        } catch (e) {
-          console.error(e)
-          return error(400)
-        }
+      async ({ userId, body }) => {
+        return await create({
+          authorId: userId,
+          jamId: body?.jamId,
+          script: DEFAULT_SCRIPT,
+          published: false,
+        })
+      },
+      {
+        isSignIn: true,
+        body: t.Object({
+          jamId: t.Optional(t.String()),
+        }),
       },
     )
-    .post(
-      '/posts/jam/:jamId',
-      async ({ userId, params: { jamId }, PostService }) => {
-        try {
-          return await PostService.create({ userId, jamId })
-        } catch (e) {
-          console.error(e)
-          return error(500)
-        }
-      },
-    )
-
     .delete(
       '/posts/:id',
-      async ({ userId, error, params: { id }, PostService }) => {
+      async ({ userId, error, params: { id } }) => {
         try {
-          return await PostService.delete({ userId, id })
+          return await deletePost({ authorId: userId, id })
         } catch (e) {
-          return error(404)
+          return error(404, 'Post not found')
         }
+      },
+      {
+        isSignIn: true,
       },
     )
     .put(
       '/posts/:id',
-      async ({ userId, error, body, params: { id }, PostService }) => {
+      async ({ userId, error, body, params: { id } }) => {
         try {
-          const post = await PostService.edit({ id, userId, ...body })
+          const post = await update({
+            id,
+            authorId: userId,
+            description: body.description,
+            script: body.script,
+            published: true,
+          })
           return post
         } catch (e) {
-          return error(404)
+          return error(404, 'Post not found')
         }
       },
       {
+        isSignIn: true,
         body: t.Object({
           script: t.String(),
           description: t.String(),
@@ -68,104 +83,96 @@ export const postMutators = () =>
     )
     .post(
       '/posts/:id/comments',
-      async ({
-        userId,
-        error,
-        params: { id },
-        body: { text },
-        PostService,
-      }) => {
+      async ({ userId, error, params: { id }, body: { text } }) => {
         try {
-          return await PostService.createComment({ postId: id, userId, text })
+          return await createComment({
+            data: {
+              authorId: userId,
+              createdAt: new Date(),
+              postId: id,
+              text,
+            },
+          })
         } catch (e) {
-          return error(404)
+          return error(404, 'Post not found')
         }
       },
       {
+        isSignIn: true,
         body: t.Object({ text: t.String() }),
       },
     )
     .delete(
       '/posts/:id/comments/:commentId',
-      async ({ userId, error, params: { commentId }, PostService }) => {
+      async ({ userId, error, params: { commentId } }) => {
         try {
-          await PostService.deleteComment({ userId, commentId })
+          await deleteComment({
+            authorId: userId,
+            id: commentId,
+          })
         } catch (e) {
-          return error(404)
+          return error(404, 'Post not found')
         }
+      },
+      {
+        isSignIn: true,
       },
     )
     .post(
       '/posts/:id/like',
-      async ({ userId, params: { id }, PostService }) => {
+      async ({ userId, params: { id } }) => {
         try {
-          return await PostService.like({ userId, id })
+          return await createLike({ postId: id, userId })
         } catch (e) {
           throw e
         }
       },
+      { isSignIn: true },
     )
     .delete(
       '/posts/:id/like',
-      async ({ userId, params: { id }, PostService }) => {
-        return await PostService.deleteLike({ userId, id })
+      async ({ userId, params: { id } }) => {
+        return await deleteLike({ postId: id, userId })
       },
+      { isSignIn: true },
     )
-
-export default function postsRoutes() {
-  return new Elysia()
+export const makePostRoutes = (authPlugin: typeof auth) =>
+  new Elysia()
     .use(html())
-    .decorate('PostService', new PostService(new JamService()))
-    .use(postMutators())
-    .get('/posts/featured', async ({ error }) => { // TODO fix this 
-      const posts = await client.post.findMany({where: { 
-          author: { 
-            name: "ehayes2000"
-          }
-        },
-        include: { 
-          comments: { 
-            include: { author: true}
-          },
-          likes: true,
-          author: true
-        },
-        orderBy: { 
-          createdAt: 'asc'
-        }
+    .use(postMutators(authPlugin))
+    .get('/posts/featured', async ({ error }) => {
+      // TODO real featured system
+      const posts = await get({
+        authorIds: ['0665a608-a67c-4264-93b0-143fa8c92389'],
       })
-      if (!posts)
-        return error(404)
-      return posts[0]
+      if (!posts.length) return error(404)
+      return posts[posts.length - 1]
     })
     .get(
       '/posts',
-      async ({ query: { userId }, error, PostService }) => {
-        if (userId) {
-          const posts = await PostService.list({ userId })
-          return posts
-        }
+      async ({ query: { userId, jamId, userName }, error }) => {
+        if (userName) return await get({ authorNames: [userName] })
+        if (jamId) return await get({ jamIds: [jamId] })
+        if (userId) return await get({ authorIds: [userId] })
         return error(404)
       },
       {
         query: t.Object({
           userId: t.Optional(t.String()),
+          userName: t.Optional(t.String()),
+          jamId: t.Optional(t.String()),
         }),
       },
     )
-    .get(
-      '/posts/:id/script',
-      async ({ params: { id }, error, PostService }) => {
-        const post = await PostService.get({ id })
-        if (!post) return error(404)
-        return <ScriptTemplate script={post.script} />
-      },
-    )
-    .get(
-      '/posts/:id',
-      async ({ params: { id }, PostService }) => await PostService.get({ id }),
-    )
-    .get('/users/:id/posts', async ({ params: { id }, PostService }) => {
-      return await PostService.list({ userId: id })
+    .get('/posts/:id/script', async ({ params: { id }, error }) => {
+      const post = (await get({ data: { id } }))[0]
+      if (!post) return error(404)
+      return <ScriptTemplate script={post.script} />
     })
-}
+    .get('/posts/:id', async ({ params: { id }, error }) => {
+      const posts = await get({ data: { id }, includeUnpublished: true })
+      if (!posts.length) return error(404)
+      return posts[0]
+    })
+
+export const postsRoutes = makePostRoutes(auth)

@@ -3,6 +3,7 @@ import { User } from '@prisma/client'
 import { GitHub } from 'arctic'
 import { Context } from 'elysia'
 import { Lucia } from 'lucia'
+import { Elysia, error } from 'elysia'
 import client from '../prisma/prisma'
 
 const adapter = new PrismaAdapter(client.session, client.user)
@@ -44,30 +45,39 @@ declare module 'lucia' {
   }
 }
 
-export const authMiddleware = async ({
-  headers,
-  cookie: { auth_session },
-}: Context) => {
-  const sessionId = lucia.readSessionCookie(
-    headers.cookie === undefined ? '' : headers.cookie,
+export const auth = new Elysia({ name: 'Service.Auth' })
+  .derive(
+    { as: 'scoped' },
+    async ({ headers: { cookie }, cookie: { auth_session }, error }) => {
+      const sessionId = lucia.readSessionCookie(cookie ?? '')
+      if (!sessionId) return { Auth: { userId: null } }
+      const { session, user } = await lucia.validateSession(sessionId)
+      if (!session || !user) {
+        const blankCookie = lucia.createBlankSessionCookie()
+        auth_session.set({ ...blankCookie.attributes })
+        return { Auth: { userId: null } }
+      }
+      if (session && session.fresh) {
+        const sessionCookie = lucia.createSessionCookie(session.id)
+        auth_session.set({ ...sessionCookie.attributes })
+      }
+      return { Auth: { userId: user.id } }
+    },
   )
-  if (!sessionId) return { isAuth: false, userId: 'null' }
-  const { session, user } = await lucia.validateSession(sessionId)
-  if (!session || !user) {
-  }
-  if (session && session.fresh) {
-    const sessionCookie = lucia.createSessionCookie(session.id)
-    auth_session.set({ ...sessionCookie.attributes })
-    if (user) {
-      return { isAuth: true, userId: user.id }
-    } else {
-      return { isAuth: false, userId: 'null' }
+  .macro(({ onBeforeHandle, mapResponse }) => ({
+    isSignIn(_: boolean) {
+      onBeforeHandle(
+        async ({
+          Auth,
+          error,
+        }): Promise<undefined | ReturnType<typeof error>> => {
+          if (!Auth?.userId || !Auth.userId) return error(401)
+        },
+      )
+    },
+  }))
+  .resolve({ as: 'scoped' }, ({ Auth }): { userId: string | '' } => {
+    return {
+      userId: Auth.userId ?? '',
     }
-  }
-  if (session && user) {
-    return { isAuth: true, userId: user.id }
-  }
-  const blankCookie = lucia.createBlankSessionCookie()
-  auth_session.set({ ...blankCookie.attributes })
-  return { isAuth: false, userId: 'null' }
-}
+  })
