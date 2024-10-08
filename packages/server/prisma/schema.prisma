@@ -15,18 +15,18 @@ model Session {
 }
 
 model User {
-  id             String           @id
-  name           String           @unique
-  posts          Post[]
-  sessions       Session[]
-  comments       Comment[]
-  likes          Like[]
-  jams           Jam[]
-  JamParticipant JamParticipant[]
+  id       String    @id
+  name     String    @unique
+  posts    Post[]
+  sessions Session[]
+  comments Comment[]
+  likes    Like[]
+  jams     Jam[]
 }
 
 model Post {
   id          String    @id
+  published   Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   description String    @default("")
@@ -59,24 +59,13 @@ model Like {
   @@id([userId, postId])
 }
 
-model JamParticipant {
-  userId String
-  user   User    @relation(fields: [userId], references: [id])
-  jamId  String
-  jam    Jam     @relation(fields: [jamId], references: [id])
-  active Boolean @default(true)
-
-  @@id([jamId, userId])
-}
-
 model Jam {
-  id             String           @id
-  ownerId        String
-  creator        User             @relation(fields: [ownerId], references: [id])
-  startTime      DateTime         @default(now())
-  endTime        DateTime
-  title          String
-  JamParticipant JamParticipant[]
-  Post           Post[]
-  isDeleted      Boolean          @default(false)
+  id        String   @id
+  ownerId   String
+  creator   User     @relation(fields: [ownerId], references: [id])
+  startTime DateTime @default(now())
+  endTime   DateTime
+  title     String
+  Post      Post[]
+  isDeleted Boolean  @default(false)
 }

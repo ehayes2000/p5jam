@@ -13,5 +13,5 @@
     "skipLibCheck": true,
     "plugins": [{ "name": "@kitajs/ts-html-plugin" }]
   },
-  "include": ["src/**/*", "prisma/prisma.ts"]
+  "include": ["src/**/*.ts", "prisma/prisma.ts"]
 }

@@ -4,19 +4,21 @@ import { swagger } from '@elysiajs/swagger'
 import { Elysia, t } from 'elysia'
 import client from '../prisma/prisma'
 import jamRoutes from './routes/jams'
-import loginRoutes from './routes/login'
-import postsRoutes from './routes/posts'
+import { loginRoutes } from './routes/login'
+import { postsRoutes } from './routes/posts'
 
 export const api = new Elysia({ prefix: '/api' })
   .guard({
     as: 'local',
     error: async ({ route, error }) => {
-      console.log(`([${new Date().toString()}] - ${route} - ${error}`)
+      console.log(
+        `([${new Date().toString()}] - ${route} - ${error.cause}\n--\n ${error.message}\n--\n${error.stack}\n--\n${error.name}`,
+      )
     },
   })
   .use(html())
-  .use(loginRoutes())
-  .use(postsRoutes())
+  .use(loginRoutes)
+  .use(postsRoutes)
   .use(jamRoutes())
   .get('/users', async () => {
     return await client.user.findMany()
@@ -32,7 +34,7 @@ if (process.env.NODE_ENV !== 'development') {
         assets: 'public',
       }),
     )
-    .get('*', () => Bun.file('public/index.html')) 
+    .get('*', () => Bun.file('public/index.html'))
 } else {
   app.get('/', ({ redirect }) => redirect(process.env.DEV_SERVER!))
 }
