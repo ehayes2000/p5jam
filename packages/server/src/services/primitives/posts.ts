@@ -1,19 +1,19 @@
-import type { TPost, TComment, TLike } from './types'
-import { v4 as uuid } from 'uuid'
-import client, { type Prisma } from '../../prisma'
+import type { TPost, TComment, TLike } from './types';
+import { v4 as uuid } from 'uuid';
+import client, { type Prisma } from '../../prisma';
 
 export type TPostData = Partial<
   NonNullable<Awaited<ReturnType<typeof client.post.findFirst>>>
->
+>;
 
 export async function get(filters: {
-  data?: TPostData
-  authorIds?: string[]
-  jamIds?: string[]
-  authorNames?: string[]
-  includeUnpublished?: boolean
+  data?: TPostData;
+  authorIds?: string[];
+  jamIds?: string[];
+  authorNames?: string[];
+  includeUnpublished?: boolean;
 }): Promise<TPost[]> {
-  const { data, authorIds, jamIds, includeUnpublished, authorNames } = filters
+  const { data, authorIds, jamIds, includeUnpublished, authorNames } = filters;
   return await client.post.findMany({
     where: {
       ...data,
@@ -56,13 +56,13 @@ export async function get(filters: {
     orderBy: {
       createdAt: 'desc',
     },
-  })
+  });
 }
 
 export type TPostCreateData = Omit<
   Omit<TPostData, 'authorId'> & { authorId: string },
   'id'
->
+>;
 
 export async function create(data: TPostCreateData): Promise<TPost> {
   return await client.post.create({
@@ -82,34 +82,34 @@ export async function create(data: TPostCreateData): Promise<TPost> {
         },
       },
     },
-  })
+  });
 }
 
 export async function deletePost(params: {
-  id: string
-  authorId: string
+  id: string;
+  authorId: string;
 }): Promise<boolean> {
-  const { id, authorId } = params
+  const { id, authorId } = params;
   try {
     await client.post.delete({
       where: {
         id,
         authorId,
       },
-    })
-    return true
+    });
+    return true;
   } catch (_) {
-    return false
+    return false;
   }
 }
 
 export type TPostUpdate = Omit<TPostData, 'id' | 'authorId' | 'jamId'> & {
-  id: string
-  authorId: string
-}
+  id: string;
+  authorId: string;
+};
 
 export async function update(data: TPostUpdate): Promise<TPost> {
-  const { id, authorId } = data
+  const { id, authorId } = data;
   return await client.post.update({
     where: {
       id,
@@ -131,5 +131,5 @@ export async function update(data: TPostUpdate): Promise<TPost> {
         },
       },
     },
-  })
+  });
 }

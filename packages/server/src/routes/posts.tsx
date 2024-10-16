@@ -21,12 +21,13 @@ function draw() {
 export const postMutators = (authPlugin: typeof auth) =>
   new Elysia()
     .use(authPlugin)
-    .guard({
-      response: {
-        401: t.String(),
-        404: t.String(),
-      },
-    })
+    // .guard({
+    //   // response: {
+    //   //   401: t.String(),
+    //   //   404: t.String(),
+    //   //   200: t.
+    //   // },
+    // })
     .post(
       '/posts', // TODO "posts"
       async ({ userId, body }) => {
