@@ -3,7 +3,7 @@ import { useLoaderData } from 'react-router-dom';
 import Post from '../components/Post';
 
 export default function User() {
-  const { posts, myId } = useLoaderData() as { posts: TPost[]; myId?: string };
+  const { posts } = useLoaderData() as { posts: TPost[]; myId?: string };
   return (
     <div className="grid justify-center gap-4 p-6">
       {posts?.length ? (

@@ -45,6 +45,11 @@
   "prisma": {
     "seed": "bun prisma/seed.ts"
   },
-  "trustedDependencies": ["electron","esbuild", "prisma", "@prisma/client", "@prisma/engines"]
-
+  "trustedDependencies": [
+    "electron",
+    "esbuild",
+    "prisma",
+    "@prisma/client",
+    "@prisma/engines"
+  ]
 }

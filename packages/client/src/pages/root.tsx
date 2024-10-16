@@ -1,8 +1,8 @@
-import { useSelector } from '@xstate/store/react';
-import { useState, useEffect } from 'react';
+// import { useSelector } from '@xstate/store/react';
+import { useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useMyID } from '../queries/queryClient';
-import { client } from '../client';
+// import { useMyID } from '../queries/queryClient';
+// import { client } from '../client';
 import { PopupContext } from '../state';
 import { useContext } from 'react';
 
@@ -13,7 +13,7 @@ function Root() {
   const location = useLocation();
 
   // const { jam } = useSelector(store, (state) => state.context);
-  const { data: myID } = useMyID();
+  // const { data: myID } = useMyID();
 
   // useEffect(() => {
   //   client.api.jams.activeJam.get().then(async (j) => {

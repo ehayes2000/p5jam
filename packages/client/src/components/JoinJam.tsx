@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { client } from '../client'
 
 export default function JoinJam({
   closeCallback,
@@ -18,11 +17,6 @@ export default function JoinJam({
   const joinJam: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     if (!validateForm({ joinCode })) return
-    const comeOnAndSlam = await client.api.jams({ id: joinCode }).join.post()
-    if (comeOnAndSlam.error)
-      alert(
-        'https://i.pinimg.com/originals/8f/59/68/8f5968f03ab0b891f58ba7d7ad4d0ede.jpg',
-      )
     else nav(`/jam/${joinCode.toUpperCase()}`)
   }
 

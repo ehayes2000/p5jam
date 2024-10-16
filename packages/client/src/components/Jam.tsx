@@ -6,7 +6,7 @@ import Timer from './Timer';
 
 export default function Jam({ jam }: { jam: TJam }) {
   const nav = useNavigate();
-  const [isComplete, setIsComplete] = useState(
+  const [isComplete, _] = useState(
     new Date(jam.endTime) <= new Date(),
   );
 

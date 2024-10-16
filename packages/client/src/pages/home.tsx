@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useSelector } from '@xstate/store/react';
 import NewJam from '../components/CreateJam';
 import JoinJam from '../components/JoinJam';
 import HighlightedPost from '../components/highlightedPost';

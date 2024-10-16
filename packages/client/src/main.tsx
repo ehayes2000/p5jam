@@ -15,7 +15,6 @@ import Jam from './pages/jamPage';
 import MyJams from './pages/myJams';
 import LoginPage from './pages/login';
 import PostDetails from './pages/postDetails';
-import Profile from './pages/profile';
 import Root from './pages/root';
 import User from './pages/user';
 import Users from './pages/users';
