@@ -1,6 +1,7 @@
 // import { useSelector } from '@xstate/store/react';
 import { useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import Logo from "../assets/logo.png"
 // import { useMyID } from '../queries/queryClient';
 // import { client } from '../client';
 import { PopupContext } from '../state';
@@ -50,8 +51,11 @@ function Root() {
             <i className="bi bi-x-lg text-black hover:text-gray-500"></i>
           </button>
         </div>
-
-        <div className="flex h-full flex-col justify-center gap-4">
+        {/* <link rel="icon" type="image/svg+xml" href="/logo.svg" /> */}
+        <img src={Logo} className="p-2 hover:cursor-pointer" onClick={() => {
+          nav("/")
+        }} />
+        <div className="flex h-full flex-col justify-start gap-4 pt-16   pr-4">
           <div className="flex flex-col items-end gap-2 text-4xl">
             <button
               className="hover:cursor-pointer hover:text-gray-500"

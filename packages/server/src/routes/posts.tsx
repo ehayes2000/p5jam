@@ -22,7 +22,7 @@ export const postMutators = (authPlugin: typeof auth) =>
   new Elysia()
     .use(authPlugin)
     // .guard({
-    //   // response: {
+    //   // response: { // breaks type inference :)
     //   //   401: t.String(),
     //   //   404: t.String(),
     //   //   200: t.
