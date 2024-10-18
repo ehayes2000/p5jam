@@ -45,7 +45,6 @@ export default function NewJam({
     });
     if (response.data) {
       const jam = response.data;
-      console.log('CREATED JAM!', jam);
       nav(`/jam/${jam.id}`);
     } else {
       alert('handle me failed to create jam');

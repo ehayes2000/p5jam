@@ -98,7 +98,8 @@ export async function deletePost(params: {
       },
     });
     return true;
-  } catch (_) {
+  } catch (e) {
+    console.error(e);
     return false;
   }
 }

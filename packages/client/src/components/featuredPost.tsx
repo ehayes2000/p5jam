@@ -19,7 +19,7 @@ export default function HightlightedPost({ post: p }: { post: TPost }) {
     <>
       <Link
         className="absolute right-0 top-0 z-50 p-2 text-sm hover:text-gray-500 font-thin"
-        to={`/user/${p.author.id}`}
+        to={`/user/${p.author.name}`}
       >
         {p.author.name}
       </Link>

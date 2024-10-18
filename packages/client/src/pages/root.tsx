@@ -1,36 +1,35 @@
 // import { useSelector } from '@xstate/store/react';
-import { useState } from 'react';
+import { TLoginContext, LoginContext } from '../login';
+import { useState, useEffect, useContext } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Logo from "../assets/logo.png"
 // import { useMyID } from '../queries/queryClient';
-// import { client } from '../client';
+import { client } from '../client';
 import { PopupContext } from '../state';
-import { useContext } from 'react';
 
 function Root() {
   const { setPopup } = useContext(PopupContext);
   const [isSideBar, setIsSideBar] = useState(true);
   const nav = useNavigate();
   const location = useLocation();
+  const { onLogin, onLogout } = useContext(LoginContext) as TLoginContext;
 
-  // const { jam } = useSelector(store, (state) => state.context);
-  // const { data: myID } = useMyID();
-
-  // useEffect(() => {
-  //   client.api.jams.activeJam.get().then(async (j) => {
-  //     if (j.data) {
-  //       const { data } = await client.api.jams({ id: j.data.id }).get();
-  //       if (!data) {
-  //         alert('expecetd active jam data :)');
-  //         return;
-  //       }
-  //       store.send({
-  //         type: 'receivedJamFromServer',
-  //         payload: { jam: data },
-  //       });
-  //     }
-  //   });
-  // }, []);
+  useEffect(() => {
+    (async () => {
+      const { data: myId } = await client.api.login.myid.get();
+      if (!myId) {
+        onLogout();
+        return
+      }
+      const { data: user } = await client.api.users.user.get({ query: { id: myId.id } })
+      if (!user) {
+        onLogout()
+        return
+      } else {
+        onLogin({ user });
+      }
+    })();
+  }, [])
 
   return (
     <div className="grid h-full w-full grid-flow-col grid-cols-5 overflow-hidden">
@@ -52,11 +51,14 @@ function Root() {
           </button>
         </div>
         {/* <link rel="icon" type="image/svg+xml" href="/logo.svg" /> */}
-        <img src={Logo} className="p-2 hover:cursor-pointer" onClick={() => {
-          nav("/")
-        }} />
-        <div className="flex h-full flex-col justify-start gap-4 pt-16   pr-4">
-          <div className="flex flex-col items-end gap-2 text-4xl">
+        <div className="flex h-full flex-col justify-start pt-16">
+          <div className="flex justify-end w-full mb-4">
+            <img src={Logo} width={200} className="hover:cursor-pointer" onClick={() => {
+              setPopup("closed")
+              nav("/")
+            }} />
+          </div>
+          <div className="flex flex-col items-end text-2xl">
             <button
               className="hover:cursor-pointer hover:text-gray-500"
               onClick={() => {
@@ -76,7 +78,7 @@ function Root() {
               New Jam
             </button>
           </div>
-          <div className="flex flex-col items-end text-2xl font-normal text-black">
+          <div className="flex flex-col items-end text-xl font-normal text-black">
             {/* <Link
               className="hover:cursor-pointer hover:text-gray-400"
               to="explore"

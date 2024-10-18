@@ -5,21 +5,19 @@ import {
   redirect,
 } from 'react-router-dom';
 import { PopupProvider } from './state';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { LoginContextProvider } from './login';
 import { client, type TJam, type TPost, type TUser } from './client';
-
 import EditPost from './pages/editPost';
 import ErrorPage from './pages/errorPage';
 import Home from './pages/home';
-import Jam from './pages/jamPage';
+import Jam from './components/Jam';
 import MyJams from './pages/myJams';
 import LoginPage from './pages/login';
 import PostDetails from './pages/postDetails';
 import Root from './pages/root';
 import User from './pages/user';
 import Users from './pages/users';
-import { queryClient } from './queries/queryClient';
-
+import type { TProfile, TJamPage } from "./types"
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'highlight.js/styles/default.min.css';
 import './index.css';
@@ -49,13 +47,15 @@ export const router = createBrowserRouter([
         path: 'user/:name',
         loader: async ({
           params: { name },
-        }): Promise<{ posts: TPost[]; myId: string | undefined }> => {
-          const { data: myId } = await client.api.login.myid.get();
+        }): Promise<TProfile> => {
+          if (!name) throw new Response('Not Found', { status: 404 });
+          const { data: user } = await client.api.users.user.get({ query: { name } })
+          if (!user) throw new Response('Not Found', { status: 404 });
           const { data: posts } = await client.api.posts.get({
-            query: { userName: name },
+            query: { userId: user.id },
           });
           if (!posts) throw new Response('Not Found', { status: 404 });
-          return { posts, myId: myId?.id };
+          return { posts, user: user };
         },
         element: <User />,
       },
@@ -65,15 +65,20 @@ export const router = createBrowserRouter([
       },
       {
         path: 'profile',
-        loader: async (): Promise<{ posts: TPost[]; myId: string }> => {
+        loader: async (): Promise<TProfile> => {
           const { data: myId } = await client.api.login.myid.get();
           if (!myId) throw redirect('/login');
+          const { data: user } = await client.api.users.user.get({ query: { id: myId.id } })
+          if (!user)
+            throw new Response("User Not Found", { status: 404 })
           const { data: posts } = await client.api.posts.get({
             query: { userId: myId.id },
           });
           if (!posts)
             throw new Response('Error Getting Profile', { status: 500 });
-          return { posts, myId: myId.id };
+          return {
+            posts, user
+          };
         },
         element: <User />,
       },
@@ -117,13 +122,15 @@ export const router = createBrowserRouter([
       },
       {
         path: 'jam/:id',
-        loader: async ({ params: { id } }): Promise<TJam> => {
+        loader: async ({ params: { id } }): Promise<TJamPage> => {
           const response = await client.api.jams({ id: String(id) }).get();
-          console.log('res', response);
           if (response.error !== null) {
             throw new Response('Not Found', { status: 404 });
           }
-          return response.data;
+          const { data: posts } = await client.api.posts.get({ query: { jamId: id } })
+          if (posts === null)
+            throw new Response("Not Found", { status: 404 })
+          return { jam: response.data, posts: posts }
         },
         element: <Jam />,
       },
@@ -145,9 +152,9 @@ export const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById('root')!).render(
-  <QueryClientProvider client={queryClient}>
+  <LoginContextProvider>
     <PopupProvider>
       <RouterProvider router={router} />
     </PopupProvider>
-  </QueryClientProvider>,
+  </LoginContextProvider>
 );

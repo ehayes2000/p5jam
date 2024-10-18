@@ -1,7 +1,9 @@
-import { useRef, useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useRef, useState, useEffect, useContext } from 'react'
 import { client, TPost } from '../client'
+import { LoginContext } from "../login"
 import Comments from './Comments'
-import { useMyID } from '../queries/queryClient'
+
 
 export function Sketch({ id }: { id: string }) {
   return (
@@ -18,25 +20,28 @@ export function Sketch({ id }: { id: string }) {
 
 export default function Post({
   post: p,
-  isComments,
+  deletePost,
+  isComments
 }: {
   post: TPost
+  deletePost: () => void,
   isComments?: boolean
 }) {
   const [isLiked, setIsLiked] = useState<boolean>()
   const [openComments, setOpenComments] = useState<boolean>(isComments ?? false)
   const [comments, setComments] = useState<typeof p.comments>(p.comments)
-  const { data: myId } = useMyID()
+  const [likes, setLikes] = useState<number>(p.likes.length)
+  const { user } = useContext(LoginContext)
+  const nav = useNavigate()
 
-  // TODO delete :)
   useEffect(() => {
-    if (!myId) return
+    if (!user?.id) return
     p.likes.forEach((l) => {
-      if (l.userId === myId) {
+      if (l.userId === user.id) {
         setIsLiked(true)
       }
     })
-  }, [])
+  }, [user])
 
   const postComment = async ({ text }: { text: string }) => {
     const newComment = await client.api
@@ -49,7 +54,7 @@ export default function Post({
     await client.api.posts({ id: p.id }).comments({ commentId: id }).delete()
     setComments(comments.filter((c) => c.id !== id))
   }
-
+  const editPost = () => nav(`/editPost/${p.id}`)
   const pref = useRef(null)
 
   return (
@@ -59,61 +64,72 @@ export default function Post({
       className="grid cursor-pointer content-center justify-center"
     >
       <div className="border p-2 gap-1 grid">
-      <h2 className=""> {p.author.name} </h2>
-      <Sketch id={p.id} />
-      <div className=""> {p.description} </div>
-      <div className="flex justify-start gap-4">
-        <span>
-          <button
-            onClick={() => {
-              if (isLiked) {
-                client.api.posts({ id: p.id }).like.delete()
-                p.likes = p.likes.filter((l) => l.userId !== 'me')
-                setIsLiked(false)
-              } else {
-                client.api.posts({ id: p.id }).like.post()
-                p.likes = [...p.likes, { postId: p.id, userId: 'me' }]
-                setIsLiked(true)
-              }
-            }}
-          >
-            <i
-              className={`bi ${isLiked ? 'bi-heart-fill text-rose-400' : 'bi-heart'}`}
-            >
-              {' '}
-            </i>
-            <span> {p.likes.length} </span>
-          </button>
-        </span>
-        <span className="px-1">
-          <button onClick={() => setOpenComments((p) => !p)}>
-            <i className={`bi bi-chat`}></i>
-            <span> {comments.length} </span>
-          </button>
-        </span>
-        <span>
-          <button>
-            <i
-              className={`bi bi-box-arrow-up`}
-              onClick={() => {
-                navigator.clipboard.writeText(`${origin}/posts/${p.id}`)
-              }}
-            ></i>
-          </button>
-        </span>
-      </div>
-      {openComments ? (
-        <div className="">
-          <Comments
-            comments={comments}
-            postComment={postComment}
-            deleteComment={deleteComment}
-          />
+        <h2 className=""> {p.author.name} </h2>
+        <Sketch id={p.id} />
+        <div className=""> {p.description} </div>
+        <div className="flex justify-between">
+          <div className="flex justify-start gap-4">
+            <span>
+              <button
+                onClick={() => {
+                  if (isLiked) {
+                    client.api.posts({ id: p.id }).like.delete()
+                    p.likes = p.likes.filter((l) => l.userId !== 'me')
+                    setLikes(p => p - 1)
+                    setIsLiked(false)
+                  } else {
+                    client.api.posts({ id: p.id }).like.post()
+                    p.likes = [...p.likes, { postId: p.id, userId: 'me' }]
+                    setLikes(p => p + 1)
+                    setIsLiked(true)
+                  }
+                }}
+              >
+                <i
+                  className={`bi ${isLiked ? 'bi-heart-fill text-rose-400' : 'bi-heart'}`}
+                >
+                </i>
+                <span> {likes} </span>
+              </button>
+            </span>
+            <span className="px-1">
+              <button onClick={() => setOpenComments((p) => !p)}>
+                <i className={`bi bi-chat`}></i>
+                <span> {comments.length} </span>
+              </button>
+            </span>
+            <span>
+              <button>
+                <i
+                  className={`bi bi-box-arrow-up`}
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${origin}/posts/${p.id}`)
+                  }}
+                ></i>
+              </button>
+            </span>
+          </div>
+          {
+            user?.id === p.author.id ?
+              <div className="flex justify-end gap-2">
+                <button className="px-2 border hover:bg-red-400" onClick={deletePost}> delete </button>
+                <button className="px-2 border hover:bg-yellow-400" onClick={editPost}> edit </button>
+              </div> : <></>
+          }
+
         </div>
-      ) : (
-        <></>
-      )}
-    </div>
-    </div>
+        {openComments ? (
+          <div className="">
+            <Comments
+              comments={comments}
+              postComment={postComment}
+              deleteComment={deleteComment}
+            />
+          </div>
+        ) : (
+          <></>
+        )}
+      </div>
+    </div >
   )
 }

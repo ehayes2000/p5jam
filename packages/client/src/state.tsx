@@ -9,7 +9,7 @@ interface TPopupContext {
 
 export const PopupContext = createContext<TPopupContext>({
   popup: 'closed',
-  setPopup: () => {},
+  setPopup: () => { },
 });
 
 export const PopupProvider: React.FC<{ children: React.ReactNode }> = ({

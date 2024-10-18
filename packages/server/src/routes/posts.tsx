@@ -48,11 +48,10 @@ export const postMutators = (authPlugin: typeof auth) =>
     .delete(
       '/posts/:id',
       async ({ userId, error, params: { id } }) => {
-        try {
-          return await deletePost({ authorId: userId, id })
-        } catch (e) {
-          return error(404, 'Post not found')
-        }
+        const isDeleted = await deletePost({ authorId: userId, id })
+        if (isDeleted)
+          return
+        else return error(404, "Not Found")
       },
       {
         isSignIn: true,

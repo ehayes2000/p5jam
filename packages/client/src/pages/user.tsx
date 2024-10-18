@@ -1,16 +1,31 @@
-import type { TPost } from '../client';
+// import { TProfile } from "../types"
+// import PostCollection from "../components/PostCollection";
+
+// export default function User() {
+//   return <PostCollection posts={posts} />
+// }
+
+
 import { useLoaderData } from 'react-router-dom';
-import Post from '../components/Post';
+
+import type { TProfile } from "../types"
+import PostCollection from "../components/PostCollection"
+import { useContext } from "react"
+import { LoginContext } from "../login"
 
 export default function User() {
-  const { posts } = useLoaderData() as { posts: TPost[]; myId?: string };
+  const { posts, user } = useLoaderData() as TProfile;
+  const { user: me } = useContext(LoginContext)
+
   return (
-    <div className="grid justify-center gap-4 p-6">
-      {posts?.length ? (
-        posts.map((p) => <Post key={p.id} post={p} />)
-      ) : (
-        <div> This user has no posts </div>
-      )}
+    <div>
+      <div className="h-1/5 p-12 border-b border-black">
+        <h1 className="text-xl font-bold">
+          {user.name}
+        </h1>
+
+      </div>
+      <PostCollection posts={posts} />
     </div>
   );
 }

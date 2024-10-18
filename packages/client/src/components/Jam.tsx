@@ -1,14 +1,19 @@
+import type { TJamPage } from "../types"
+import { useLoaderData } from "react-router-dom"
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { type TJam, type TPost, client } from '../client';
+import PostCollection from './PostCollection';
 import Post from '../components/Post';
 import Timer from './Timer';
 
-export default function Jam({ jam }: { jam: TJam }) {
+export default function Jam() {
   const nav = useNavigate();
+  const { posts, jam } = useLoaderData() as TJamPage
   const [isComplete, _] = useState(
     new Date(jam.endTime) <= new Date(),
   );
+  console.log("POST", posts)
 
   // useEffect(() => {
   //   const timer = setTimeout(
@@ -79,36 +84,26 @@ export default function Jam({ jam }: { jam: TJam }) {
         </button>
       </div>
       <div className="mt-6 flex justify-center p-4 flex-col gap-2">
-        <JamPosts jamId={jam.id} />
+        <PostCollection posts={posts} />
+        {/* <JamPosts jamId={jam.id} /> */}
       </div>
     </div>
   );
 }
 
-const JamPosts = ({ jamId }: { jamId: string }) => {
-  const [posts, setPosts] = useState<TPost[] | null>(null);
-  useEffect(() => {
-    client.api.posts.get({ query: { jamId } }).then((response) => {
-      if (response.data) {
-        setPosts(response.data);
-      } else {
-        alert('handle this');
-      }
-    });
-  }, []);
+// const JamPosts = ({ jamId }: { jamId: string }) => {
+//   const [posts, setPosts] = useState<TPost[] | null>(null);
+//   useEffect(() => {
+//     client.api.posts.get({ query: { jamId } }).then((response) => {
+//       if (response.data) {
+//         setPosts(response.data);
+//       } else {
+//         alert('handle this');
+//       }
+//     });
+//   }, []);
 
-  return (
-    <>
-      {posts ? (
-        <>
-          {' '}
-          {posts.map((p) => (
-            <Post post={p} key={p.id} />
-          ))}
-        </>
-      ) : (
-        <> loading ... </>
-      )}
-    </>
-  );
-};
+//   return (
+//     <PostCollection posts={posts} />
+//   );
+// };

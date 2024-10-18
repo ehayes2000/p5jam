@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { TPost } from '../client';
-import { useMyID } from '../queries/queryClient';
+import { LoginContext } from '../login';
 
 export default function Comments({
   comments,
@@ -11,12 +11,11 @@ export default function Comments({
   postComment: (t: { text: string }) => Promise<void>;
   deleteComment: (id: { id: string }) => Promise<void>;
 }) {
-  const { data: myId } = useMyID();
+  const { user } = useContext(LoginContext)
   const [myComment, setMyComment] = useState<string>(''); // who ?
-
   return (
     <div className="flex flex-col gap-1">
-      {myId ? (
+      {user?.id ? (
         <div className="">
           <textarea
             onChange={(e) => setMyComment(e.target.value)}
@@ -41,7 +40,7 @@ export default function Comments({
         let dateString = '';
         try {
           dateString = new Date(c.createdAt).toDateString();
-        } catch {}
+        } catch { }
         return (
           <div key={c.id} className="flex-col justify-between border p-1">
             <div className="flex justify-start gap-2">
@@ -50,7 +49,7 @@ export default function Comments({
             </div>
             <div className="text-wrap"> {c.text} </div>
 
-            {c.authorId === myId ? (
+            {c.authorId === user?.id ? (
               <button onClick={() => deleteComment({ id: c.id })}>
                 <i className="bi bi-trash3" />
               </button>
