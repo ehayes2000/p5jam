@@ -66,7 +66,7 @@ export const postMutators = (authPlugin: typeof auth) =>
             authorId: userId,
             description: body.description,
             script: body.script,
-            published: true,
+            published: body.published,
           })
           return post
         } catch (e) {
@@ -78,6 +78,7 @@ export const postMutators = (authPlugin: typeof auth) =>
         body: t.Object({
           script: t.String(),
           description: t.String(),
+          published: t.Boolean()
         }),
       },
     )

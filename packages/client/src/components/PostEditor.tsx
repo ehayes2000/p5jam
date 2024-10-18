@@ -11,20 +11,27 @@ const MAX_DESCRIPTION = 255
 
 export default function PostEditor({
   post,
-  callback,
+  postCallback,
+  saveDraftCallback,
 }: {
-  callback: ({
+  postCallback: ({
+    description,
+    script,
+  }: {
+    description: string
+    script: string
+  }) => void,
+  saveDraftCallback: ({
     description,
     script,
   }: {
     description: string
     script: string
   }) => void
-  callbackText: string
   post: { description: string; script: string }
 }) {
   const [script, setScript] = useState<string>(post.script)
-  const [description, setDescription] = useState<string>(post.description)
+  const [description, setDescription] = useState<string>("")
   const [keybind, setKeyBind] = useState<Keybind>(() => {
     const savedKeybind = localStorage.getItem('keybind')
     return (savedKeybind as Keybind) || 'Normal'
@@ -54,73 +61,66 @@ export default function PostEditor({
   ]
   let editSize = '550px'
   return (
-    <div className="grid w-full gap-1">
+    <div className="w-full gap-1 h-full">
       <form
         onSubmit={async (e) => {
           e.preventDefault()
-          callback({ description, script })
         }}
+        className="h-full flex flex-col justify-between"
       >
-        <div className="flex flex-col gap-1">
-          <div className="flex justify-between">
-            <span className="flex gap-2">
-              Key bindings
-              <select
-                className="px-2"
-                onChange={(e) => setKeyBind(e.target.value as Keybind)}
-                value={keybind}
-              >
-                <option value="Normal"> Normal </option>
-                <option value="Vim"> Vim </option>
-              </select>
-            </span>
-          </div>
+        <div className="flex flex-col gap-1 w-full">
           <div className="">
             <div className="flex w-full gap-2">
-              <CodeMirror
-                value={post.script}
-                theme={githubLight}
-                extensions={
-                  keybind === 'Vim' ? [vim(), javascript()] : [javascript()]
-                }
-                className="flex-grow border"
-                onChange={setScript}
-                height={editSize}
-              />
+              <div className="flex-grow">
+                <CodeMirror
+                  value={post.script}
+                  theme={githubLight}
+                  extensions={
+                    keybind === 'Vim' ? [vim(), javascript()] : [javascript()]
+                  }
+                  className="flex-grow border col-span-3"
+                  onChange={setScript}
+                  height={editSize}
+                />
+              </div>
               <div
-                className={`h-[${editSize}] overflow-hidden border-gray-400`}
+                className={`h-[${editSize}] border-gray-400`}
               >
                 <div className="border">
                   <PostPreview draft={{ script, description }} />
                 </div>
               </div>
+
             </div>
           </div>
 
-          <div className="">
-            <div className="flex justify-between">
-              <h1 className="content-end font-medium"> Description </h1>
-              <span className="content-end text-sm font-light">
-                {description.length} / {MAX_DESCRIPTION}
-              </span>
-            </div>
-            <CodeMirror
-              value={post.description}
-              onChange={(v) => {
-                if (v.length <= MAX_DESCRIPTION) setDescription(v)
-              }}
-              extensions={descriptionExtensions}
-              className="border"
-            />
-          </div>
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className="bg-gray-200 px-2 hover:bg-gray-300"
+        </div>
+        <div className="flex justify-end gap-2">
+          <span className="flex gap-2">
+            Key bindings
+            <select
+              className="px-2"
+              onChange={(e) => setKeyBind(e.target.value as Keybind)}
+              value={keybind}
             >
-              Post
-            </button>
-          </div>
+              <option value="Normal"> Normal </option>
+              <option value="Vim"> Vim </option>
+            </select>
+          </span>
+          <button
+            type="button"
+            onClick={() => { saveDraftCallback({ description, script }) }}
+            className="bg-yellow-400 px-2 hover:bg-yellow-600"
+          >
+            Save Draft
+          </button>
+          <button
+            type="button"
+            onClick={() => { postCallback({ description, script }) }}
+            className="px-2 bg-green-400 hover:bg-green-600"
+          >
+            Post
+          </button>
         </div>
       </form>
     </div>

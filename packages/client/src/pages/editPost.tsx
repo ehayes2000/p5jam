@@ -5,7 +5,7 @@ import PostEditor from '../components/PostEditor';
 function EditPost() {
   const post = useLoaderData() as TPost;
   const nav = useNavigate();
-  const updatePost = async ({
+  const postPost = async ({
     script,
     description,
   }: {
@@ -13,22 +13,31 @@ function EditPost() {
     description: string;
   }) => {
     // TODO use return code?
-    await client.api.posts({ id: post.id }).put({ script, description });
+    await client.api.posts({ id: post.id }).put({ script, description, published: true });
+    if (post.jamId) nav(`/jam/${post.jamId}`);
+    else nav('/profile');
+  };
+
+  const saveDraft = async ({
+    script,
+    description,
+  }: {
+    script: string;
+    description: string;
+  }) => {
+    // TODO use return code?
+    await client.api.posts({ id: post.id }).put({ script, description, published: false });
     if (post.jamId) nav(`/jam/${post.jamId}`);
     else nav('/profile');
   };
 
   return (
-    <div>
-      {post ? (
-        <PostEditor
-          post={{ description: post.description, script: post.script }}
-          callback={updatePost}
-          callbackText="Post"
-        /> // TODO reroute to profile?
-      ) : (
-        <></>
-      )}
+    <div className='px-10 py-4 h-full'>
+      <PostEditor
+        post={{ description: post.description, script: post.script }}
+        postCallback={postPost}
+        saveDraftCallback={saveDraft}
+      />
     </div>
   );
 }

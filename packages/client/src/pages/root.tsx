@@ -33,9 +33,9 @@ function Root() {
   }, [])
 
   return (
-    <div className="grid h-full w-full grid-flow-col grid-cols-5 overflow-hidden">
+    <div className="grid h-full w-full grid-flow-col grid-cols-5 ">
       <div
-        className={`${isSideBar ? 'hidden' : ''} absolute z-50 p-4 text-xl text-black hover:text-gray-500`}
+        className={`${isSideBar ? 'hidden' : ''} absolute z-50  p-1 text-xl text-black hover:text-gray-500`}
       >
         <button onClick={() => setIsSideBar(true)}>
           <i className="bi bi-layout-sidebar"></i>
@@ -113,7 +113,7 @@ function Root() {
         </div>
       </div>
       <div
-        className={`${isSideBar ? 'col-span-4' : 'col-span-full'} g-amber-400 h-full w-full overflow-hidden overflow-y-auto`}
+        className={`${isSideBar ? 'col-span-4' : 'col-span-full'} g-amber-400 h-full w-full  overflow-y-auto`}
       >
         <Outlet />
       </div>
