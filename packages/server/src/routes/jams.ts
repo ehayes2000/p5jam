@@ -1,24 +1,24 @@
-import { Elysia, t } from 'elysia'
-import { auth } from '../githubAuth'
-import JamService from '../services/JamService'
-import { type TJam } from '../services/primitives/types'
+import { Elysia, t } from 'elysia';
+import { auth } from '../githubAuth';
+import JamService from '../services/JamService';
+import { type TJam } from '../services/primitives/types';
 
 export default function jamRoutes() {
-  return makeJamRoutes(auth)
+  return makeJamRoutes(auth);
 }
 
 export const makeJamRoutes = (authPlugin: typeof auth) => {
   return new Elysia()
     .decorate('JamService', new JamService())
     .get('/jams/:id', async ({ params: { id }, error, JamService }) => {
-      const jams = await JamService.get(id)
-      if (!jams) return error(404)
-      return jams
+      const jams = await JamService.get(id);
+      if (!jams) return error(404);
+      return jams;
     })
     .get(
       '/jams',
       async ({ query: { userId }, JamService }) => {
-        return await JamService.list({ userId })
+        return await JamService.list({ userId });
       },
       {
         query: t.Object({
@@ -29,13 +29,13 @@ export const makeJamRoutes = (authPlugin: typeof auth) => {
     .use(authPlugin)
     .post(
       '/jams',
-      async ({ userId, body: { title, durationMs }, JamService }) => {
+      async ({ userId, body: { durationMs }, JamService }) => {
         const jam = await JamService.create({
           userId,
-          title,
           durationMs,
-        })
-        return jam
+          title: 'unamed',
+        });
+        return jam;
       },
       {
         isSignIn: true,
@@ -44,5 +44,5 @@ export const makeJamRoutes = (authPlugin: typeof auth) => {
           durationMs: t.Integer(),
         }),
       },
-    )
-}
+    );
+};

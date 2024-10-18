@@ -12,33 +12,10 @@ export default function NewJam({
   const [minutes, setMinutes] = useState('');
   const nav = useNavigate();
 
-  const validateForm = ({
-    title,
-    hours,
-    minutes,
-  }: {
-    title: string;
-    hours: string;
-    minutes: string;
-  }) => {
-    try {
-      if (title.length > 255 || title.length <= 0) return false;
-      if (minutes.length && Number(minutes) >= 60) return false;
-      if (hours.length && Number(hours) >= 96) return false;
-      if (!hours && !minutes) return false;
-      return true;
-    } catch (e) {
-      {
-        return false;
-      }
-    }
-  };
-
   const createJam: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     const durationMs =
       Number(hours) * 60 * 60 * 1000 + Number(minutes) * 60 * 1000;
-    if (!validateForm({ title, hours, minutes })) return;
     const response = await client.api.jams.post({
       title,
       durationMs,
@@ -46,8 +23,11 @@ export default function NewJam({
     if (response.data) {
       const jam = response.data;
       nav(`/jam/${jam.id}`);
-    } else {
-      alert('handle me failed to create jam');
+    } else if (response.error.status === 401) {
+      nav(`/login`)
+    }
+    else {
+      alert('Could not create jam');
     }
   };
 
@@ -68,19 +48,6 @@ export default function NewJam({
           }}
           className="flex flex-col gap-2 text-left"
         >
-          <div>
-            <div>
-              <label htmlFor="title">Title</label>
-            </div>
-            <input
-              className="w-full border border-black p-1"
-              type="text"
-              name="title"
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
           <div className="w-full">
             <div>Duration</div>
 

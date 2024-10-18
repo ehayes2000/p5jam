@@ -12,8 +12,9 @@ function Root() {
   const [isSideBar, setIsSideBar] = useState(true);
   const nav = useNavigate();
   const location = useLocation();
-  const { onLogin, onLogout } = useContext(LoginContext) as TLoginContext;
+  const { onLogin, onLogout, user } = useContext(LoginContext) as TLoginContext;
 
+  // get logged in user info
   useEffect(() => {
     (async () => {
       const { data: myId } = await client.api.login.myid.get();
@@ -71,7 +72,12 @@ function Root() {
             <button
               className="hover:cursor-pointer hover:text-gray-500"
               onClick={() => {
-                setPopup('create');
+                setPopup("closed")
+                if (!user) {
+                  nav("/login")
+                } else {
+                  setPopup('create');
+                }
                 if (location.pathname !== '/') nav('/');
               }}
             >

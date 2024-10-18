@@ -65,6 +65,19 @@ export type TPostCreateData = Omit<
 >;
 
 export async function create(data: TPostCreateData): Promise<TPost> {
+  if (data.jamId) {
+    const now = new Date();
+    const jam = await client.jam.findFirst({
+      where: {
+        id: data.jamId,
+      },
+      select: {
+        endTime: true,
+      },
+    });
+    if (!jam) throw new Error('Cannot post to nonexistent jam');
+    if (jam.endTime < now) throw new Error('Cannt post to expired jam');
+  }
   return await client.post.create({
     data: { ...data, id: uuid() },
     include: {

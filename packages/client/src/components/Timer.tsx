@@ -36,14 +36,14 @@ export default function Timer({ endTime }: { endTime: Date }) {
     return value < 10 ? `0${value}` : value
   }
   const TimeNumber = ({ n, s }: { n: number; s: string }) => (
-    <span className="text-2xl font-normal">
+    <span className="text-4xl font-light text-end w-30">
       {addLeadingZero(n)}
-      <span className="text-xs">{s}</span>
+      <span className="text-xs text-start content-end">{s}</span>
     </span>
   )
 
   return (
-    <div className="align-center flex gap-1 text-center text-4xl">
+    <div className="align-center grid grid-cols-3 gap-2 text-center text-4xl">
       <TimeNumber n={timeLeft.hours} s="H" />
       <TimeNumber n={timeLeft.minutes} s="M" />
       <TimeNumber n={timeLeft.seconds} s="S" />
