@@ -29,18 +29,18 @@ export const makeJamRoutes = (authPlugin: typeof auth) => {
     .use(authPlugin)
     .post(
       '/jams',
-      async ({ userId, body: { durationMs }, JamService }) => {
+      async ({ userId, body: { durationMs, title }, JamService }) => {
         const jam = await JamService.create({
           userId,
           durationMs,
-          title: 'unamed',
+          title: title?.trim() ?? '',
         });
         return jam;
       },
       {
         isSignIn: true,
         body: t.Object({
-          title: t.String(),
+          title: t.Optional(t.String()),
           durationMs: t.Integer(),
         }),
       },

@@ -43,7 +43,7 @@ export default function Timer({ endTime }: { endTime: Date }) {
   )
 
   return (
-    <div className="align-center grid grid-cols-3 gap-2 text-center text-4xl">
+    <div className="grid grid-cols-3 gap-2 text-center text-4xl">
       <TimeNumber n={timeLeft.hours} s="H" />
       <TimeNumber n={timeLeft.minutes} s="M" />
       <TimeNumber n={timeLeft.seconds} s="S" />

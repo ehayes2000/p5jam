@@ -7,6 +7,7 @@ export default function NewJam({
 }: {
   closeCallback: () => void;
 }) {
+  const [isTitle, setIsTitle] = useState(false)
   const [title, setTitle] = useState('');
   const [hours, setHours] = useState('');
   const [minutes, setMinutes] = useState('');
@@ -17,8 +18,8 @@ export default function NewJam({
     const durationMs =
       Number(hours) * 60 * 60 * 1000 + Number(minutes) * 60 * 1000;
     const response = await client.api.jams.post({
-      title,
       durationMs,
+      title: isTitle ? title : ""
     });
     if (response.data) {
       const jam = response.data;
@@ -84,6 +85,26 @@ export default function NewJam({
               />
             </div>
           </div>
+          <div className="flex gap-1 items-center">
+            Name
+            <input
+              className="
+                peer relative appearance-none shrink-0 w-4 h-4 border border-1 border-black 
+                checked:bg-blue-400 
+              "
+              type="checkbox"
+              onChange={(e) => setIsTitle(e.target.checked)}
+            />
+          </div>
+          <input
+            className={`${isTitle ? '' : 'hidden'} min-w-0 border border-black p-1`}
+            type="text"
+            name="Title"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            size={1}
+          />
         </form>
       </div>
       <div className="-mr-6 -mt-4 text-right">

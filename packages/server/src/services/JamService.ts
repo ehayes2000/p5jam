@@ -18,8 +18,6 @@ export default class JamService {
   constructor() {}
 
   async get(id: string): Promise<TJam | undefined> {
-    console.log('GET', id, await get({ id: id.toUpperCase() }));
-
     return (await get({ id: id.toUpperCase() }))[0];
   }
 

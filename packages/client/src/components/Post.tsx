@@ -3,6 +3,7 @@ import { useRef, useState, useEffect, useContext } from 'react'
 import { client, TPost } from '../client'
 import { LoginContext } from "../login"
 import Comments from './Comments'
+import JamTag from './JamTag'
 
 
 export function Sketch({ id }: { id: string }) {
@@ -69,7 +70,7 @@ export default function Post({
         <div className="flex justify-between">
           <h2 className=""> {p.author.name} </h2>
           {
-            showJam && p.jamId ? <Link to={`/jam/${p.jamId}`}> <i className="hover:bg-purple-400 tracking-widest border px-2"> {p.jamId} </i> </Link> : <></>
+            showJam && p.jamId ? <JamTag jamId={p.jamId} /> : <></>
           }
         </div>
         <Sketch id={p.id} />

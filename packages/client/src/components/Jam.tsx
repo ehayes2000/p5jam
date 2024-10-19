@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 import type { TJamPage } from "../types"
 import { useLoaderData } from "react-router-dom"
 import { useState } from 'react';
@@ -11,28 +12,37 @@ export default function Jam() {
     new Date(jam.endTime) <= new Date(),
   );
 
+
   return (
     <div className="">
-      <div className="grid grid-cols-2 justify-center gap-4 border-b border-black p-16 text-4xl font-bold">
-        <div className="justify-center flex text-center text-sm ">
-          <div className="flex gap-2 text-4xl text-black">
-            {Array.from(jam.id).map((c, i) => (
-              <div
-                key={i}
-                className="w-[3.2rem] border border-black py-1 text-center font-light"
-              >
-                {c}
+      <div className="flex flex-col justify-between border-b border-black p-8">
+        <div className={`w-full grid ${jam.title.trim() !== "" ? "grid-cols-3" : "grid-cols-2 "} gap-10 justify-end text-4xl font-bold `}>
+          <div>
+            <div className="justify-end flex ">
+              <div className="flex gap-2 text-4xl text-black ">
+                {Array.from(jam.id).map((c, i) => (
+                  <div
+                    key={i}
+                    className="w-[3.2rem] border border-black py-1 text-center font-light"
+                  >
+                    {c}
+                  </div>
+                ))}
               </div>
-            ))}
+              {isComplete || (
+                <h4 className="relative -translate-x-8 mt-10 h-0 w-0 -rotate-45 animate-oscillate text-amber-400">
+                  Join!
+                </h4>
+              )}
+            </div>
+            <div className="py-1 text-sm font-thin text-end"> created by: <Link className="font-bold" to={`/user/${jam.creator.name}`}> {jam.creator.name} </Link> </div>
           </div>
-          {isComplete || (
-            <h4 className="relative -ml-6 mt-12 h-0 w-0 -rotate-45 animate-oscillate text-amber-400">
-              Join!
-            </h4>
-          )}
-        </div>
-        <div className="align-center flex content-center items-center justify-center">
-          {isComplete ? <div> Jam Over </div> : <Timer endTime={jam.endTime} />}{' '}
+          <div className={`${jam.title === "" ? "hidden" : ""} text-4xl text-center `}>
+            {jam.title}
+          </div>
+          <div className="flex   justify-start ">
+            {isComplete ? <div> Jam Over </div> : <Timer endTime={jam.endTime} />}{' '}
+          </div>
         </div>
       </div>
       <div
