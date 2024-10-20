@@ -1,5 +1,5 @@
 import { useNavigate, Link } from 'react-router-dom'
-import { useRef, useState, useEffect, useContext } from 'react'
+import { type ReactNode, useRef, useState, useEffect, useContext } from 'react'
 import { client, TPost } from '../client'
 import { LoginContext } from "../login"
 import Comments from './Comments'
@@ -21,14 +21,16 @@ export function Sketch({ id }: { id: string }) {
 
 export default function Post({
   post: p,
-  deletePost: deleteCallback,
   showJam,
-  isComments
+  isComments,
+  deletePost: deleteCallback,
+  sketch
 }: {
   post: TPost
   deletePost?: () => void,
   showJam: boolean,
-  isComments?: boolean
+  isComments?: boolean,
+  sketch?: ReactNode
 }) {
   const [isLiked, setIsLiked] = useState<boolean>()
   const [openComments, setOpenComments] = useState<boolean>(isComments ?? false)
@@ -81,7 +83,9 @@ export default function Post({
             showJam && p.jamId ? <JamTag jamId={p.jamId} /> : <></>
           }
         </div>
-        <Sketch id={p.id} />
+        {sketch ??
+          <Sketch id={p.id} />}
+
         <div className="flex justify-between">
           <div className="flex justify-start gap-4">
             <span>

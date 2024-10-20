@@ -14,3 +14,5 @@ export interface TJamCollection {
   owner: TJam[];
   participant: TJam[];
 }
+
+export type Keybind = 'Vim' | 'Normal';

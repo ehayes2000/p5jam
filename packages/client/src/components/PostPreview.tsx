@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 export default function PostPreview({
   draft,
 }: {
-  draft: { description: string; script: string }
+  draft: { script: string }
 }) {
   const sizington = `
     var WINDOW_WIDTH = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
@@ -37,5 +37,5 @@ export default function PostPreview({
       URL.revokeObjectURL(blobUrl)
     }
   }, [blobUrl])
-  return <iframe src={blobUrl} width="360" height="360" scrolling="no"></iframe>
+  return <iframe src={blobUrl} width="360" height="360" scrolling="no" className="rounded-sm"></iframe>
 }

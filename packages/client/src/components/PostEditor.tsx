@@ -5,8 +5,7 @@ import CodeMirror, { EditorView, EditorState } from '@uiw/react-codemirror'
 import { vim } from '@replit/codemirror-vim'
 import { javascript } from '@codemirror/lang-javascript'
 import { githubLight } from '@uiw/codemirror-theme-github'
-
-type Keybind = 'Vim' | 'Normal'
+import type { Keybind } from "../types"
 
 const MAX_DESCRIPTION = 255
 
@@ -88,7 +87,7 @@ export default function PostEditor({
                 className={`h-[${editSize}] border-gray-400`}
               >
                 <div className="border">
-                  <PostPreview draft={{ script, description }} />
+                  <PostPreview draft={{ script }} />
                 </div>
               </div>
 
