@@ -1,5 +1,5 @@
 import { Elysia, Context, t } from 'elysia'
-import { auth } from '../githubAuth'
+import { auth, nonThrowingAuth } from '../githubAuth'
 import { create as createLike, deleteLike } from '../services/primitives/likes'
 import { create, get, update, deletePost } from '../services/primitives/posts'
 import {
@@ -18,7 +18,7 @@ function draw() {
   background(220);
 }` as const
 
-export const postMutators = (authPlugin: typeof auth) =>
+export const postAuthRoutes = (authPlugin: typeof auth) =>
   new Elysia()
     .use(authPlugin)
     // .guard({
@@ -137,10 +137,11 @@ export const postMutators = (authPlugin: typeof auth) =>
       },
       { isSignIn: true },
     )
+
 export const makePostRoutes = (authPlugin: typeof auth) =>
   new Elysia()
     .use(html())
-    .use(postMutators(authPlugin))
+    .use(postAuthRoutes(authPlugin))
     .get('/posts/featured', async ({ error }) => {
       // TODO real featured system
       const posts = await get({
@@ -165,15 +166,24 @@ export const makePostRoutes = (authPlugin: typeof auth) =>
         }),
       },
     )
-    .get('/posts/:id/script', async ({ params: { id }, error }) => {
-      const post = (await get({ data: { id } }))[0]
+    .use(nonThrowingAuth)
+    .get('/posts/:id', async ({ params: { id }, error, Auth }) => {
+      const post = (await get({ data: { id }, includeUnpublished: true }))[0]
       if (!post) return error(404)
-      return <ScriptTemplate script={post.script} />
+      if (Auth && Auth.userId === post.authorId)
+        return post
+      if (!post.published)
+        return error(404)
+      return post
     })
-    .get('/posts/:id', async ({ params: { id }, error }) => {
-      const posts = await get({ data: { id }, includeUnpublished: true })
-      if (!posts.length) return error(404)
-      return posts[0]
+    .get('/posts/:id/script', async ({ params: { id }, error, Auth }) => {
+      const post = (await get({ data: { id }, includeUnpublished: true }))[0]
+      if (!post) return error(404)
+      if (Auth && Auth.userId === post.authorId)
+        return <ScriptTemplate script={post.script} />
+      if (!post.published)
+        return error(404)
+      return <ScriptTemplate script={post.script} />
     })
 
 export const postsRoutes = makePostRoutes(auth)

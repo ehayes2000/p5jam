@@ -85,18 +85,6 @@ function Root() {
             </button>
           </div>
           <div className="flex flex-col items-end text-xl font-normal text-black">
-            {/* <Link
-              className="hover:cursor-pointer hover:text-gray-400"
-              to="explore"
-            >
-              Explore
-            </Link> */}
-            <Link
-              className="hover:cursor-pointer hover:text-gray-500"
-              to="jam/myJams"
-            >
-              My Jams
-            </Link>
             <Link
               className="hover:cursor-pointer hover:text-gray-500"
               to="profile"

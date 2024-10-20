@@ -1,3 +1,4 @@
+import { type TPost } from "../client"
 import { useState, useEffect } from 'react'
 import PostPreview from './PostPreview'
 import CodeMirror, { EditorView, EditorState } from '@uiw/react-codemirror'
@@ -28,7 +29,7 @@ export default function PostEditor({
     description: string
     script: string
   }) => void
-  post: { description: string; script: string }
+  post: TPost
 }) {
   const [script, setScript] = useState<string>(post.script)
   const [description, setDescription] = useState<string>("")
@@ -110,7 +111,7 @@ export default function PostEditor({
           <button
             type="button"
             onClick={() => { saveDraftCallback({ description, script }) }}
-            className="bg-yellow-400 px-2 hover:bg-yellow-600"
+            className={`${post.published ? "hidden" : ""} bg-yellow-400 px-2 hover:bg-yellow-600`}
           >
             Save Draft
           </button>
@@ -119,7 +120,7 @@ export default function PostEditor({
             onClick={() => { postCallback({ description, script }) }}
             className="px-2 bg-green-400 hover:bg-green-600"
           >
-            Post
+            {post.published ? "Update" : "Post"}
           </button>
         </div>
       </form>

@@ -12,8 +12,16 @@ export async function get(filters: {
   jamIds?: string[];
   authorNames?: string[];
   includeUnpublished?: boolean;
+  isUnpublished?: boolean;
 }): Promise<TPost[]> {
-  const { data, authorIds, jamIds, includeUnpublished, authorNames } = filters;
+  const {
+    data,
+    authorIds,
+    jamIds,
+    includeUnpublished,
+    authorNames,
+    isUnpublished,
+  } = filters;
   return await client.post.findMany({
     where: {
       ...data,
@@ -37,6 +45,7 @@ export async function get(filters: {
           }
         : {}),
       ...(includeUnpublished === true ? {} : { published: true }),
+      ...(isUnpublished === true ? { published: false } : {}),
     },
     include: {
       comments: {

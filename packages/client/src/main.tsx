@@ -17,7 +17,7 @@ import PostDetails from './pages/postDetails';
 import Root from './pages/root';
 import User from './pages/user';
 import Users from './pages/users';
-import type { TProfile, TJamPage } from "./types"
+import type { TProfile, TJamPage, TJamCollection } from "./types"
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'highlight.js/styles/default.min.css';
 import './index.css';
@@ -133,19 +133,6 @@ export const router = createBrowserRouter([
           return { jam: response.data, posts: posts }
         },
         element: <Jam />,
-      },
-      {
-        path: 'jam/myJams',
-        loader: async (): Promise<{ owner: TJam[]; participant: TJam[] }> => {
-          const response = await client.api.login.myid.get();
-          if (!response.data) throw redirect('/login');
-          const { data: jams } = await client.api.jams.get({
-            query: { userId: response.data.id },
-          });
-          if (!jams) return { owner: [], participant: [] }; // TODO
-          return jams;
-        },
-        element: <MyJams />,
       },
     ],
   },

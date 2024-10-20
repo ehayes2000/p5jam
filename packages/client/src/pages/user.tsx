@@ -1,17 +1,15 @@
+import { useContext } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import type { TProfile } from "../types"
-import PostCollection from "../components/PostCollection"
-export default function User() {
-  const { posts, user } = useLoaderData() as TProfile;
+import MyProfile from './myProfile';
+import UserProfile from './userProfile';
+import { LoginContext } from '../login';
 
-  return (
-    <div>
-      <div className="h-1/5 p-12 border-b border-black">
-        <h1 className="text-xl font-bold">
-          {user.name}
-        </h1>
-      </div>
-      <PostCollection posts={posts} showJam={true} />
-    </div>
-  );
+export default function User() {
+  const profile = useLoaderData() as TProfile;
+  const { user: me } = useContext(LoginContext)
+  if (me && me.id === profile.user.id) {
+    return <MyProfile profile={profile} />
+  }
+  return <UserProfile profile={profile} />
 }

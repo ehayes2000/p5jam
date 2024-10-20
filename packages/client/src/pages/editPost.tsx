@@ -34,7 +34,7 @@ function EditPost() {
   return (
     <div className='px-10 py-4 h-full'>
       <PostEditor
-        post={{ description: post.description, script: post.script }}
+        post={post}
         postCallback={postPost}
         saveDraftCallback={saveDraft}
       />

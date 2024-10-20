@@ -11,13 +11,11 @@ export default function Jam() {
   const [isComplete, _] = useState(
     new Date(jam.endTime) <= new Date(),
   );
-
-
   return (
     <div className="">
-      <div className="flex flex-col justify-between border-b border-black p-8">
-        <div className={`w-full grid ${jam.title.trim() !== "" ? "grid-cols-3" : "grid-cols-2 "} gap-10 justify-end text-4xl font-bold `}>
-          <div>
+      <div className="flex flex-col justify-between border-b border-black p-8 pb-6">
+        <div className={`w-full ${jam.title.trim() !== "" ? "grid grid-cols-5" : "grid grid-cols-4 justify-end "} gap-10 text-4xl font-bold `}>
+          <div className="col-span-2">
             <div className="justify-end flex ">
               <div className="flex gap-2 text-4xl text-black ">
                 {Array.from(jam.id).map((c, i) => (
@@ -35,12 +33,12 @@ export default function Jam() {
                 </h4>
               )}
             </div>
-            <div className="py-1 text-sm font-thin text-end"> created by: <Link className="font-bold" to={`/user/${jam.creator.name}`}> {jam.creator.name} </Link> </div>
+            <div className="py-2 text-sm font-thin text-end"> created by: <Link className="font-normal" to={`/user/${jam.creator.name}`}> {jam.creator.name} </Link> </div>
           </div>
           <div className={`${jam.title === "" ? "hidden" : ""} text-4xl text-center `}>
             {jam.title}
           </div>
-          <div className="flex   justify-start ">
+          <div className="flex justify-start col-span-2">
             {isComplete ? <div> Jam Over </div> : <Timer endTime={jam.endTime} />}{' '}
           </div>
         </div>

@@ -9,3 +9,8 @@ export interface TJamPage {
   jam: TJam;
   posts: TPost[];
 }
+
+export interface TJamCollection {
+  owner: TJam[];
+  participant: TJam[];
+}

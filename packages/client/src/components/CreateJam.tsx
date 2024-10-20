@@ -86,7 +86,7 @@ export default function NewJam({
             </div>
           </div>
           <div className="flex gap-1 items-center">
-            Name
+            Title
             <input
               className="
                 peer relative appearance-none shrink-0 w-4 h-4 border border-1 border-black 
