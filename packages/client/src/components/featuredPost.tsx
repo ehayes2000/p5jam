@@ -18,10 +18,16 @@ export default function HightlightedPost({ post: p }: { post: TPost }) {
   return (
     <>
       <Link
-        className="absolute right-0 top-0 z-50 p-2 text-sm hover:text-gray-500 font-thin"
+        className="absolute right-0 top-0 z-50 p-2 text-sm hover:text-gray-500 font-thin "
         to={`/user/${p.author.name}`}
       >
         {p.author.name}
+      </Link>
+      <Link
+        className="absolute right-0 top-5 z-50 p-2 text-sm hover:text-gray-500 font-thin "
+        to={`/posts/${p.id}`}
+      >
+        source
       </Link>
       <Sketch id={p.id} />
     </>

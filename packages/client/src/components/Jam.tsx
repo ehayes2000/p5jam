@@ -14,8 +14,8 @@ export default function Jam() {
   return (
     <div className="">
       <div className="flex flex-col justify-between border-b border-black p-8 pb-6">
-        <div className={`w-full ${jam.title.trim() !== "" ? "grid grid-cols-5" : "grid grid-cols-4 justify-end "} gap-10 text-4xl font-bold `}>
-          <div className="col-span-2">
+        <div className={`w-full ${jam.title && jam.title.trim() !== "" ? "grid grid-cols-[1fr,2fr,1fr]" : "grid grid-cols-2 justify-end "} gap-10 text-4xl font-bold `}>
+          <div className="w-full">
             <div className="justify-end flex ">
               <div className="flex gap-2 text-4xl text-black ">
                 {Array.from(jam.id).map((c, i) => (
@@ -38,7 +38,7 @@ export default function Jam() {
           <div className={`${jam.title === "" ? "hidden" : ""} text-4xl text-center `}>
             {jam.title}
           </div>
-          <div className="flex justify-start col-span-2">
+          <div className="flex justify-start ">
             {isComplete ? <div> Jam Over </div> : <Timer endTime={jam.endTime} />}{' '}
           </div>
         </div>

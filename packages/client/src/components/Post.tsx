@@ -13,20 +13,20 @@ export function Sketch({ id }: { id: string }) {
       width="360" // TODO
       height="360"
       scrolling="no" // TODO
-      className="rounded-sm"
+      className="rounded-sm "
       src={`${import.meta.env.VITE_API_BASE}/api/posts/${id}/script`}
-    ></iframe>
+    />
   )
 }
 
 export default function Post({
   post: p,
-  deletePost,
+  deletePost: deleteCallback,
   showJam,
   isComments
 }: {
   post: TPost
-  deletePost: () => void,
+  deletePost?: () => void,
   showJam: boolean,
   isComments?: boolean
 }) {
@@ -60,21 +60,28 @@ export default function Post({
   const editPost = () => nav(`/editPost/${p.id}`)
   const pref = useRef(null)
 
+  const deletePost = async () => {
+    if (confirm("Are you sure you want to delete this post?")) {
+      if (deleteCallback)
+        deleteCallback()
+      await client.api.posts({ id: p.id }).delete()
+    }
+  }
+
   return (
     <div
       ref={pref}
       key={p.id}
-      className="grid cursor-pointer content-center justify-center"
+      className="grid content-center justify-center "
     >
       <div className="border p-2 gap-1 grid">
         <div className="flex justify-between">
-          <h2 className=""> {p.author.name} </h2>
+          <Link to={`/user/${p.author.name}`}> {p.author.name} </Link>
           {
             showJam && p.jamId ? <JamTag jamId={p.jamId} /> : <></>
           }
         </div>
         <Sketch id={p.id} />
-        <div className=""> {p.description} </div>
         <div className="flex justify-between">
           <div className="flex justify-start gap-4">
             <span>
@@ -122,9 +129,13 @@ export default function Post({
               <div className="flex justify-end gap-2">
                 <button className="px-2 border hover:bg-red-400" onClick={deletePost}> delete </button>
                 <button className="px-2 border hover:bg-yellow-400" onClick={editPost}> edit </button>
-              </div> : <></>
+              </div> :
+              <div className="flex justify-end ">
+                <button className="px-2 border hover:bg-blue-400" onClick={
+                  () => nav(`/posts/${p.id}`)
+                }> source </button>
+              </div>
           }
-
         </div>
         {openComments ? (
           <div className="">
