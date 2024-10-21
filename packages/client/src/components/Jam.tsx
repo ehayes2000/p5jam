@@ -1,8 +1,7 @@
-import { type TPost } from "../client"
 import { Link } from "react-router-dom"
 import type { TJamPage } from "../types"
 import { useLoaderData } from "react-router-dom"
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { JamPostCollection } from './PostCollection';
 import Timer from './Timer';
 import CreateSketch from "./CreateSketch";

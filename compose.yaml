@@ -1,17 +1,22 @@
 services:
-  web:
+  proxy:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.proxy
+    ports:
+      - '8080:80'
+      - '8443:443'
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
     ports:
       - '3000:3000'
     volumes:
       - prod-db:/app/data
+    env_file:
+      - 'packages/server/.env.production'
     restart: unless-stopped
-    environment:
-      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:?GITHUB_CLIENT_ID is required}
-      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:?GITHUB_CLIENT_SECRET is required}
-      DATABASE_URL: ${DATABASE_URL:-file:./dev.db} #
 volumes:
   prod-db:
     driver: local

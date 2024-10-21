@@ -29,7 +29,11 @@ export const lucia = new Lucia(adapter, {
   },
 });
 
-if (!process.env.GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET)
+if (
+  !process.env.GITHUB_CLIENT_ID ||
+  !process.env.GITHUB_CLIENT_SECRET ||
+  !process.env.CLIENT_SERVER
+)
   throw new Error(
     'undefined environment variables GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET',
   );

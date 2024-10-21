@@ -6,18 +6,17 @@ import {
 } from 'react-router-dom';
 import { PopupProvider } from './state';
 import { LoginContextProvider } from './login';
-import { client, type TJam, type TPost, type TUser } from './client';
+import { client, type TPost, type TUser } from './client';
 import EditPost from './pages/editPost';
 import ErrorPage from './pages/errorPage';
 import Home from './pages/home';
 import Jam from './components/Jam';
-import MyJams from './pages/myJams';
 import LoginPage from './pages/login';
 import PostDetails from './pages/postDetails';
 import Root from './pages/root';
 import User from './pages/user';
 import Users from './pages/users';
-import type { TProfile, TJamPage, TJamCollection } from "./types"
+import type { TProfile, TJamPage } from "./types"
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'highlight.js/styles/default.min.css';
 import './index.css';

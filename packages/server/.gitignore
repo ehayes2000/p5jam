@@ -4,3 +4,7 @@ src/generated/
 .env
 *.db
 .DS_Store
+.env.development
+.env.production
+.env.test
+

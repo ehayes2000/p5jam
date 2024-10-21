@@ -1,0 +1,8 @@
+FROM oven/bun:1 AS build
+COPY --from=node:20-slim /usr/local/bin/node /usr/local/bin/node
+
+COPY packages/server /app/packages/server
+WORKDIR /app/packages/server
+
+RUN bun i && bun run build
+ENTRYPOINT [ "bun", "run", "start:prod" ]

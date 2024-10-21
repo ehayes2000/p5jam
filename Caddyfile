@@ -1,0 +1,24 @@
+localhost {
+    handle /api/* {
+        reverse_proxy api:3000 {
+            header_up Host {upstream_hostport}
+            header_up X-Real-IP {remote_host}
+        }
+    }
+
+    handle /ws/* { 
+      reverse_proxy api:3000
+    }
+
+    handle { 
+      file_server 
+      root * /app/client/ 
+      try_files {path} /index.html
+    }
+
+    log { 
+      output stderr
+      level DEBUG
+      format console
+    }
+}

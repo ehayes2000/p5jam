@@ -1,13 +1,12 @@
 import { type TPost } from "../client"
 import { useState, useEffect } from 'react'
 import PostPreview from './PostPreview'
-import CodeMirror, { EditorView, EditorState } from '@uiw/react-codemirror'
+import CodeMirror from '@uiw/react-codemirror'
 import { vim } from '@replit/codemirror-vim'
 import { javascript } from '@codemirror/lang-javascript'
 import { githubLight } from '@uiw/codemirror-theme-github'
 import type { Keybind } from "../types"
 
-const MAX_DESCRIPTION = 255
 
 export default function PostEditor({
   post,
@@ -31,7 +30,7 @@ export default function PostEditor({
   post: TPost
 }) {
   const [script, setScript] = useState<string>(post.script)
-  const [description, setDescription] = useState<string>("")
+  const [description, _] = useState<string>("")
   const [keybind, setKeyBind] = useState<Keybind>(() => {
     const savedKeybind = localStorage.getItem('keybind')
     return (savedKeybind as Keybind) || 'Normal'
@@ -41,24 +40,6 @@ export default function PostEditor({
     localStorage.setItem('keybind', keybind)
   }, [keybind])
 
-  const characterLimitExtension = EditorState.transactionFilter.of((tr) => {
-    const newContent = tr.newDoc.sliceString(0)
-    if (newContent.length <= MAX_DESCRIPTION) {
-      return tr
-    }
-    return []
-  })
-
-  const descriptionExtensions = [
-    EditorView.lineWrapping,
-    EditorView.theme({
-      '&': { height: '150px' },
-      '.cm-gutters': { display: 'none' },
-      '.cm-lineNumbers': { display: 'none' },
-    }),
-    characterLimitExtension,
-    ...(keybind === 'Vim' ? [vim()] : []),
-  ]
   let editSize = '550px'
   return (
     <div className="w-full gap-1 h-full">

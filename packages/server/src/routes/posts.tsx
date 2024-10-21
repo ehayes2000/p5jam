@@ -146,7 +146,7 @@ export const makePostRoutes = (authPlugin: typeof auth) =>
     .get('/posts/featured', async ({ error }) => {
       // TODO real featured system
       const posts = await get({
-        authorIds: ['0665a608-a67c-4264-93b0-143fa8c92389'],
+        authorNames: ["ehayes2000"]
       })
       if (!posts.length) return error(404)
       return posts[posts.length - 1]

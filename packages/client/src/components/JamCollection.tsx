@@ -9,7 +9,6 @@ export default function JamCollection(props: { jams: TJamCollection }) {
   const { jams } = props
   const { user } = useContext(LoginContext)
   const combinedView = [...jams.owner, ...jams.participant]
-  const now = new Date();
   combinedView.sort((a, b) => {
     let at = new Date(b.startTime);
     let bt = new Date(a.startTime);

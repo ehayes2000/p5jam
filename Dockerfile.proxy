@@ -1,0 +1,13 @@
+FROM oven/bun:1 AS build
+COPY --from=node:20-slim /usr/local/bin/node /usr/local/bin/node
+
+COPY . /app/
+WORKDIR /app/
+
+RUN bun i --frozen-lockfile \
+  && (cd packages/server && bun run build) \
+  && (cd packages/client && bun run build) 
+
+FROM caddy AS proxy
+COPY --from=build /app/packages/client/dist /app/client/
+COPY Caddyfile /etc/caddy/Caddyfile
