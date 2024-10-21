@@ -21,13 +21,6 @@ function draw() {
 export const postAuthRoutes = (authPlugin: typeof auth) =>
   new Elysia()
     .use(authPlugin)
-    // .guard({
-    //   // response: { // breaks type inference :)
-    //   //   401: t.String(),
-    //   //   404: t.String(),
-    //   //   200: t.
-    //   // },
-    // })
     .post(
       '/posts', // TODO "posts"
       async ({ userId, body }) => {
@@ -47,10 +40,14 @@ export const postAuthRoutes = (authPlugin: typeof auth) =>
     )
     .delete(
       '/posts/:id',
-      async ({ userId, error, params: { id } }) => {
+      async ({ userId, error, params: { id }, server }) => {
+        const post = (await get({ data: { id } }))[0]
         const isDeleted = await deletePost({ authorId: userId, id })
-        if (isDeleted)
+        if (isDeleted) {
+          if (post.jamId)
+            server?.publish(`jam-${post.jamId}`, JSON.stringify({ remove: [id] }))
           return
+        }
         else return error(404, "Not Found")
       },
       {
@@ -59,7 +56,7 @@ export const postAuthRoutes = (authPlugin: typeof auth) =>
     )
     .put(
       '/posts/:id',
-      async ({ userId, error, body, params: { id } }) => {
+      async ({ userId, error, body, params: { id }, server }) => {
         try {
           const post = await update({
             id,
@@ -67,7 +64,11 @@ export const postAuthRoutes = (authPlugin: typeof auth) =>
             description: body.description,
             script: body.script,
             published: body.published,
+            updatedAt: new Date()
           })
+          if (post.jamId) {
+            server?.publish(`jam-${post.jamId}`, JSON.stringify({ add: [post] }))
+          }
           return post
         } catch (e) {
           return error(404, 'Post not found')

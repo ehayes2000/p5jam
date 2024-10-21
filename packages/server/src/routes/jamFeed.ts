@@ -8,8 +8,7 @@ export const jamFeed = new Elysia().ws('/ws/jam', {
   async open(ws) {
     const { jamId } = ws.data.query;
     const posts = await get({ jamIds: [jamId] });
-    console.log('SEND POSTS', posts);
-    ws.send(posts);
-    ws.subscribe(jamId);
+    ws.send({ add: posts });
+    ws.subscribe(`jam-${jamId}`);
   },
 });
