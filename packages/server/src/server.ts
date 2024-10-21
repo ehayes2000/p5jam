@@ -6,6 +6,7 @@ import jamRoutes from './routes/jams';
 import { loginRoutes } from './routes/login';
 import { postsRoutes } from './routes/posts';
 import { userRoutes } from './routes/users';
+import { jamFeed } from './routes/jamFeed';
 
 export const api = new Elysia({ prefix: '/api' })
   .guard({
@@ -22,7 +23,7 @@ export const api = new Elysia({ prefix: '/api' })
   .use(userRoutes)
   .use(jamRoutes());
 
-const app = new Elysia().use(api).use(swagger());
+const app = new Elysia().use(jamFeed).use(api).use(swagger());
 
 if (process.env.NODE_ENV !== 'development') {
   app

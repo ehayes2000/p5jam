@@ -4,6 +4,7 @@ import type { TPost } from "../client"
 
 export default function PostCollection(props: { posts: TPost[], showJam?: boolean }) {
   const [posts, setPosts] = useState<TPost[]>(props.posts)
+  console.log("COLLECT", posts)
   const deleteCallback = (id: string) => {
     return () => {
       setPosts(p => p.filter(post => post.id !== id))
