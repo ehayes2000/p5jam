@@ -1,4 +1,4 @@
-localhost {
+codejam.space {
     handle /api/* {
         reverse_proxy api:3000 {
             header_up Host {upstream_hostport}

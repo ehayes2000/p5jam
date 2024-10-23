@@ -4,14 +4,13 @@ services:
       context: .
       dockerfile: Dockerfile.proxy
     ports:
-      - '8080:80'
-      - '8443:443'
+      - '443:443'
   api:
     build:
       context: .
       dockerfile: Dockerfile.api
     ports:
-      - '3000:3000'
+      - '127.0.0.1:3000:3000'
     volumes:
       - prod-db:/app/data
     env_file:
