@@ -1,10 +1,10 @@
 // import { useSelector } from '@xstate/store/react';
 import { TLoginContext, LoginContext } from '../login';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Logo from "../assets/logo.png"
+import { client } from "../client"
 // import { useMyID } from '../queries/queryClient';
-import { client } from '../client';
 import { PopupContext } from '../state';
 
 function Root() {
@@ -12,8 +12,7 @@ function Root() {
   const [isSideBar, setIsSideBar] = useState(true);
   const nav = useNavigate();
   const location = useLocation();
-  const { onLogin, onLogout, user } = useContext(LoginContext) as TLoginContext;
-
+  const { user, onLogin, onLogout } = useContext(LoginContext) as TLoginContext;
   // get logged in user info
   useEffect(() => {
     (async () => {
@@ -33,7 +32,7 @@ function Root() {
   }, [])
 
   return (
-    <div className="grid h-full w-full grid-flow-col grid-cols-5 ">
+    <div className="grid h-full w-full grid-flow-col grid-cols-5">
       <div
         className={`${isSideBar ? 'hidden' : ''} absolute z-50  p-1 text-xl text-black hover:text-gray-500`}
       >
@@ -86,10 +85,17 @@ function Root() {
           <div className="flex flex-col items-end text-xl font-normal text-black">
             <Link
               className="hover:cursor-pointer hover:text-gray-500"
+              to="explore"
+            >
+              Explore
+            </Link>
+            <Link
+              className="hover:cursor-pointer hover:text-gray-500"
               to="profile"
             >
               Profile
             </Link>
+
             <Link
               className="hover:cursor-pointer hover:text-gray-500"
               to="users"
@@ -98,7 +104,7 @@ function Root() {
             </Link>
           </div>
         </div>
-        <a className="font-thin text-sm text-gray-400 absolute bottom-0 right-0 p-4" href="https://ehayes.page">
+        <a className="font-thin text-gray-400 absolute bottom-0 right-0 p-4" href="https://ehayes.page">
           Hire Me
         </a>
       </div>

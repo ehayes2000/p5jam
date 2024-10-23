@@ -2,6 +2,8 @@ import type { TPost, TComment, TLike } from './types';
 import { v4 as uuid } from 'uuid';
 import client, { type Prisma } from '../../prisma';
 
+const PAGE_SIZE = 100;
+
 export type TPostData = Partial<
   NonNullable<Awaited<ReturnType<typeof client.post.findFirst>>>
 >;
@@ -13,6 +15,7 @@ export async function get(filters: {
   authorNames?: string[];
   includeUnpublished?: boolean;
   isUnpublished?: boolean;
+  offset?: number;
 }): Promise<TPost[]> {
   const {
     data,
@@ -21,6 +24,7 @@ export async function get(filters: {
     includeUnpublished,
     authorNames,
     isUnpublished,
+    offset,
   } = filters;
   return await client.post.findMany({
     where: {
@@ -47,6 +51,7 @@ export async function get(filters: {
       ...(includeUnpublished === true ? {} : { published: true }),
       ...(isUnpublished === true ? { published: false } : {}),
     },
+    ...(offset ? { skip: offset, take: PAGE_SIZE } : {}),
     include: {
       comments: {
         include: {

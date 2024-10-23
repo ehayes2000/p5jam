@@ -4,6 +4,7 @@ import {
   RouterProvider,
   redirect,
 } from 'react-router-dom';
+import ExplorePage from './pages/explorePage';
 import { PopupProvider } from './state';
 import { LoginContextProvider } from './login';
 import { client, type TPost, type TUser } from './client';
@@ -133,6 +134,16 @@ export const router = createBrowserRouter([
         },
         element: <Jam />,
       },
+      {
+        path: 'explore',
+        loader: async () => {
+          const { data: posts } = await client.api.posts.explore.get()
+          if (!posts)
+            return []
+          return posts
+        },
+        element: <ExplorePage />
+      }
     ],
   },
 ]);

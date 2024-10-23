@@ -152,6 +152,13 @@ export const makePostRoutes = (authPlugin: typeof auth) =>
       return posts[posts.length - 1]
     })
     .get(
+      '/posts/explore',
+      async ({
+      }) => {
+        return await get({ offset: 0 })
+      }, {
+    })
+    .get(
       '/posts',
       async ({ query: { userId, jamId, userName }, error }) => {
         if (userName) return await get({ authorNames: [userName] })
