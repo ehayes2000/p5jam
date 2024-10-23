@@ -3,6 +3,7 @@ import type { TPost } from "../client"
 import type { TProfile, TJamCollection } from "../types"
 import PostCollection from "../components/PostCollection"
 import JamCollection from "../components/JamCollection"
+import CreateSketch from "../components/CreateSketch"
 import { client } from "../client"
 
 
@@ -35,10 +36,11 @@ export default function MyProfile(props: { profile: TProfile }) {
   return (
     <div>
       <div className="border-b border-black px-12">
-        <div className={`h-1/5 py-12`}>
+        <div className={`h-1/5 py-12 flex flex-row justify-between`}>
           <h1 className={`text-xl font-bold`}>
             {user.name}
           </h1>
+          <CreateSketch />
         </div>
         <div className="grid grid-cols-3 justify-around w-1/5 border-black border-b-0 border divide-black divide-x">
           <button className={`${activeTab === "posts" ? "bg-gray-200" : ""}`}

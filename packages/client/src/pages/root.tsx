@@ -42,24 +42,23 @@ function Root() {
         </button>
       </div>
       <div
-        className={`z-50 bg-white ${isSideBar ? '' : 'hidden'} fixed bottom-0 flex h-full w-full border-r border-black p-4 font-bold sm:relative sm:flex-col sm:justify-start`}
+        className={`z-50 bg-white ${isSideBar ? '' : 'hidden'} fixed flex h-full w-full border-r border-black p-4 font-bold sm:relative sm:flex-col`}
       >
         <div
-          className={`content-end text-right text-xl text-black hover:text-gray-500`}
+          className={`absolute right-4 content-end text-right text-xl text-black hover:text-gray-500`}
         >
           <button onClick={() => setIsSideBar(false)}>
             <i className="bi bi-x-lg text-black hover:text-gray-500"></i>
           </button>
         </div>
-        {/* <link rel="icon" type="image/svg+xml" href="/logo.svg" /> */}
-        <div className="flex h-full flex-col justify-start pt-16">
-          <div className="flex justify-end w-full mb-4">
-            <img src={Logo} width={200} className="hover:cursor-pointer" onClick={() => {
-              setPopup("closed")
-              nav("/")
-            }} />
-          </div>
-          <div className="flex flex-col items-end text-2xl">
+        <div className="flex h-full flex-col justify-center pt-16">
+          <div className="flex flex-col items-end text-2xl relative">
+            <div className="flex justify-end w-full mb-4 absolute left-0 top-0 -mt-[180px]">
+              <img src={Logo} width={200} className="hover:cursor-pointer top-0" onClick={() => {
+                setPopup("closed")
+                nav("/")
+              }} />
+            </div>
             <button
               className="hover:cursor-pointer hover:text-gray-500"
               onClick={() => {
@@ -99,9 +98,13 @@ function Root() {
             </Link>
           </div>
         </div>
+        <a className="font-thin text-sm text-gray-400 absolute bottom-0 right-0 p-4" href="https://ehayes.page">
+          Hire Me
+        </a>
       </div>
       <div
         className={`${isSideBar ? 'col-span-4' : 'col-span-full'} g-amber-400 h-full w-full  overflow-y-auto`}
+
       >
         <Outlet />
       </div>
